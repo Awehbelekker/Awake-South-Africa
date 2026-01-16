@@ -55,9 +55,9 @@ export default function Header() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-full border border-white/30 p-0.5 overflow-hidden">
+            <div className="relative w-14 h-14 rounded-full border border-white/30 p-0.5 overflow-hidden">
               <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-awake-black">
-                <Image src={AWAKE_IMAGES.logo} alt="Awake SA" width={32} height={32} className="object-contain" />
+                <Image src={AWAKE_IMAGES.logo} alt="Awake SA" width={48} height={48} className="object-contain" />
               </div>
             </div>
             <div className="flex flex-col">
