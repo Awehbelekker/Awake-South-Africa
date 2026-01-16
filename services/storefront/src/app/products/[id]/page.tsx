@@ -2,8 +2,8 @@
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { PRODUCTS } from "@/lib/constants";
-import { useCartStore } from "@/lib/store/cart";
-import { useWishlistStore } from "@/lib/store/wishlist";
+import { useCartStore } from "@/store/cart";
+import { useWishlistStore } from "@/store/wishlist";
 
 export default function ProductDetailPage() {
   const params = useParams();

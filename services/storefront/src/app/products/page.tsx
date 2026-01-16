@@ -8,18 +8,18 @@ import { PRODUCTS } from '@/lib/constants'
 import { useCartStore } from '@/store/cart'
 import { useWishlistStore } from '@/store/wishlist'
 
-// Flatten all products into a single array with category tags
+// Flatten all products into a single array
 const allProducts = [
-  ...PRODUCTS.jetboards.map(p => ({ ...p, categoryTag: 'Jetboards' })),
-  ...PRODUCTS.limitedEdition.map(p => ({ ...p, categoryTag: 'Limited Edition' })),
-  ...PRODUCTS.efoils.map(p => ({ ...p, categoryTag: 'eFoils' })),
-  ...PRODUCTS.batteries.map(p => ({ ...p, categoryTag: 'Batteries' })),
-  ...PRODUCTS.wings.map(p => ({ ...p, categoryTag: 'Wings' })),
-  ...PRODUCTS.bags.map(p => ({ ...p, categoryTag: 'Bags' })),
-  ...PRODUCTS.safetyStorage.map(p => ({ ...p, categoryTag: 'Safety' })),
-  ...PRODUCTS.electronics.map(p => ({ ...p, categoryTag: 'Electronics' })),
-  ...PRODUCTS.parts.map(p => ({ ...p, categoryTag: 'Parts' })),
-  ...PRODUCTS.apparel.map(p => ({ ...p, categoryTag: 'Apparel' })),
+  ...PRODUCTS.jetboards,
+  ...PRODUCTS.limitedEdition,
+  ...PRODUCTS.efoils,
+  ...PRODUCTS.batteries,
+  ...PRODUCTS.wings,
+  ...PRODUCTS.bags,
+  ...PRODUCTS.safetyStorage,
+  ...PRODUCTS.electronics,
+  ...PRODUCTS.parts,
+  ...PRODUCTS.apparel,
 ]
 
 function ProductsContent() {
@@ -32,14 +32,18 @@ function ProductsContent() {
   const filteredProducts = selectedCategory === 'all' 
     ? allProducts 
     : selectedCategory === 'jetboards' 
-      ? [...PRODUCTS.jetboards.map(p => ({ ...p, categoryTag: 'Jetboards' })), ...PRODUCTS.limitedEdition.map(p => ({ ...p, categoryTag: 'Limited Edition' }))]
+      ? [...PRODUCTS.jetboards, ...PRODUCTS.limitedEdition]
       : selectedCategory === 'efoils'
-        ? PRODUCTS.efoils.map(p => ({ ...p, categoryTag: 'eFoils' }))
+        ? PRODUCTS.efoils
         : selectedCategory === 'batteries'
-          ? PRODUCTS.batteries.map(p => ({ ...p, categoryTag: 'Batteries' }))
+          ? PRODUCTS.batteries
           : selectedCategory === 'wings'
-            ? PRODUCTS.wings.map(p => ({ ...p, categoryTag: 'Wings' }))
-            : allProducts.filter(p => p.category === selectedCategory)
+            ? PRODUCTS.wings
+            : selectedCategory === 'accessories'
+              ? [...PRODUCTS.bags, ...PRODUCTS.safetyStorage, ...PRODUCTS.electronics, ...PRODUCTS.parts]
+              : selectedCategory === 'apparel'
+                ? PRODUCTS.apparel
+                : allProducts.filter(p => p.category === selectedCategory);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-ZA', {

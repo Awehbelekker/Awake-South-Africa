@@ -241,16 +241,12 @@ export const PRODUCTS = {
       specs: ["Max Speed: 45 km/h", "Battery: 65 min ride time", "Advanced control", "Carbon construction"],
       features: ["Maximum speed", "Precision foiling", "Competition ready"],
     },
-      battery: "XR 4 (65 min)",
-      description: "Top-spec eFoil with ultimate performance",
-      specs: ["Max Speed: 45 km/h", "Battery: 65 min ride time", "Advanced control", "Carbon construction"],
-      features: ["Maximum speed", "Precision foiling", "Competition ready"],
-    },
   ],
 
   // 🔋 BATTERIES (0% Duty)
   batteries: [
     { 
+      categoryTag: "Battery",
       id: "flex-battery-lr4", 
       name: "Flex Battery LR 4", 
       price: 78765, 
@@ -261,6 +257,7 @@ export const PRODUCTS = {
       specs: ["90 min runtime", "Quick swap design", "LED indicators"],
     },
     { 
+      categoryTag: "Battery",
       id: "flex-battery-xr4", 
       name: "Flex Battery XR 4", 
       price: 121918, 
