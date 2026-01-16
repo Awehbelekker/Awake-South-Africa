@@ -77,8 +77,8 @@ export const SA_CONTENT = {
   contact: {
     email: "info@awakesa.co.za",
     supportEmail: "awakesa-dot-co-dot-za@d5641ff5-d501-4a95-b7a6-c463d7eb55dc.mail.conversations.godaddy.com",
-    phone: "+27 XXX XXX XXXX",
-    whatsapp: "+27 XXX XXX XXXX",
+    phone: "+27 64 575 5210",
+    whatsapp: "+27 64 575 5210",
   },
   address: {
     city: "Cape Town",

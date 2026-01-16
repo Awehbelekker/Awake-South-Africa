@@ -24,8 +24,8 @@ interface AdminStore {
 const DEFAULT_SETTINGS: StoreSettings = {
   storeName: 'Awake SA',
   email: 'info@awakesa.co.za',
-  phone: '+27 XXX XXX XXXX',
-  whatsapp: '+27 XXX XXX XXXX',
+  phone: '+27 64 575 5210',
+  whatsapp: '+27 64 575 5210',
   currency: 'ZAR',
   taxRate: 0.15,
   exchangeRate: 19.85,

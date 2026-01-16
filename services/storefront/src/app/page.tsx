@@ -9,8 +9,8 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <Image src={AWAKE_IMAGES.brabus.shadowExplore} alt="Awake Electric Surfboard" fill className="object-cover opacity-40" priority />
-          <div className="absolute inset-0 bg-gradient-to-b from-awake-black/80 via-awake-black/50 to-awake-black" />
+          <Image src={AWAKE_IMAGES.brabus.shadowExplore} alt="Awake Electric Surfboard" fill className="object-cover opacity-60" priority />
+          <div className="absolute inset-0 bg-gradient-to-b from-awake-black/60 via-awake-black/30 to-awake-black/80" />
         </div>
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-primary/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" />
