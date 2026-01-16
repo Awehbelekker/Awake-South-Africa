@@ -14,6 +14,7 @@ const allProducts = [
   ...PRODUCTS.limitedEdition,
   ...PRODUCTS.efoils,
   ...PRODUCTS.batteries,
+  ...PRODUCTS.boardsOnly,
   ...PRODUCTS.wings,
   ...PRODUCTS.bags,
   ...PRODUCTS.safetyStorage,
