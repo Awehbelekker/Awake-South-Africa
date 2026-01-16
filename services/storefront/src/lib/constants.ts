@@ -106,13 +106,13 @@ export const SA_CONTENT = {
   ],
   demo: {
     locations: [
-      { name: "Langebaan", area: "West Coast", image: "https://awakeboards.com/cdn/shop/files/accessory-ladies_4.png?v=1752224160" },
-      { name: "Melkbosstrand", area: "Cape Town", image: "https://awakeboards.com/cdn/shop/files/Ravik_ADVENTURE-22_1_1.png?v=1752232151" },
-      { name: "Eden on the Bay", area: "Cape Town", image: "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150" },
-      { name: "MAC Club", area: "Milnerton", image: "https://awakeboards.com/cdn/shop/files/BRABUSx3.png?v=1754380085" },
-      { name: "V&A Waterfront", area: "Cape Town", image: "https://awakeboards.com/cdn/shop/files/accessory-ladies_4.png?v=1752224160" },
-      { name: "Clifton Beach", area: "Atlantic Seaboard", image: "https://awakeboards.com/cdn/shop/files/Ravik_ADVENTURE-22_1_1.png?v=1752232151" },
-      { name: "Llandudno Beach", area: "Atlantic Seaboard", image: "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150" },
+      { name: "Langebaan", area: "West Coast" },
+      { name: "Melkbosstrand", area: "Cape Town" },
+      { name: "Eden on the Bay", area: "Cape Town" },
+      { name: "MAC Club", area: "Milnerton" },
+      { name: "V&A Waterfront", area: "Cape Town" },
+      { name: "Clifton Beach", area: "Atlantic Seaboard" },
+      { name: "Llandudno Beach", area: "Atlantic Seaboard" },
     ],
   },
   pricing: {
