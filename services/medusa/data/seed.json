@@ -1,0 +1,434 @@
+{
+  "store": {
+    "currencies": [
+      {
+        "code": "ZAR",
+        "symbol": "R",
+        "symbol_native": "R",
+        "name": "South African Rand"
+      }
+    ],
+    "default_currency_code": "ZAR",
+    "swap_link_template": "https://awakesa.co.za/products/{handle}"
+  },
+  "users": [
+    {
+      "email": "admin@awakesa.co.za",
+      "password": "awake2026admin",
+      "role": "admin"
+    }
+  ],
+  "regions": [
+    {
+      "name": "South Africa",
+      "currency_code": "ZAR",
+      "tax_rate": 15,
+      "payment_providers": [
+        {
+          "id": "manual"
+        }
+      ],
+      "fulfillment_providers": [
+        {
+          "id": "manual"
+        }
+      ],
+      "countries": ["ZA"]
+    }
+  ],
+  "products": [
+    {
+      "title": "RÄVIK Explore XR 4",
+      "subtitle": "Entry-level electric jetboard",
+      "description": "Entry-level electric jetboard with impressive performance. Perfect for beginners and families.",
+      "handle": "ravik-explore-xr4",
+      "is_giftcard": false,
+      "weight": 32000,
+      "metadata": {
+        "costEUR": 5950,
+        "exchangeRate": 19.85,
+        "category": "jetboards",
+        "categoryTag": "Jetboard",
+        "skillLevel": "Beginner",
+        "battery": "XR 4 (65 min)",
+        "specs": ["Max Speed: 50 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Carbon composite construction"],
+        "features": ["Intuitive hand controller", "Quick battery swap", "Durable construction"]
+      },
+      "images": [
+        "https://awakeboards.com/cdn/shop/files/Ravik_ADVENTURE-22_1_1.png?v=1752232151"
+      ],
+      "options": [
+        {
+          "title": "Configuration"
+        }
+      ],
+      "variants": [
+        {
+          "title": "Standard",
+          "sku": "RAVIK-EXPLORE-XR4",
+          "prices": [
+            {
+              "amount": 24113900,
+              "currency_code": "ZAR"
+            }
+          ],
+          "options": [
+            {
+              "value": "Standard"
+            }
+          ],
+          "inventory_quantity": 5,
+          "metadata": {
+            "costEUR": 5950,
+            "priceExVAT": 209686,
+            "costZAR": 118108
+          }
+        }
+      ]
+    },
+    {
+      "title": "RÄVIK Adventure XR 4",
+      "subtitle": "Mid-range performance jetboard",
+      "description": "Mid-range performance jetboard for enthusiasts. Perfect balance of power and versatility for expedition rides.",
+      "handle": "ravik-adventure-xr4",
+      "is_giftcard": false,
+      "weight": 32000,
+      "metadata": {
+        "costEUR": 8450,
+        "exchangeRate": 19.85,
+        "category": "jetboards",
+        "categoryTag": "Jetboard",
+        "skillLevel": "Intermediate",
+        "battery": "XR 4 (65 min)",
+        "specs": ["Max Speed: 55 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Advanced motor system"],
+        "features": ["Enhanced power delivery", "Premium build quality", "Extended range"]
+      },
+      "images": [
+        "https://awakeboards.com/cdn/shop/files/Ravik_ADVENTURE-22_1_1.png?v=1752232151"
+      ],
+      "options": [
+        {
+          "title": "Configuration"
+        }
+      ],
+      "variants": [
+        {
+          "title": "Standard",
+          "sku": "RAVIK-ADVENTURE-XR4",
+          "prices": [
+            {
+              "amount": 34902400,
+              "currency_code": "ZAR"
+            }
+          ],
+          "options": [
+            {
+              "value": "Standard"
+            }
+          ],
+          "inventory_quantity": 5,
+          "metadata": {
+            "costEUR": 8450,
+            "priceExVAT": 303499,
+            "costZAR": 167733
+          }
+        }
+      ]
+    },
+    {
+      "title": "RÄVIK Ultimate XR 4",
+      "subtitle": "Top-tier performance electric jetboard",
+      "description": "Top-tier performance electric jetboard. Engineered for experienced riders who demand peak performance and agility.",
+      "handle": "ravik-ultimate-xr4",
+      "is_giftcard": false,
+      "weight": 32000,
+      "metadata": {
+        "costEUR": 9750,
+        "exchangeRate": 19.85,
+        "category": "jetboards",
+        "categoryTag": "Jetboard",
+        "skillLevel": "Expert",
+        "battery": "XR 4 (65 min)",
+        "specs": ["Max Speed: 60 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Pro-level performance"],
+        "features": ["Maximum acceleration", "Carbon fiber components", "Competition ready"]
+      },
+      "images": [
+        "https://awakeboards.com/cdn/shop/files/Ravik_ADVENTURE-22_1_1.png?v=1752232151"
+      ],
+      "options": [
+        {
+          "title": "Configuration"
+        }
+      ],
+      "variants": [
+        {
+          "title": "Standard",
+          "sku": "RAVIK-ULTIMATE-XR4",
+          "prices": [
+            {
+              "amount": 40296700,
+              "currency_code": "ZAR"
+            }
+          ],
+          "options": [
+            {
+              "value": "Standard"
+            }
+          ],
+          "inventory_quantity": 3,
+          "metadata": {
+            "costEUR": 9750,
+            "priceExVAT": 350406,
+            "costZAR": 193538
+          }
+        }
+      ]
+    },
+    {
+      "title": "BRABUS Shadow",
+      "subtitle": "Limited Edition - One of 77",
+      "description": "Exclusive BRABUS collaboration - luxury meets performance. One of 77 limited edition boards.",
+      "handle": "brabus-shadow",
+      "is_giftcard": false,
+      "weight": 32000,
+      "metadata": {
+        "costEUR": 10950,
+        "exchangeRate": 19.85,
+        "category": "jetboards",
+        "categoryTag": "Limited Edition",
+        "skillLevel": "Expert",
+        "battery": "XR 4 (65 min)",
+        "badge": "Limited Edition",
+        "specs": ["Max Speed: 60 km/h", "Exclusive BRABUS Design", "Carbon Fiber", "Premium finishes"],
+        "features": ["Numbered limited edition", "Signature BRABUS styling", "Collector's item"]
+      },
+      "images": [
+        "https://awakeboards.com/cdn/shop/files/BRABUSx3.png?v=1754380085"
+      ],
+      "options": [
+        {
+          "title": "Configuration"
+        }
+      ],
+      "variants": [
+        {
+          "title": "Limited Edition",
+          "sku": "BRABUS-SHADOW-LE",
+          "prices": [
+            {
+              "amount": 45221600,
+              "currency_code": "ZAR"
+            }
+          ],
+          "options": [
+            {
+              "value": "Limited Edition"
+            }
+          ],
+          "inventory_quantity": 2,
+          "metadata": {
+            "costEUR": 10950,
+            "priceExVAT": 393231,
+            "costZAR": 217358
+          }
+        }
+      ]
+    },
+    {
+      "title": "VINGA Adventure LR 4",
+      "subtitle": "Extended range eFoil",
+      "description": "Extended range eFoil for long sessions. Perfect for learning and exploring.",
+      "handle": "vinga-adventure-lr4",
+      "is_giftcard": false,
+      "weight": 28000,
+      "metadata": {
+        "costEUR": 7800,
+        "exchangeRate": 19.85,
+        "category": "efoils",
+        "categoryTag": "eFoil",
+        "skillLevel": "Beginner to Intermediate",
+        "battery": "LR 4 (90 min)",
+        "specs": ["Max Speed: 40 km/h", "Battery: 90 min ride time", "Silent operation", "Stable foil design"],
+        "features": ["Long battery life", "Easy to learn", "Smooth ride"]
+      },
+      "images": [
+        "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150"
+      ],
+      "options": [
+        {
+          "title": "Configuration"
+        }
+      ],
+      "variants": [
+        {
+          "title": "Standard",
+          "sku": "VINGA-ADV-LR4",
+          "prices": [
+            {
+              "amount": 32205200,
+              "currency_code": "ZAR"
+            }
+          ],
+          "options": [
+            {
+              "value": "Standard"
+            }
+          ],
+          "inventory_quantity": 4,
+          "metadata": {
+            "costEUR": 7800,
+            "priceExVAT": 280045,
+            "costZAR": 154830
+          }
+        }
+      ]
+    },
+    {
+      "title": "VINGA Adventure XR 4",
+      "subtitle": "Performance eFoil",
+      "description": "Performance-focused eFoil with XR battery. Enhanced stability and range for longer explorations.",
+      "handle": "vinga-adventure-xr4",
+      "is_giftcard": false,
+      "weight": 28000,
+      "metadata": {
+        "costEUR": 8780,
+        "exchangeRate": 19.85,
+        "category": "efoils",
+        "categoryTag": "eFoil",
+        "skillLevel": "Intermediate",
+        "battery": "XR 4 (65 min)",
+        "specs": ["Max Speed: 40 km/h", "Battery: 65 min ride time", "Silent operation", "Responsive control"],
+        "features": ["Compact battery", "Travel-friendly", "Precision handling"]
+      },
+      "images": [
+        "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150"
+      ],
+      "options": [
+        {
+          "title": "Configuration"
+        }
+      ],
+      "variants": [
+        {
+          "title": "Standard",
+          "sku": "VINGA-ADV-XR4",
+          "prices": [
+            {
+              "amount": 36250900,
+              "currency_code": "ZAR"
+            }
+          ],
+          "options": [
+            {
+              "value": "Standard"
+            }
+          ],
+          "inventory_quantity": 4,
+          "metadata": {
+            "costEUR": 8780,
+            "priceExVAT": 315225,
+            "costZAR": 174283
+          }
+        }
+      ]
+    },
+    {
+      "title": "VINGA Ultimate LR 4",
+      "subtitle": "Advanced eFoil",
+      "description": "Advanced eFoil with extended ride time. Advanced performance and dynamic control.",
+      "handle": "vinga-ultimate-lr4",
+      "is_giftcard": false,
+      "weight": 28000,
+      "metadata": {
+        "costEUR": 8450,
+        "exchangeRate": 19.85,
+        "category": "efoils",
+        "categoryTag": "eFoil",
+        "skillLevel": "Intermediate to Expert",
+        "battery": "LR 4 (90 min)",
+        "specs": ["Max Speed: 45 km/h", "Battery: 90 min ride time", "Advanced control", "Premium wings"],
+        "features": ["High performance", "Long sessions", "Professional grade"]
+      },
+      "images": [
+        "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150"
+      ],
+      "options": [
+        {
+          "title": "Configuration"
+        }
+      ],
+      "variants": [
+        {
+          "title": "Standard",
+          "sku": "VINGA-ULT-LR4",
+          "prices": [
+            {
+              "amount": 34902400,
+              "currency_code": "ZAR"
+            }
+          ],
+          "options": [
+            {
+              "value": "Standard"
+            }
+          ],
+          "inventory_quantity": 3,
+          "metadata": {
+            "costEUR": 8450,
+            "priceExVAT": 303499,
+            "costZAR": 167733
+          }
+        }
+      ]
+    },
+    {
+      "title": "VINGA Ultimate XR 4",
+      "subtitle": "Top-spec eFoil",
+      "description": "Top-spec eFoil with ultimate performance. For those seeking peak performance and control.",
+      "handle": "vinga-ultimate-xr4",
+      "is_giftcard": false,
+      "weight": 28000,
+      "metadata": {
+        "costEUR": 9430,
+        "exchangeRate": 19.85,
+        "category": "efoils",
+        "categoryTag": "eFoil",
+        "skillLevel": "Expert",
+        "battery": "XR 4 (65 min)",
+        "specs": ["Max Speed: 45 km/h", "Battery: 65 min ride time", "Advanced control", "Carbon construction"],
+        "features": ["Maximum speed", "Precision foiling", "Competition ready"]
+      },
+      "images": [
+        "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150"
+      ],
+      "options": [
+        {
+          "title": "Configuration"
+        }
+      ],
+      "variants": [
+        {
+          "title": "Standard",
+          "sku": "VINGA-ULT-XR4",
+          "prices": [
+            {
+              "amount": 38948100,
+              "currency_code": "ZAR"
+            }
+          ],
+          "options": [
+            {
+              "value": "Standard"
+            }
+          ],
+          "inventory_quantity": 3,
+          "metadata": {
+            "costEUR": 9430,
+            "priceExVAT": 338679,
+            "costZAR": 187186
+          }
+        }
+      ]
+    }
+  ]
+}
