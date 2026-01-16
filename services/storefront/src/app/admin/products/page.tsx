@@ -135,7 +135,22 @@ export default function AdminProductsPage() {
                           type="text"
                           value={editForm.image}
                           onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
-                          placeholder="Image URL"
+                          placeholder="Image URL or paste from clipboard"
+                          className="w-full px-2 py-1 border rounded text-xs mb-2"
+                        />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                              const reader = new FileReader()
+                              reader.onloadend = () => {
+                                setEditForm({ ...editForm, image: reader.result as string })
+                              }
+                              reader.readAsDataURL(file)
+                            }
+                          }}
                           className="w-full px-2 py-1 border rounded text-xs"
                         />
                         {editForm.image && (
