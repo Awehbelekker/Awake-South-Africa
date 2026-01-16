@@ -3,17 +3,17 @@ import { persist } from "zustand/middleware";
 
 export interface WishlistItem {
   id: string;
-  product_id: string;
-  title: string;
-  thumbnail?: string;
-  unit_price: number;
+  name: string;
+  price: number;
+  image: string;
 }
 
 interface WishlistState {
   items: WishlistItem[];
   addItem: (item: WishlistItem) => void;
-  removeItem: (productId: string) => void;
-  isInWishlist: (productId: string) => boolean;
+  removeItem: (id: string) => void;
+  clearWishlist: () => void;
+  isInWishlist: (id: string) => boolean;
 }
 
 export const useWishlistStore = create<WishlistState>()(
@@ -21,14 +21,17 @@ export const useWishlistStore = create<WishlistState>()(
     (set, get) => ({
       items: [],
       addItem: (item) => {
-        if (!get().items.some((i) => i.product_id === item.product_id)) {
+        if (!get().items.some((i) => i.id === item.id)) {
           set((state) => ({ items: [...state.items, item] }));
         }
       },
-      removeItem: (productId) => {
-        set((state) => ({ items: state.items.filter((item) => item.product_id !== productId) }));
+      removeItem: (id) => {
+        set((state) => ({ items: state.items.filter((item) => item.id !== id) }));
       },
-      isInWishlist: (productId) => get().items.some((item) => item.product_id === productId),
+      clearWishlist: () => {
+        set({ items: [] });
+      },
+      isInWishlist: (id) => get().items.some((item) => item.id === id),
     }),
     { name: "awake-wishlist" }
   )

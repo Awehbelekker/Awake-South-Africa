@@ -1,28 +1,27 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface Customer {
+export interface User {
   id: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  name: string;
   phone?: string;
 }
 
 interface AuthState {
-  customer: Customer | null;
+  user: User | null;
   isAuthenticated: boolean;
-  login: (customer: Customer) => void;
+  login: (user: User) => void;
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      customer: null,
+      user: null,
       isAuthenticated: false,
-      login: (customer) => set({ customer, isAuthenticated: true }),
-      logout: () => set({ customer: null, isAuthenticated: false }),
+      login: (user) => set({ user, isAuthenticated: true }),
+      logout: () => set({ user: null, isAuthenticated: false }),
     }),
     { name: "awake-auth" }
   )

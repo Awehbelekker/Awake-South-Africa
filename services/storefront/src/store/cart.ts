@@ -3,22 +3,19 @@ import { persist } from "zustand/middleware";
 
 export interface CartItem {
   id: string;
-  product_id: string;
-  title: string;
-  variant_title?: string;
-  thumbnail?: string;
-  unit_price: number;
+  name: string;
+  price: number;
+  image: string;
   quantity: number;
 }
 
 interface CartState {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
-  removeItem: (itemId: string) => void;
-  updateQuantity: (itemId: string, quantity: number) => void;
+  addItem: (item: CartItem) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  getTotalItems: () => number;
-  getTotalPrice: () => number;
+  total: () => number;
 }
 
 export const useCartStore = create<CartState>()(
@@ -38,23 +35,24 @@ export const useCartStore = create<CartState>()(
         });
       },
 
-      removeItem: (itemId) => {
-        set((state) => ({ items: state.items.filter((item) => item.id !== itemId) }));
+      removeItem: (id) => {
+        set((state) => ({ items: state.items.filter((item) => item.id !== id) }));
       },
 
-      updateQuantity: (itemId, quantity) => {
-        if (quantity < 1) { get().removeItem(itemId); return; }
+      updateQuantity: (id, quantity) => {
+        if (quantity < 1) {
+          get().removeItem(id);
+          return;
+        }
         set((state) => ({
-          items: state.items.map((item) => item.id === itemId ? { ...item, quantity } : item),
+          items: state.items.map((item) => (item.id === id ? { ...item, quantity } : item)),
         }));
       },
 
       clearCart: () => set({ items: [] }),
 
-      getTotalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
-
-      getTotalPrice: () => get().items.reduce((total, item) => total + item.unit_price * item.quantity, 0),
+      total: () => get().items.reduce((sum, item) => sum + item.price * item.quantity, 0),
     }),
-    { name: "awake-cart", partialize: (state) => ({ items: state.items }) }
+    { name: "awake-cart" }
   )
 );

@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { AWAKE_IMAGES, SA_CONTENT } from '@/lib/constants'
+import { AWAKE_IMAGES } from '@/lib/constants'
 import { useCartStore } from '@/store/cart'
 import { useWishlistStore } from '@/store/wishlist'
 
@@ -65,7 +65,7 @@ const products = [
   },
 ]
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams()
   const categoryFilter = searchParams.get('category')
   const [selectedCategory, setSelectedCategory] = useState(categoryFilter || 'all')
@@ -87,6 +87,111 @@ export default function ProductsPage() {
   const isInWishlist = (id: string) => wishlistItems.some(item => item.id === id)
 
   return (
+    <>
+      {/* Category Filter */}
+      <div className="flex flex-wrap justify-center gap-4 mb-12">
+        {['all', 'jetboards', 'efoils', 'accessories'].map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`px-6 py-3 rounded-lg font-medium transition-all ${
+              selectedCategory === category
+                ? 'bg-accent-primary text-awake-black'
+                : 'bg-awake-gray text-white hover:bg-awake-gray/80'
+            }`}
+          >
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Products Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredProducts.map((product) => (
+          <div
+            key={product.id}
+            className="bg-awake-gray rounded-xl overflow-hidden group hover:ring-2 hover:ring-accent-primary transition-all"
+          >
+            <div className="relative h-64 overflow-hidden">
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <button
+                onClick={() => addToWishlist({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image,
+                })}
+                className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                  isInWishlist(product.id)
+                    ? 'bg-red-500 text-white'
+                    : 'bg-white/10 backdrop-blur text-white hover:bg-white/20'
+                }`}
+              >
+                ♥
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-xl font-bold">{product.name}</h3>
+                <span className="text-accent-primary font-bold">
+                  {formatPrice(product.price)}
+                </span>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">{product.description}</p>
+              <ul className="text-sm text-gray-500 mb-6 space-y-1">
+                {product.specs.map((spec, i) => (
+                  <li key={i}>• {spec}</li>
+                ))}
+              </ul>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => addItem({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    quantity: 1,
+                  })}
+                  className="flex-1 bg-accent-primary text-awake-black py-3 rounded-lg font-bold hover:bg-accent-secondary transition-colors"
+                >
+                  Add to Cart
+                </button>
+                <Link
+                  href={`/products/${product.id}`}
+                  className="px-4 py-3 border border-white/20 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  Details
+                </Link>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Finance CTA */}
+      <div className="mt-16 bg-gradient-to-r from-accent-primary/20 to-accent-secondary/20 rounded-2xl p-8 text-center">
+        <h2 className="text-2xl font-bold mb-4">Finance Options Available</h2>
+        <p className="text-gray-300 mb-6">
+          Split your purchase with PayFast PayJustNow. 0% interest, 3 easy payments.
+        </p>
+        <Link
+          href="/contact"
+          className="inline-block bg-white text-awake-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors"
+        >
+          Enquire Now
+        </Link>
+      </div>
+    </>
+  )
+}
+
+export default function ProductsPage() {
+  return (
     <main className="min-h-screen bg-awake-black text-white py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Our Products</h1>
@@ -94,104 +199,9 @@ export default function ProductsPage() {
           Premium electric watercraft for the ultimate riding experience
         </p>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {['all', 'jetboards', 'efoils', 'accessories'].map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                selectedCategory === category
-                  ? 'bg-accent-primary text-awake-black'
-                  : 'bg-awake-gray text-white hover:bg-awake-gray/80'
-              }`}
-            >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Products Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="bg-awake-gray rounded-xl overflow-hidden group hover:ring-2 hover:ring-accent-primary transition-all"
-            >
-              <div className="relative h-64 overflow-hidden">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <button
-                  onClick={() => addToWishlist({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    image: product.image,
-                  })}
-                  className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                    isInWishlist(product.id)
-                      ? 'bg-red-500 text-white'
-                      : 'bg-white/10 backdrop-blur text-white hover:bg-white/20'
-                  }`}
-                >
-                  ♥
-                </button>
-              </div>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold">{product.name}</h3>
-                  <span className="text-accent-primary font-bold">
-                    {formatPrice(product.price)}
-                  </span>
-                </div>
-                <p className="text-gray-400 text-sm mb-4">{product.description}</p>
-                <ul className="text-sm text-gray-500 mb-6 space-y-1">
-                  {product.specs.map((spec, i) => (
-                    <li key={i}>• {spec}</li>
-                  ))}
-                </ul>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => addItem({
-                      id: product.id,
-                      name: product.name,
-                      price: product.price,
-                      image: product.image,
-                      quantity: 1,
-                    })}
-                    className="flex-1 bg-accent-primary text-awake-black py-3 rounded-lg font-bold hover:bg-accent-secondary transition-colors"
-                  >
-                    Add to Cart
-                  </button>
-                  <Link
-                    href={`/products/${product.id}`}
-                    className="px-4 py-3 border border-white/20 rounded-lg hover:bg-white/10 transition-colors"
-                  >
-                    Details
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Finance CTA */}
-        <div className="mt-16 bg-gradient-to-r from-accent-primary/20 to-accent-secondary/20 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Finance Options Available</h2>
-          <p className="text-gray-300 mb-6">
-            Split your purchase with PayFast PayJustNow. 0% interest, 3 easy payments.
-          </p>
-          <Link
-            href="/contact"
-            className="inline-block bg-white text-awake-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors"
-          >
-            Enquire Now
-          </Link>
-        </div>
+        <Suspense fallback={<div className="text-center py-12">Loading products...</div>}>
+          <ProductsContent />
+        </Suspense>
       </div>
     </main>
   )
