@@ -5,8 +5,8 @@
 // ============================================
 
 export const AWAKE_IMAGES = {
-  // Logo
-  logo: "https://awakeboards.com/cdn/shop/files/Awake_1200x1200.png?v=1613697127",
+  // Logo - Using text-based approach since CDN logo is unavailable
+  logo: "/images/awake-logo.svg",
 
   // Hero Images
   hero: {
