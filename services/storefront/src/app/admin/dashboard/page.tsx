@@ -34,7 +34,7 @@ export default function AdminDashboard() {
       }, 0) / products.filter(p => p.costEUR).length
     : 0
 
-  const categories = [...new Set(products.map(p => p.categoryTag || p.category))]
+  const categories = Array.from(new Set(products.map(p => p.categoryTag || p.category)))
 
   return (
     <div className="min-h-screen bg-gray-100">

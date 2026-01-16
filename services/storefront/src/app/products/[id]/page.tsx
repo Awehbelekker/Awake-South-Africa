@@ -95,7 +95,7 @@ export default function ProductDetailPage() {
           <div className="flex flex-col">
             <div className="mb-4">
               <span className="text-accent-primary text-sm font-medium">
-                {'categoryTag' in product ? product.categoryTag : product.category}
+                {(product as any).categoryTag || (product as any).category || 'Product'}
               </span>
             </div>
 

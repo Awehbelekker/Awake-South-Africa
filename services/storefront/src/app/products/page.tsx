@@ -42,7 +42,7 @@ function ProductsContent() {
   const isInWishlist = (id: string) => wishlistItems.some(item => item.id === id)
 
   // Get unique categories from products
-  const categoryTags = [...new Set(allProducts.map(p => p.categoryTag || p.category))]
+  const categoryTags = Array.from(new Set(allProducts.map(p => p.categoryTag || p.category)))
   
   const categories = [
     { id: 'all', name: 'All Products', count: allProducts.filter(p => p.inStock).length },
@@ -53,24 +53,28 @@ function ProductsContent() {
     }))
   ].filter(c => c.count > 0)
 
+  const jetboardsCount = allProducts.filter(p => p.inStock && (p.categoryTag === 'jetboards' || p.category === 'Jetboards')).length
+  const efoilsCount = allProducts.filter(p => p.inStock && (p.categoryTag === 'efoils' || p.category === 'eFoils')).length
+  const wingsCount = allProducts.filter(p => p.inStock && (p.categoryTag === 'wings' || p.category === 'Wings')).length
+
   return (
     <>
       {/* Stats Banner */}
       <div className="bg-awake-gray rounded-xl p-6 mb-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
         <div>
-          <div className="text-3xl font-bold text-accent-primary">{PRODUCTS.jetboards.length + PRODUCTS.limitedEdition.length}</div>
+          <div className="text-3xl font-bold text-accent-primary">{jetboardsCount}</div>
           <div className="text-sm text-gray-400">Jetboards</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-accent-primary">{PRODUCTS.efoils.length}</div>
+          <div className="text-3xl font-bold text-accent-primary">{efoilsCount}</div>
           <div className="text-sm text-gray-400">eFoils</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-accent-primary">{PRODUCTS.wings.length}</div>
+          <div className="text-3xl font-bold text-accent-primary">{wingsCount}</div>
           <div className="text-sm text-gray-400">Wing Kits</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-accent-primary">{allProducts.length}</div>
+          <div className="text-3xl font-bold text-accent-primary">{allProducts.filter(p => p.inStock).length}</div>
           <div className="text-sm text-gray-400">Total Products</div>
         </div>
       </div>
@@ -101,37 +105,37 @@ function ProductsContent() {
           >
             <Link href={`/products/${product.id}`}>
               <div className="relative h-64 overflow-hidden cursor-pointer">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              {'badge' in product && product.badge && (
-                <div className="absolute top-4 left-4 bg-accent-primary text-awake-black px-3 py-1 rounded-full text-xs font-bold z-10">
-                  {product.badge}
-                </div>
-              )}
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  addToWishlist({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    image: product.image,
-                  });
-                }}
-                className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors z-10 ${
-                  isInWishlist(product.id)
-                    ? 'bg-red-500 text-white'
-                    : 'bg-white/10 backdrop-blur text-white hover:bg-white/20'
-                }`}
-              >
-                ♥
-              </button>
+                <Image
+                  src={product.image || '/images/awake-default.jpg'}
+                  alt={product.name}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                {'badge' in product && product.badge && (
+                  <div className="absolute top-4 left-4 bg-accent-primary text-awake-black px-3 py-1 rounded-full text-xs font-bold z-10">
+                    {product.badge}
+                  </div>
+                )}
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    addToWishlist({
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      image: product.image || '/images/awake-default.jpg',
+                    });
+                  }}
+                  className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors z-10 ${
+                    isInWishlist(product.id)
+                      ? 'bg-red-500 text-white'
+                      : 'bg-white/10 backdrop-blur text-white hover:bg-white/20'
+                  }`}
+                >
+                  ♥
+                </button>
+              </div>
             </Link>
-            </div>
             <div className="p-6">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
@@ -180,7 +184,7 @@ function ProductsContent() {
                       id: product.id,
                       name: product.name,
                       price: product.price,
-                      image: product.image,
+                      image: product.image || '/images/awake-default.jpg',
                       quantity: 1,
                     });
                   }}

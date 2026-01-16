@@ -29,7 +29,7 @@ export default function AdminProductsPage() {
     ? products 
     : products.filter(p => (p.categoryTag || p.category) === filter)
 
-  const categories = ['all', ...new Set(products.map(p => p.categoryTag || p.category))]
+  const categories = ['all', ...Array.from(new Set(products.map(p => p.categoryTag || p.category)))]
 
   const startEdit = (product: any) => {
     setEditingId(product.id)
