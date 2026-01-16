@@ -97,7 +97,13 @@ export default function AdminProductsPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Image
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Product
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Description
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Price (inc VAT)
@@ -127,9 +133,29 @@ export default function AdminProductsPage() {
                       <td className="px-6 py-4">
                         <input
                           type="text"
+                          value={editForm.image}
+                          onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
+                          placeholder="Image URL"
+                          className="w-full px-2 py-1 border rounded text-xs"
+                        />
+                        {editForm.image && (
+                          <img src={editForm.image} alt="" className="w-16 h-16 object-cover mt-2 rounded" />
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <input
+                          type="text"
                           value={editForm.name}
                           onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                           className="w-full px-2 py-1 border rounded"
+                        />
+                      </td>
+                      <td className="px-6 py-4">
+                        <textarea
+                          value={editForm.description}
+                          onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                          className="w-full px-2 py-1 border rounded text-sm"
+                          rows={3}
                         />
                       </td>
                       <td className="px-6 py-4">
@@ -180,8 +206,14 @@ export default function AdminProductsPage() {
                   ) : (
                     <>
                       <td className="px-6 py-4">
+                        <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded" />
+                      </td>
+                      <td className="px-6 py-4">
                         <div className="text-sm font-medium text-gray-900">{product.name}</div>
                         <div className="text-sm text-gray-500">{product.categoryTag || product.category}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-600 max-w-xs truncate">{product.description}</div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         R{product.price.toLocaleString()}
