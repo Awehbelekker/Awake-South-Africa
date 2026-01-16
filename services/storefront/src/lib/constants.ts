@@ -271,55 +271,55 @@ export const PRODUCTS = {
 
   // 📦 BOARDS ONLY (0% Duty)
   boardsOnly: [
-    { id: "ravik-explore-board", name: "RÄVIK Explore (Board Only)", price: 132934, priceExVAT: 115595, category: "boards", image: AWAKE_IMAGES.ravik.explore, description: "Board without battery" },
-    { id: "ravik-adventure-board", name: "RÄVIK Adventure (Board Only)", price: 213847, priceExVAT: 185954, category: "boards", image: AWAKE_IMAGES.ravik.adventure, description: "Board without battery" },
-    { id: "ravik-ultimate-board", name: "RÄVIK Ultimate (Board Only)", price: 240819, priceExVAT: 209408, category: "boards", image: AWAKE_IMAGES.ravik.ultimate, description: "Board without battery" },
-    { id: "vinga-adventure-board", name: "VINGA Adventure (Board Only)", price: 240819, priceExVAT: 209408, category: "boards", image: AWAKE_IMAGES.vinga.adventure, description: "Board without battery" },
-    { id: "vinga-ultimate-board", name: "VINGA Ultimate (Board Only)", price: 254305, priceExVAT: 221135, category: "boards", image: AWAKE_IMAGES.vinga.ultimate, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "ravik-explore-board", name: "RÄVIK Explore (Board Only)", price: 132934, priceExVAT: 115595, category: "boards", image: AWAKE_IMAGES.ravik.explore, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "ravik-adventure-board", name: "RÄVIK Adventure (Board Only)", price: 213847, priceExVAT: 185954, category: "boards", image: AWAKE_IMAGES.ravik.adventure, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "ravik-ultimate-board", name: "RÄVIK Ultimate (Board Only)", price: 240819, priceExVAT: 209408, category: "boards", image: AWAKE_IMAGES.ravik.ultimate, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "vinga-adventure-board", name: "VINGA Adventure (Board Only)", price: 240819, priceExVAT: 209408, category: "boards", image: AWAKE_IMAGES.vinga.adventure, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "vinga-ultimate-board", name: "VINGA Ultimate (Board Only)", price: 254305, priceExVAT: 221135, category: "boards", image: AWAKE_IMAGES.vinga.ultimate, description: "Board without battery" },
   ],
 
   // 🪁 eFOIL WING KITS (0% Duty)
   wings: [
-    { id: "cruise-1600", name: "CRUISE 1600 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "Cruising wing for stable rides" },
-    { id: "powder-1800", name: "POWDER 1800 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "Powder conditions wing" },
-    { id: "powder-1400", name: "POWDER 1400 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "Compact powder wing" },
-    { id: "fluid-1300", name: "FLUID 1300 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "Fluid performance wing" },
-    { id: "fluid-1000", name: "FLUID 1000 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "High speed wing" },
+    { categoryTag: "Wing Kit", id: "cruise-1600", name: "CRUISE 1600 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "Cruising wing for stable rides" },
+    { categoryTag: "Wing Kit", id: "powder-1800", name: "POWDER 1800 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "Powder conditions wing" },
+    { categoryTag: "Wing Kit", id: "powder-1400", name: "POWDER 1400 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "Compact powder wing" },
+    { categoryTag: "Wing Kit", id: "fluid-1300", name: "FLUID 1300 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "Fluid performance wing" },
+    { categoryTag: "Wing Kit", id: "fluid-1000", name: "FLUID 1000 Wing Kit", price: 27168, priceExVAT: 23624, category: "wings", image: AWAKE_IMAGES.accessories.carbonFins, description: "High speed wing" },
   ],
 
   // 🎒 BAGS (20% Duty)
   bags: [
-    { id: "board-bag-kit", name: "Board Bag Kit", price: 19406, priceExVAT: 16875, category: "accessories", image: AWAKE_IMAGES.accessories.batteryBackpack, description: "Protective bag for RÄVIK/VINGA" },
-    { id: "battery-bag", name: "Battery Bag", price: 9620, priceExVAT: 8365, category: "accessories", image: AWAKE_IMAGES.accessories.batteryBackpack, description: "Dedicated battery storage" },
-    { id: "premium-travel-bag", name: "Premium Travel Bag", price: 16169, priceExVAT: 14060, category: "accessories", image: AWAKE_IMAGES.accessories.batteryBackpack, description: "Luxury travel case" },
+    { categoryTag: "Bag", id: "board-bag-kit", name: "Board Bag Kit", price: 19406, priceExVAT: 16875, category: "accessories", image: AWAKE_IMAGES.accessories.batteryBackpack, description: "Protective bag for RÄVIK/VINGA" },
+    { categoryTag: "Bag", id: "battery-bag", name: "Battery Bag", price: 9620, priceExVAT: 8365, category: "accessories", image: AWAKE_IMAGES.accessories.batteryBackpack, description: "Dedicated battery storage" },
+    { categoryTag: "Bag", id: "premium-travel-bag", name: "Premium Travel Bag", price: 16169, priceExVAT: 14060, category: "accessories", image: AWAKE_IMAGES.accessories.batteryBackpack, description: "Luxury travel case" },
   ],
 
   // 🛡️ SAFETY & STORAGE (20% Duty)
   safetyStorage: [
-    { id: "life-vest", name: "Life Vest (CE Certified)", price: 9620, priceExVAT: 8365, category: "accessories", image: AWAKE_IMAGES.accessories.lifeVest, description: "Safety vest meeting CE standards" },
-    { id: "awake-dock", name: "Awake Dock (Floating)", price: 78298, priceExVAT: 68085, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Floating dock system" },
-    { id: "wall-mount", name: "Wall Mount", price: 29518, priceExVAT: 25668, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Wall mounting bracket" },
-    { id: "board-stand", name: "Board Stand", price: 16169, priceExVAT: 14060, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Display stand" },
+    { categoryTag: "Safety", id: "life-vest", name: "Life Vest (CE Certified)", price: 9620, priceExVAT: 8365, category: "accessories", image: AWAKE_IMAGES.accessories.lifeVest, description: "Safety vest meeting CE standards" },
+    { categoryTag: "Storage", id: "awake-dock", name: "Awake Dock (Floating)", price: 78298, priceExVAT: 68085, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Floating dock system" },
+    { categoryTag: "Storage", id: "wall-mount", name: "Wall Mount", price: 29518, priceExVAT: 25668, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Wall mounting bracket" },
+    { categoryTag: "Storage", id: "board-stand", name: "Board Stand", price: 16169, priceExVAT: 14060, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Display stand" },
   ],
 
   // 🎮 ELECTRONICS (0% Duty)
   electronics: [
-    { id: "hand-controller", name: "Flex Hand Controller", price: 16224, priceExVAT: 14108, category: "accessories", image: AWAKE_IMAGES.accessories.charger, description: "Wireless hand controller" },
-    { id: "battery-charger", name: "Battery Charger", price: 24662, priceExVAT: 21445, category: "accessories", image: AWAKE_IMAGES.accessories.charger, description: "Fast battery charger" },
-    { id: "controller-charger", name: "Controller Charger", price: 5628, priceExVAT: 4894, category: "accessories", image: AWAKE_IMAGES.accessories.charger, description: "Controller charging cable" },
+    { categoryTag: "Electronics", id: "hand-controller", name: "Flex Hand Controller", price: 16224, priceExVAT: 14108, category: "accessories", image: AWAKE_IMAGES.accessories.charger, description: "Wireless hand controller" },
+    { categoryTag: "Electronics", id: "battery-charger", name: "Battery Charger", price: 24662, priceExVAT: 21445, category: "accessories", image: AWAKE_IMAGES.accessories.charger, description: "Fast battery charger" },
+    { categoryTag: "Electronics", id: "controller-charger", name: "Controller Charger", price: 5628, priceExVAT: 4894, category: "accessories", image: AWAKE_IMAGES.accessories.charger, description: "Controller charging cable" },
   ],
 
   // ⚙️ PARTS (0% Duty)
   parts: [
-    { id: "ravik-fins", name: "RÄVIK Fins (Set of 3)", price: 5628, priceExVAT: 4894, category: "accessories", image: AWAKE_IMAGES.accessories.carbonFins, description: "Standard fin set" },
-    { id: "carbon-fins", name: "Carbon Fins (Set of 3)", price: 8055, priceExVAT: 7004, category: "accessories", image: AWAKE_IMAGES.accessories.carbonFins, description: "Premium carbon fiber fins" },
-    { id: "foot-straps", name: "Foot Straps", price: 8325, priceExVAT: 7239, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Adjustable foot straps" },
-    { id: "beach-mat", name: "Beach Mat", price: 5614, priceExVAT: 4882, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Portable beach mat" },
+    { categoryTag: "Parts", id: "ravik-fins", name: "RÄVIK Fins (Set of 3)", price: 5628, priceExVAT: 4894, category: "accessories", image: AWAKE_IMAGES.accessories.carbonFins, description: "Standard fin set" },
+    { categoryTag: "Parts", id: "carbon-fins", name: "Carbon Fins (Set of 3)", price: 8055, priceExVAT: 7004, category: "accessories", image: AWAKE_IMAGES.accessories.carbonFins, description: "Premium carbon fiber fins" },
+    { categoryTag: "Parts", id: "foot-straps", name: "Foot Straps", price: 8325, priceExVAT: 7239, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Adjustable foot straps" },
+    { categoryTag: "Parts", id: "beach-mat", name: "Beach Mat", price: 5614, priceExVAT: 4882, category: "accessories", image: AWAKE_IMAGES.accessories.beachMat, description: "Portable beach mat" },
   ],
 
   // 👕 APPAREL (45% Duty)
   apparel: [
-    { id: "tshirt", name: "Awake T-shirt", price: 3283, priceExVAT: 2855, category: "apparel", image: AWAKE_IMAGES.lifestyle.riders, description: "Official Awake branded tee" },
-    { id: "cap", name: "Awake Cap", price: 1689, priceExVAT: 1469, category: "apparel", image: AWAKE_IMAGES.lifestyle.riders, description: "Branded cap" },
+    { categoryTag: "Apparel", id: "tshirt", name: "Awake T-shirt", price: 3283, priceExVAT: 2855, category: "apparel", image: AWAKE_IMAGES.lifestyle.riders, description: "Official Awake branded tee" },
+    { categoryTag: "Apparel", id: "cap", name: "Awake Cap", price: 1689, priceExVAT: 1469, category: "apparel", image: AWAKE_IMAGES.lifestyle.riders, description: "Branded cap" },
   ],
 };
