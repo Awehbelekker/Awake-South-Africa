@@ -1,27 +1,12 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { PRODUCTS } from '@/lib/constants'
 import { useCartStore } from '@/store/cart'
 import { useWishlistStore } from '@/store/wishlist'
-
-// Flatten all products into a single array
-const allProducts = [
-  ...PRODUCTS.jetboards,
-  ...PRODUCTS.limitedEdition,
-  ...PRODUCTS.efoils,
-  ...PRODUCTS.batteries,
-  ...PRODUCTS.boardsOnly,
-  ...PRODUCTS.wings,
-  ...PRODUCTS.bags,
-  ...PRODUCTS.safetyStorage,
-  ...PRODUCTS.electronics,
-  ...PRODUCTS.parts,
-  ...PRODUCTS.apparel,
-]
+import { useProductsStore } from '@/store/products'
 
 function ProductsContent() {
   const searchParams = useSearchParams()
@@ -29,22 +14,22 @@ function ProductsContent() {
   const [selectedCategory, setSelectedCategory] = useState(categoryFilter || 'all')
   const { addItem } = useCartStore()
   const { addItem: addToWishlist, items: wishlistItems } = useWishlistStore()
+  const { products: allProducts } = useProductsStore()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-gray-600">Loading products...</div>
+    </div>
+  }
 
   const filteredProducts = selectedCategory === 'all' 
-    ? allProducts 
-    : selectedCategory === 'jetboards' 
-      ? [...PRODUCTS.jetboards, ...PRODUCTS.limitedEdition]
-      : selectedCategory === 'efoils'
-        ? PRODUCTS.efoils
-        : selectedCategory === 'batteries'
-          ? PRODUCTS.batteries
-          : selectedCategory === 'wings'
-            ? PRODUCTS.wings
-            : selectedCategory === 'accessories'
-              ? [...PRODUCTS.bags, ...PRODUCTS.safetyStorage, ...PRODUCTS.electronics, ...PRODUCTS.parts]
-              : selectedCategory === 'apparel'
-                ? PRODUCTS.apparel
-                : allProducts.filter(p => p.category === selectedCategory);
+    ? allProducts.filter(p => p.inStock)
+    : allProducts.filter(p => p.inStock && (p.categoryTag === selectedCategory || p.category === selectedCategory));
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-ZA', {
@@ -56,15 +41,17 @@ function ProductsContent() {
 
   const isInWishlist = (id: string) => wishlistItems.some(item => item.id === id)
 
+  // Get unique categories from products
+  const categoryTags = [...new Set(allProducts.map(p => p.categoryTag || p.category))]
+  
   const categories = [
-    { id: 'all', name: 'All Products', count: allProducts.length },
-    { id: 'jetboards', name: 'Jetboards', count: PRODUCTS.jetboards.length + PRODUCTS.limitedEdition.length },
-    { id: 'efoils', name: 'eFoils', count: PRODUCTS.efoils.length },
-    { id: 'batteries', name: 'Batteries', count: PRODUCTS.batteries.length },
-    { id: 'wings', name: 'Wings', count: PRODUCTS.wings.length },
-    { id: 'accessories', name: 'Accessories', count: PRODUCTS.bags.length + PRODUCTS.safetyStorage.length + PRODUCTS.electronics.length + PRODUCTS.parts.length },
-    { id: 'apparel', name: 'Apparel', count: PRODUCTS.apparel.length },
-  ]
+    { id: 'all', name: 'All Products', count: allProducts.filter(p => p.inStock).length },
+    ...categoryTags.map(tag => ({
+      id: tag,
+      name: tag.charAt(0).toUpperCase() + tag.slice(1),
+      count: allProducts.filter(p => p.inStock && (p.categoryTag === tag || p.category === tag)).length
+    }))
+  ].filter(c => c.count > 0)
 
   return (
     <>
