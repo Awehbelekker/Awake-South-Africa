@@ -4,65 +4,22 @@ import { useState, Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { AWAKE_IMAGES } from '@/lib/constants'
+import { PRODUCTS } from '@/lib/constants'
 import { useCartStore } from '@/store/cart'
 import { useWishlistStore } from '@/store/wishlist'
 
-const products = [
-  {
-    id: 'ravik-s',
-    name: 'RÄVIK S',
-    category: 'jetboards',
-    price: 285000,
-    image: AWAKE_IMAGES.products.ravikS,
-    description: 'The ultimate electric jetboard for thrill-seekers. Top speed 57 km/h.',
-    specs: ['57 km/h top speed', '45 min ride time', 'Carbon fiber construction'],
-  },
-  {
-    id: 'ravik-3',
-    name: 'RÄVIK 3',
-    category: 'jetboards',
-    price: 245000,
-    image: AWAKE_IMAGES.products.ravik3,
-    description: 'Perfect balance of performance and accessibility.',
-    specs: ['50 km/h top speed', '40 min ride time', 'Premium build quality'],
-  },
-  {
-    id: 'vinga-2',
-    name: 'VINGA 2',
-    category: 'efoils',
-    price: 195000,
-    image: AWAKE_IMAGES.products.vinga2,
-    description: 'Glide above the water with our advanced eFoil technology.',
-    specs: ['40 km/h top speed', '90 min ride time', 'Whisper quiet'],
-  },
-  {
-    id: 'brabus-shadow',
-    name: 'BRABUS x AWAKE',
-    category: 'jetboards',
-    price: 350000,
-    image: AWAKE_IMAGES.products.brabusShadow,
-    description: 'Luxury meets performance. Limited edition collaboration.',
-    specs: ['60 km/h top speed', '45 min ride time', 'Exclusive BRABUS design'],
-  },
-  {
-    id: 'battery-pack',
-    name: 'Extra Battery Pack',
-    category: 'accessories',
-    price: 45000,
-    image: AWAKE_IMAGES.accessories.battery,
-    description: 'Extend your ride time with an additional battery.',
-    specs: ['Quick swap design', '45 min additional ride time', 'LED indicators'],
-  },
-  {
-    id: 'charger-pro',
-    name: 'Pro Charger',
-    category: 'accessories',
-    price: 12000,
-    image: AWAKE_IMAGES.accessories.charger,
-    description: 'Fast charging solution for your Awake board.',
-    specs: ['2 hour full charge', 'Smart charging', 'Travel friendly'],
-  },
+// Flatten all products into a single array with category tags
+const allProducts = [
+  ...PRODUCTS.jetboards.map(p => ({ ...p, categoryTag: 'Jetboards' })),
+  ...PRODUCTS.limitedEdition.map(p => ({ ...p, categoryTag: 'Limited Edition' })),
+  ...PRODUCTS.efoils.map(p => ({ ...p, categoryTag: 'eFoils' })),
+  ...PRODUCTS.batteries.map(p => ({ ...p, categoryTag: 'Batteries' })),
+  ...PRODUCTS.wings.map(p => ({ ...p, categoryTag: 'Wings' })),
+  ...PRODUCTS.bags.map(p => ({ ...p, categoryTag: 'Bags' })),
+  ...PRODUCTS.safetyStorage.map(p => ({ ...p, categoryTag: 'Safety' })),
+  ...PRODUCTS.electronics.map(p => ({ ...p, categoryTag: 'Electronics' })),
+  ...PRODUCTS.parts.map(p => ({ ...p, categoryTag: 'Parts' })),
+  ...PRODUCTS.apparel.map(p => ({ ...p, categoryTag: 'Apparel' })),
 ]
 
 function ProductsContent() {
@@ -73,8 +30,16 @@ function ProductsContent() {
   const { addItem: addToWishlist, items: wishlistItems } = useWishlistStore()
 
   const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(p => p.category === selectedCategory)
+    ? allProducts 
+    : selectedCategory === 'jetboards' 
+      ? [...PRODUCTS.jetboards.map(p => ({ ...p, categoryTag: 'Jetboards' })), ...PRODUCTS.limitedEdition.map(p => ({ ...p, categoryTag: 'Limited Edition' }))]
+      : selectedCategory === 'efoils'
+        ? PRODUCTS.efoils.map(p => ({ ...p, categoryTag: 'eFoils' }))
+        : selectedCategory === 'batteries'
+          ? PRODUCTS.batteries.map(p => ({ ...p, categoryTag: 'Batteries' }))
+          : selectedCategory === 'wings'
+            ? PRODUCTS.wings.map(p => ({ ...p, categoryTag: 'Wings' }))
+            : allProducts.filter(p => p.category === selectedCategory)
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-ZA', {
@@ -86,21 +51,51 @@ function ProductsContent() {
 
   const isInWishlist = (id: string) => wishlistItems.some(item => item.id === id)
 
+  const categories = [
+    { id: 'all', name: 'All Products', count: allProducts.length },
+    { id: 'jetboards', name: 'Jetboards', count: PRODUCTS.jetboards.length + PRODUCTS.limitedEdition.length },
+    { id: 'efoils', name: 'eFoils', count: PRODUCTS.efoils.length },
+    { id: 'batteries', name: 'Batteries', count: PRODUCTS.batteries.length },
+    { id: 'wings', name: 'Wings', count: PRODUCTS.wings.length },
+    { id: 'accessories', name: 'Accessories', count: PRODUCTS.bags.length + PRODUCTS.safetyStorage.length + PRODUCTS.electronics.length + PRODUCTS.parts.length },
+    { id: 'apparel', name: 'Apparel', count: PRODUCTS.apparel.length },
+  ]
+
   return (
     <>
+      {/* Stats Banner */}
+      <div className="bg-awake-gray rounded-xl p-6 mb-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div>
+          <div className="text-3xl font-bold text-accent-primary">{PRODUCTS.jetboards.length + PRODUCTS.limitedEdition.length}</div>
+          <div className="text-sm text-gray-400">Jetboards</div>
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-accent-primary">{PRODUCTS.efoils.length}</div>
+          <div className="text-sm text-gray-400">eFoils</div>
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-accent-primary">{PRODUCTS.wings.length}</div>
+          <div className="text-sm text-gray-400">Wing Kits</div>
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-accent-primary">{allProducts.length}</div>
+          <div className="text-sm text-gray-400">Total Products</div>
+        </div>
+      </div>
+
       {/* Category Filter */}
-      <div className="flex flex-wrap justify-center gap-4 mb-12">
-        {['all', 'jetboards', 'efoils', 'accessories'].map((category) => (
+      <div className="flex flex-wrap justify-center gap-3 mb-12">
+        {categories.map((category) => (
           <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-6 py-3 rounded-lg font-medium transition-all ${
-              selectedCategory === category
+            key={category.id}
+            onClick={() => setSelectedCategory(category.id)}
+            className={`px-5 py-3 rounded-lg font-medium transition-all ${
+              selectedCategory === category.id
                 ? 'bg-accent-primary text-awake-black'
                 : 'bg-awake-gray text-white hover:bg-awake-gray/80'
             }`}
           >
-            {category.charAt(0).toUpperCase() + category.slice(1)}
+            {category.name} <span className="text-sm opacity-70">({category.count})</span>
           </button>
         ))}
       </div>
@@ -119,6 +114,11 @@ function ProductsContent() {
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
+              {'badge' in product && product.badge && (
+                <div className="absolute top-4 left-4 bg-accent-primary text-awake-black px-3 py-1 rounded-full text-xs font-bold">
+                  {product.badge}
+                </div>
+              )}
               <button
                 onClick={() => addToWishlist({
                   id: product.id,
@@ -136,18 +136,38 @@ function ProductsContent() {
               </button>
             </div>
             <div className="p-6">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-xl font-bold">{product.name}</h3>
-                <span className="text-accent-primary font-bold">
-                  {formatPrice(product.price)}
-                </span>
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1">
+                  <div className="text-xs text-accent-primary font-medium mb-1">{product.categoryTag}</div>
+                  <h3 className="text-lg font-bold">{product.name}</h3>
+                  {'battery' in product && product.battery && (
+                    <div className="text-xs text-gray-500 mt-1">🔋 {product.battery}</div>
+                  )}
+                </div>
+                <div className="text-right ml-4">
+                  <div className="text-xl font-bold text-accent-primary">
+                    {formatPrice(product.price)}
+                  </div>
+                  {product.priceExVAT && (
+                    <div className="text-xs text-gray-500">
+                      {formatPrice(product.priceExVAT)} ex-VAT
+                    </div>
+                  )}
+                </div>
               </div>
-              <p className="text-gray-400 text-sm mb-4">{product.description}</p>
-              <ul className="text-sm text-gray-500 mb-6 space-y-1">
-                {product.specs.map((spec, i) => (
-                  <li key={i}>• {spec}</li>
-                ))}
-              </ul>
+              
+              {product.description && (
+                <p className="text-gray-400 text-sm mb-4">{product.description}</p>
+              )}
+              
+              {'specs' in product && product.specs && product.specs.length > 0 && (
+                <ul className="text-sm text-gray-500 mb-4 space-y-1">
+                  {product.specs.slice(0, 3).map((spec, i) => (
+                    <li key={i}>• {spec}</li>
+                  ))}
+                </ul>
+              )}
+              
               <div className="flex gap-3">
                 <button
                   onClick={() => addItem({
@@ -157,13 +177,13 @@ function ProductsContent() {
                     image: product.image,
                     quantity: 1,
                   })}
-                  className="flex-1 bg-accent-primary text-awake-black py-3 rounded-lg font-bold hover:bg-accent-secondary transition-colors"
+                  className="flex-1 bg-accent-primary text-awake-black py-3 rounded-lg font-bold hover:bg-accent-secondary transition-colors text-sm"
                 >
                   Add to Cart
                 </button>
                 <Link
                   href={`/products/${product.id}`}
-                  className="px-4 py-3 border border-white/20 rounded-lg hover:bg-white/10 transition-colors"
+                  className="px-4 py-3 border border-white/20 rounded-lg hover:bg-white/10 transition-colors text-sm"
                 >
                   Details
                 </Link>
@@ -172,6 +192,12 @@ function ProductsContent() {
           </div>
         ))}
       </div>
+
+      {filteredProducts.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-400 text-lg">No products found in this category.</p>
+        </div>
+      )}
 
       {/* Finance CTA */}
       <div className="mt-16 bg-gradient-to-r from-accent-primary/20 to-accent-secondary/20 rounded-2xl p-8 text-center">
@@ -186,6 +212,17 @@ function ProductsContent() {
           Enquire Now
         </Link>
       </div>
+
+      {/* Price Info */}
+      <div className="mt-8 bg-awake-gray rounded-xl p-6">
+        <h3 className="font-bold mb-3 text-center">📋 Pricing Information</h3>
+        <ul className="text-sm text-gray-400 space-y-2 max-w-2xl mx-auto">
+          <li>✓ All prices include 15% VAT</li>
+          <li>✓ Customs duties calculated per product category</li>
+          <li>✓ Exchange rate: R19.85/EUR (December 2025)</li>
+          <li>✓ Free standard shipping on complete boards</li>
+        </ul>
+      </div>
     </>
   )
 }
@@ -194,12 +231,17 @@ export default function ProductsPage() {
   return (
     <main className="min-h-screen bg-awake-black text-white py-20 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Our Products</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Complete Product Catalog</h1>
         <p className="text-xl text-gray-400 text-center mb-12">
-          Premium electric watercraft for the ultimate riding experience
+          Official Awake products with South African pricing (December 2025)
         </p>
 
-        <Suspense fallback={<div className="text-center py-12">Loading products...</div>}>
+        <Suspense fallback={
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-primary"></div>
+            <p className="mt-4 text-gray-400">Loading products...</p>
+          </div>
+        }>
           <ProductsContent />
         </Suspense>
       </div>
