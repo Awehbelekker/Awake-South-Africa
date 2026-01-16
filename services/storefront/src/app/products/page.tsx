@@ -107,7 +107,8 @@ function ProductsContent() {
             key={product.id}
             className="bg-awake-gray rounded-xl overflow-hidden group hover:ring-2 hover:ring-accent-primary transition-all"
           >
-            <div className="relative h-64 overflow-hidden">
+            <Link href={`/products/${product.id}`}>
+              <div className="relative h-64 overflow-hidden cursor-pointer">
               <Image
                 src={product.image}
                 alt={product.name}
@@ -115,18 +116,21 @@ function ProductsContent() {
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               {'badge' in product && product.badge && (
-                <div className="absolute top-4 left-4 bg-accent-primary text-awake-black px-3 py-1 rounded-full text-xs font-bold">
+                <div className="absolute top-4 left-4 bg-accent-primary text-awake-black px-3 py-1 rounded-full text-xs font-bold z-10">
                   {product.badge}
                 </div>
               )}
               <button
-                onClick={() => addToWishlist({
-                  id: product.id,
-                  name: product.name,
-                  price: product.price,
-                  image: product.image,
-                })}
-                className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                onClick={(e) => {
+                  e.preventDefault();
+                  addToWishlist({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                  });
+                }}
+                className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors z-10 ${
                   isInWishlist(product.id)
                     ? 'bg-red-500 text-white'
                     : 'bg-white/10 backdrop-blur text-white hover:bg-white/20'
@@ -134,6 +138,7 @@ function ProductsContent() {
               >
                 ♥
               </button>
+            </Link>
             </div>
             <div className="p-6">
               <div className="flex items-start justify-between mb-2">
@@ -142,6 +147,13 @@ function ProductsContent() {
                   <h3 className="text-lg font-bold">{product.name}</h3>
                   {'battery' in product && product.battery && (
                     <div className="text-xs text-gray-500 mt-1">🔋 {product.battery}</div>
+                  )}
+                  {'skillLevel' in product && product.skillLevel && (
+                    <div className="mt-2 inline-block">
+                      <span className="px-2 py-1 bg-accent-primary/10 text-accent-primary text-xs font-medium rounded-full">
+                        {product.skillLevel}
+                      </span>
+                    </div>
                   )}
                 </div>
                 <div className="text-right ml-4">
@@ -170,19 +182,23 @@ function ProductsContent() {
               
               <div className="flex gap-3">
                 <button
-                  onClick={() => addItem({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    image: product.image,
-                    quantity: 1,
-                  })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addItem({
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      image: product.image,
+                      quantity: 1,
+                    });
+                  }}
                   className="flex-1 bg-accent-primary text-awake-black py-3 rounded-lg font-bold hover:bg-accent-secondary transition-colors text-sm"
                 >
                   Add to Cart
                 </button>
                 <Link
                   href={`/products/${product.id}`}
+                  onClick={(e) => e.stopPropagation()}
                   className="px-4 py-3 border border-white/20 rounded-lg hover:bg-white/10 transition-colors text-sm"
                 >
                   Details

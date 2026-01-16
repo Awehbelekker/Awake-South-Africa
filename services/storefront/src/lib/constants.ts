@@ -5,8 +5,8 @@
 // ============================================
 
 export const AWAKE_IMAGES = {
-  // Logo - Using text-based approach since CDN logo is unavailable
-  logo: "/images/awake-logo.svg",
+  // Logo
+  logo: "/images/awake-logo.png",
 
   // Hero Images
   hero: {
@@ -121,6 +121,7 @@ export const PRODUCTS = {
   // 🏄 COMPLETE JETBOARDS (0% Duty)
   jetboards: [
     { 
+      categoryTag: "Jetboard",
       id: "ravik-explore-xr4", 
       name: "RÄVIK Explore XR 4", 
       price: 241139, 
@@ -128,11 +129,13 @@ export const PRODUCTS = {
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.explore,
       battery: "XR 4 (65 min)",
-      description: "Entry-level electric jetboard with impressive performance",
+      skillLevel: "Beginner",
+      description: "Entry-level electric jetboard with impressive performance. Perfect for beginners and families.",
       specs: ["Max Speed: 50 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Carbon composite construction"],
       features: ["Intuitive hand controller", "Quick battery swap", "Durable construction"],
     },
     { 
+      categoryTag: "Jetboard",
       id: "ravik-adventure-xr4", 
       name: "RÄVIK Adventure XR 4", 
       price: 349024, 
@@ -140,11 +143,13 @@ export const PRODUCTS = {
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.adventure,
       battery: "XR 4 (65 min)",
-      description: "Mid-range performance jetboard for enthusiasts",
+      skillLevel: "Intermediate",
+      description: "Mid-range performance jetboard for enthusiasts. Perfect balance of power and versatility for expedition rides.",
       specs: ["Max Speed: 55 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Advanced motor system"],
       features: ["Enhanced power delivery", "Premium build quality", "Extended range"],
     },
     { 
+      categoryTag: "Jetboard",
       id: "ravik-ultimate-xr4", 
       name: "RÄVIK Ultimate XR 4", 
       price: 402967, 
@@ -152,7 +157,8 @@ export const PRODUCTS = {
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.ultimate,
       battery: "XR 4 (65 min)",
-      description: "Top-tier performance electric jetboard",
+      skillLevel: "Expert",
+      description: "Top-tier performance electric jetboard. Engineered for experienced riders who demand peak performance and agility.",
       specs: ["Max Speed: 60 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Pro-level performance"],
       features: ["Maximum acceleration", "Carbon fiber components", "Competition ready"],
     },
@@ -161,6 +167,7 @@ export const PRODUCTS = {
   // 🏆 LIMITED EDITION
   limitedEdition: [
     { 
+      categoryTag: "Limited Edition",
       id: "brabus-shadow", 
       name: "BRABUS Shadow", 
       price: 452216, 
@@ -169,7 +176,8 @@ export const PRODUCTS = {
       image: AWAKE_IMAGES.brabus.shadowExplore, 
       badge: "Limited Edition",
       battery: "XR 4 (65 min)",
-      description: "Exclusive BRABUS collaboration - luxury meets performance",
+      skillLevel: "Expert",
+      description: "Exclusive BRABUS collaboration - luxury meets performance. One of 77 limited edition boards.",
       specs: ["Max Speed: 60 km/h", "Exclusive BRABUS Design", "Carbon Fiber", "Premium finishes"],
       features: ["Numbered limited edition", "Signature BRABUS styling", "Collector's item"],
     },
@@ -178,6 +186,7 @@ export const PRODUCTS = {
   // 🪁 COMPLETE eFOILS (0% Duty)
   efoils: [
     { 
+      categoryTag: "eFoil",
       id: "vinga-adventure-lr4", 
       name: "VINGA Adventure LR 4", 
       price: 322052, 
@@ -185,11 +194,13 @@ export const PRODUCTS = {
       category: "efoils",
       image: AWAKE_IMAGES.vinga.adventure,
       battery: "LR 4 (90 min)",
-      description: "Extended range eFoil for long sessions",
+      skillLevel: "Beginner to Intermediate",
+      description: "Extended range eFoil for long sessions. Perfect for learning and exploring.",
       specs: ["Max Speed: 40 km/h", "Battery: 90 min ride time", "Silent operation", "Stable foil design"],
       features: ["Long battery life", "Easy to learn", "Smooth ride"],
     },
     { 
+      categoryTag: "eFoil",
       id: "vinga-adventure-xr4", 
       name: "VINGA Adventure XR 4", 
       price: 362509, 
@@ -197,11 +208,13 @@ export const PRODUCTS = {
       category: "efoils",
       image: AWAKE_IMAGES.vinga.adventure,
       battery: "XR 4 (65 min)",
-      description: "Performance-focused eFoil with XR battery",
+      skillLevel: "Intermediate",
+      description: "Performance-focused eFoil with XR battery. Enhanced stability and range for longer explorations.",
       specs: ["Max Speed: 40 km/h", "Battery: 65 min ride time", "Silent operation", "Responsive control"],
       features: ["Compact battery", "Travel-friendly", "Precision handling"],
     },
     { 
+      categoryTag: "eFoil",
       id: "vinga-ultimate-lr4", 
       name: "VINGA Ultimate LR 4", 
       price: 349024, 
@@ -209,17 +222,25 @@ export const PRODUCTS = {
       category: "efoils",
       image: AWAKE_IMAGES.vinga.ultimate,
       battery: "LR 4 (90 min)",
-      description: "Advanced eFoil with extended ride time",
+      skillLevel: "Intermediate to Expert",
+      description: "Advanced eFoil with extended ride time. Advanced performance and dynamic control.",
       specs: ["Max Speed: 45 km/h", "Battery: 90 min ride time", "Advanced control", "Premium wings"],
       features: ["High performance", "Long sessions", "Professional grade"],
     },
     { 
+      categoryTag: "eFoil",
       id: "vinga-ultimate-xr4", 
       name: "VINGA Ultimate XR 4", 
       price: 389481, 
       priceExVAT: 338679,
       category: "efoils",
       image: AWAKE_IMAGES.vinga.ultimate,
+      battery: "XR 4 (65 min)",
+      skillLevel: "Expert",
+      description: "Top-spec eFoil with ultimate performance. For those seeking peak performance and control.",
+      specs: ["Max Speed: 45 km/h", "Battery: 65 min ride time", "Advanced control", "Carbon construction"],
+      features: ["Maximum speed", "Precision foiling", "Competition ready"],
+    },
       battery: "XR 4 (65 min)",
       description: "Top-spec eFoil with ultimate performance",
       specs: ["Max Speed: 45 km/h", "Battery: 65 min ride time", "Advanced control", "Carbon construction"],
