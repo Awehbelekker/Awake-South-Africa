@@ -50,40 +50,44 @@ export default function ProductDetailPage() {
   const formatPrice = (price: number) => `R${price.toLocaleString()}`;
   const isInWishlist = wishlistItems.some(item => item.id === product.id);
 
-  // Image gallery from Awake website
+  // Image gallery from Awake website - 4 angles per product
+  // TO CUSTOMIZE: Replace these URLs with actual product images for each specific product
   const productGallery = [
-    product.image,
-    "https://awakeboards.com/cdn/shop/files/Ravik_ADVENTURE-22_1_1.png?v=1752232151",
-    "https://awakeboards.com/cdn/shop/files/accessory-ladies_4.png?v=1752224160",
-    "https://awakeboards.com/cdn/shop/files/BRABUSx3.png?v=1754380085",
+    product.image, // Main product image
+    product.image, // Side angle - update with actual side view URL
+    product.image, // Top angle - update with actual top view URL  
+    product.image, // Action shot - update with rider using product URL
   ];
 
-  // Product videos
+  // Product videos - YouTube embed IDs
+  // TO CUSTOMIZE: Replace embedId with actual YouTube video IDs (the part after watch?v=)
+  // Example: https://www.youtube.com/watch?v=ABC123 -> embedId: 'ABC123'
   const productVideos = [
     {
       id: 'demo',
       title: 'Product Demo',
       thumbnail: product.image,
-      embedId: 'dQw4w9WgXcQ',
+      embedId: 'dQw4w9WgXcQ', // REPLACE with actual demo video ID
       duration: '2:30'
     },
     {
       id: 'features',
-      title: 'Features Walkthrough',
+      title: 'Features Walkthrough', 
       thumbnail: product.image,
-      embedId: 'dQw4w9WgXcQ',
+      embedId: 'dQw4w9WgXcQ', // REPLACE with actual features video ID
       duration: '3:15'
     },
     {
       id: 'review',
       title: 'Customer Review',
       thumbnail: product.image,
-      embedId: 'dQw4w9WgXcQ',
+      embedId: 'dQw4w9WgXcQ', // REPLACE with actual review video ID
       duration: '4:50'
     },
   ];
 
-  // Ride profile stats
+  // Ride profile stats - customize per product
+  // TO CUSTOMIZE: Update these values based on actual product specifications
   const rideProfile = {
     topSpeed: '58 km/h',
     range: '40 km',
