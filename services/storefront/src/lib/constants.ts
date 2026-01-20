@@ -161,10 +161,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Jetboard",
       id: "ravik-explore",
-      name: "Awake RÄVIK Explore",
-      price: 198301, // €9,990 * 19.85 = R198,301
-      priceExVAT: 172435,
-      costEUR: 9990,
+      name: "Awake RÄVIK Explore XR 4",
+      price: 242000, // Retail inc-VAT R241,139 rounded up
+      priceExVAT: 210500, // Retail ex-VAT R209,686 rounded up
+      costEUR: 12150, // Landed cost R155,323 / 19.85 * 1.15 rounded up
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.explore,
       battery: "XR 4 (65 min)",
@@ -176,10 +176,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Jetboard",
       id: "ravik-adventure",
-      name: "Awake RÄVIK Adventure",
-      price: 277721, // €13,990 * 19.85 = R277,721
-      priceExVAT: 241496,
-      costEUR: 13990,
+      name: "Awake RÄVIK Adventure XR 4",
+      price: 350000, // Retail inc-VAT R349,024 rounded up
+      priceExVAT: 304000, // Retail ex-VAT R303,499 rounded up
+      costEUR: 17600, // Landed cost R224,814 / 19.85 * 1.15 rounded up
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.adventure,
       battery: "XR 4 (65 min)",
@@ -191,10 +191,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Jetboard",
       id: "ravik-ultimate",
-      name: "Awake RÄVIK Ultimate",
-      price: 317401, // €15,990 * 19.85 = R317,401
-      priceExVAT: 276001,
-      costEUR: 15990,
+      name: "Awake RÄVIK Ultimate XR 4",
+      price: 403000, // Retail inc-VAT R402,967 rounded up
+      priceExVAT: 351000, // Retail ex-VAT R350,406 rounded up
+      costEUR: 20300, // Landed cost R259,560 / 19.85 * 1.15 rounded up
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.ultimate,
       battery: "XR 4 (65 min)",
@@ -226,10 +226,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Limited Edition",
       id: "brabus-shadow-explore",
-      name: "BRABUS x Awake SHADOW EXPLORE",
-      price: 315615, // €15,900 * 19.85 = R315,615
-      priceExVAT: 274448,
-      costEUR: 15900,
+      name: "BRABUS Shadow (Limited)",
+      price: 453000, // Retail inc-VAT R452,216 rounded up
+      priceExVAT: 394000, // Retail ex-VAT R393,231 rounded up
+      costEUR: 22800, // Landed cost R291,282 / 19.85 * 1.15 rounded up
       category: "jetboards",
       image: AWAKE_IMAGES.brabus.shadowExplore,
       badge: "Limited Edition",
@@ -246,10 +246,10 @@ export const PRODUCTS = {
     {
       categoryTag: "eFoil",
       id: "vinga-adventure-lr4",
-      name: "Awake VINGA Adventure (LR 4)",
-      price: 257851, // €12,990 * 19.85 = R257,851
-      priceExVAT: 224218,
-      costEUR: 12990,
+      name: "Awake VINGA Adventure LR 4",
+      price: 323000, // Retail inc-VAT R322,052 rounded up
+      priceExVAT: 281000, // Retail ex-VAT R280,045 rounded up
+      costEUR: 16250, // Landed cost R207,441 / 19.85 * 1.15 rounded up
       category: "efoils",
       image: AWAKE_IMAGES.vinga.adventure,
       battery: "LR 4 (90 min)",
@@ -261,10 +261,10 @@ export const PRODUCTS = {
     {
       categoryTag: "eFoil",
       id: "vinga-adventure-xr4",
-      name: "Awake VINGA Adventure (XR 4)",
-      price: 287631, // €14,490 * 19.85 = R287,631
-      priceExVAT: 250114,
-      costEUR: 14490,
+      name: "Awake VINGA Adventure XR 4",
+      price: 363000, // Retail inc-VAT R362,509 rounded up
+      priceExVAT: 316000, // Retail ex-VAT R315,225 rounded up
+      costEUR: 18300, // Landed cost R233,500 / 19.85 * 1.15 rounded up
       category: "efoils",
       image: AWAKE_IMAGES.vinga.adventure,
       battery: "XR 4 (65 min)",
@@ -276,10 +276,10 @@ export const PRODUCTS = {
     {
       categoryTag: "eFoil",
       id: "vinga-ultimate-lr4",
-      name: "Awake VINGA Ultimate (LR 4)",
-      price: 277721, // €13,990 * 19.85 = R277,721
-      priceExVAT: 241496,
-      costEUR: 13990,
+      name: "Awake VINGA Ultimate LR 4",
+      price: 350000, // Retail inc-VAT R349,024 rounded up
+      priceExVAT: 304000, // Retail ex-VAT R303,499 rounded up
+      costEUR: 17600, // Landed cost R224,814 / 19.85 * 1.15 rounded up
       category: "efoils",
       image: AWAKE_IMAGES.vinga.ultimate,
       battery: "LR 4 (90 min)",
@@ -291,10 +291,10 @@ export const PRODUCTS = {
     {
       categoryTag: "eFoil",
       id: "vinga-ultimate-xr4",
-      name: "Awake VINGA Ultimate (XR 4)",
-      price: 307501, // €15,490 * 19.85 = R307,501
-      priceExVAT: 267392,
-      costEUR: 15490,
+      name: "Awake VINGA Ultimate XR 4",
+      price: 390000, // Retail inc-VAT R389,481 rounded up
+      priceExVAT: 339000, // Retail ex-VAT R338,679 rounded up
+      costEUR: 19650, // Landed cost R250,873 / 19.85 * 1.15 rounded up
       category: "efoils",
       image: AWAKE_IMAGES.vinga.ultimate,
       battery: "XR 4 (65 min)",
@@ -310,10 +310,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Battery",
       id: "flex-battery-lr4",
-      name: "Awake Flex Battery LR 4",
-      price: 59351, // €2,990 * 19.85 = R59,351
-      priceExVAT: 51609,
-      costEUR: 2990,
+      name: "Awake Flex Battery LR 4 (90 min)",
+      price: 79000, // Retail inc-VAT R78,765 rounded up
+      priceExVAT: 69000, // Retail ex-VAT R68,491 rounded up
+      costEUR: 4000, // Landed cost R50,734 / 19.85 * 1.15 rounded up
       category: "batteries",
       image: AWAKE_IMAGES.batteries.flexLR4,
       description: "Long range battery - 90 minutes ride time. Perfect for extended sessions on the water with quick swap design.",
@@ -323,10 +323,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Battery",
       id: "flex-battery-xr4",
-      name: "Awake Flex Battery XR 4",
-      price: 99051, // €4,990 * 19.85 = R99,051
-      priceExVAT: 86131,
-      costEUR: 4990,
+      name: "Awake Flex Battery XR 4 (65 min)",
+      price: 122000, // Retail inc-VAT R121,918 rounded up
+      priceExVAT: 107000, // Retail ex-VAT R106,016 rounded up
+      costEUR: 6200, // Landed cost R78,530 / 19.85 * 1.15 rounded up
       category: "batteries",
       image: AWAKE_IMAGES.batteries.flexXR4,
       description: "Extended range battery - 65 minutes ride time. Compact design with fast charging capability.",
@@ -351,38 +351,77 @@ export const PRODUCTS = {
 
   // 📦 BOARDS ONLY (0% Duty)
   boardsOnly: [
-    { categoryTag: "Board Only", id: "ravik-explore-board", name: "RÄVIK Explore (Board Only)", price: 132934, priceExVAT: 115595, category: "boards", image: AWAKE_IMAGES.ravik.explore, description: "Board without battery" },
-    { categoryTag: "Board Only", id: "ravik-adventure-board", name: "RÄVIK Adventure (Board Only)", price: 213847, priceExVAT: 185954, category: "boards", image: AWAKE_IMAGES.ravik.adventure, description: "Board without battery" },
-    { categoryTag: "Board Only", id: "ravik-ultimate-board", name: "RÄVIK Ultimate (Board Only)", price: 240819, priceExVAT: 209408, category: "boards", image: AWAKE_IMAGES.ravik.ultimate, description: "Board without battery" },
-    { categoryTag: "Board Only", id: "vinga-adventure-board", name: "VINGA Adventure (Board Only)", price: 240819, priceExVAT: 209408, category: "boards", image: AWAKE_IMAGES.vinga.adventure, description: "Board without battery" },
-    { categoryTag: "Board Only", id: "vinga-ultimate-board", name: "VINGA Ultimate (Board Only)", price: 254305, priceExVAT: 221135, category: "boards", image: AWAKE_IMAGES.vinga.ultimate, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "ravik-explore-board", name: "RÄVIK Explore (Board Only)", price: 133000, priceExVAT: 116000, category: "boards", image: AWAKE_IMAGES.ravik.explore, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "ravik-adventure-board", name: "RÄVIK Adventure (Board Only)", price: 214000, priceExVAT: 186000, category: "boards", image: AWAKE_IMAGES.ravik.adventure, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "ravik-ultimate-board", name: "RÄVIK Ultimate (Board Only)", price: 241000, priceExVAT: 210000, category: "boards", image: AWAKE_IMAGES.ravik.ultimate, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "vinga-adventure-board", name: "VINGA Adventure (Board Only)", price: 241000, priceExVAT: 210000, category: "boards", image: AWAKE_IMAGES.vinga.adventure, description: "Board without battery" },
+    { categoryTag: "Board Only", id: "vinga-ultimate-board", name: "VINGA Ultimate (Board Only)", price: 255000, priceExVAT: 222000, category: "boards", image: AWAKE_IMAGES.vinga.ultimate, description: "Board without battery" },
   ],
 
   // 🪁 eFOIL WING KITS (0% Duty) - Real Awake Products
   wings: [
     {
       categoryTag: "Wing Kit",
-      id: "powder-wing-kit",
-      name: "Awake Powder Wing Kit",
-      price: 19651, // €990 * 19.85 = R19,651
-      priceExVAT: 17088,
-      costEUR: 990,
+      id: "cruise-1600-wing-kit",
+      name: "CRUISE 1600 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
       category: "wings",
       image: AWAKE_IMAGES.accessories.powderWing,
-      description: "Powder wing kit for versatile eFoil performance. Ideal for various water conditions.",
+      description: "CRUISE 1600 wing kit for versatile eFoil performance. Ideal for various water conditions.",
       specs: ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
       features: ["All-around performance", "Durable", "Smooth ride"],
     },
     {
       categoryTag: "Wing Kit",
-      id: "fluid-wing-kit",
-      name: "Awake Fluid Wing Kit",
-      price: 19651, // €990 * 19.85 = R19,651
-      priceExVAT: 17088,
-      costEUR: 990,
+      id: "powder-1800-wing-kit",
+      name: "POWDER 1800 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
+      category: "wings",
+      image: AWAKE_IMAGES.accessories.powderWing,
+      description: "POWDER 1800 wing kit for versatile eFoil performance. Ideal for various water conditions.",
+      specs: ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
+      features: ["All-around performance", "Durable", "Smooth ride"],
+    },
+    {
+      categoryTag: "Wing Kit",
+      id: "powder-1400-wing-kit",
+      name: "POWDER 1400 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
+      category: "wings",
+      image: AWAKE_IMAGES.accessories.powderWing,
+      description: "POWDER 1400 wing kit for versatile eFoil performance. Ideal for various water conditions.",
+      specs: ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
+      features: ["All-around performance", "Durable", "Smooth ride"],
+    },
+    {
+      categoryTag: "Wing Kit",
+      id: "fluid-1300-wing-kit",
+      name: "FLUID 1300 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
       category: "wings",
       image: AWAKE_IMAGES.accessories.fluidWing,
-      description: "Fluid wing kit for high-speed eFoil performance. Designed for speed and agility.",
+      description: "FLUID 1300 wing kit for high-speed eFoil performance. Designed for speed and agility.",
+      specs: ["High-speed design", "Carbon fiber", "Precision engineering", "Aerodynamic"],
+      features: ["Maximum speed", "Responsive", "Competition-ready"],
+    },
+    {
+      categoryTag: "Wing Kit",
+      id: "fluid-1000-wing-kit",
+      name: "FLUID 1000 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
+      category: "wings",
+      image: AWAKE_IMAGES.accessories.fluidWing,
+      description: "FLUID 1000 wing kit for high-speed eFoil performance. Designed for speed and agility.",
       specs: ["High-speed design", "Carbon fiber", "Precision engineering", "Aerodynamic"],
       features: ["Maximum speed", "Responsive", "Competition-ready"],
     },
@@ -392,42 +431,42 @@ export const PRODUCTS = {
   bags: [
     {
       categoryTag: "Bag",
-      id: "ravik-board-bag-kit",
-      name: "Awake RÄVIK Board Bag Kit",
-      price: 11711, // €590 * 19.85 = R11,711
-      priceExVAT: 10183,
-      costEUR: 590,
+      id: "board-bag-kit",
+      name: "Board Bag Kit (RÄVIK/VINGA)",
+      price: 19500, // Retail inc-VAT R19,406 rounded up
+      priceExVAT: 17000, // Retail ex-VAT R16,875 rounded up
+      costEUR: 985, // Landed cost R12,500 / 19.85 * 1.15 rounded up (20% duty)
       category: "accessories",
       image: AWAKE_IMAGES.accessories.boardBag,
-      description: "Protective bag kit for RÄVIK jetboards. Includes board bag and accessories storage.",
+      description: "Protective bag kit for RÄVIK jetboards and VINGA eFoils. Includes board bag and accessories storage.",
       specs: ["Padded protection", "Weather resistant", "Multiple compartments", "Durable zippers"],
       features: ["Full protection", "Easy transport", "Quality materials"],
     },
     {
       categoryTag: "Bag",
-      id: "vinga-board-bag-kit",
-      name: "Awake VINGA Board Bag Kit",
-      price: 11711, // €590 * 19.85 = R11,711
-      priceExVAT: 10183,
-      costEUR: 590,
+      id: "battery-bag",
+      name: "Battery Bag",
+      price: 9700, // Retail inc-VAT R9,620 rounded up
+      priceExVAT: 8400, // Retail ex-VAT R8,365 rounded up
+      costEUR: 485, // Landed cost R6,196 / 19.85 * 1.15 rounded up (20% duty)
       category: "accessories",
-      image: AWAKE_IMAGES.accessories.vingaBoardBag,
-      description: "Protective bag kit for VINGA eFoils. Designed for complete eFoil protection and transport.",
-      specs: ["eFoil specific", "Padded interior", "Weather resistant", "Foil compartment"],
-      features: ["Complete protection", "Travel-ready", "Organized storage"],
+      image: AWAKE_IMAGES.accessories.batteryBackpack,
+      description: "Dedicated battery bag for safe transport of Awake batteries.",
+      specs: ["Battery specific", "Padded protection", "Comfortable straps", "Compact design"],
+      features: ["Safe transport", "Comfortable carry", "Durable"],
     },
     {
       categoryTag: "Bag",
-      id: "battery-backpack",
-      name: "Awake Battery Backpack",
-      price: 2382, // €120 * 19.85 = R2,382
-      priceExVAT: 2071,
-      costEUR: 120,
+      id: "premium-travel-bag",
+      name: "Premium Travel Bag",
+      price: 16200, // Retail inc-VAT R16,169 rounded up
+      priceExVAT: 14100, // Retail ex-VAT R14,060 rounded up
+      costEUR: 815, // Landed cost R10,415 / 19.85 * 1.15 rounded up (20% duty)
       category: "accessories",
-      image: AWAKE_IMAGES.accessories.batteryBackpack,
-      description: "Dedicated battery backpack for safe transport of Awake batteries.",
-      specs: ["Battery specific", "Padded protection", "Comfortable straps", "Compact design"],
-      features: ["Safe transport", "Comfortable carry", "Durable"],
+      image: AWAKE_IMAGES.accessories.boardBag,
+      description: "Premium travel bag for complete protection during transport.",
+      specs: ["Premium materials", "Padded interior", "Weather resistant", "Multiple compartments"],
+      features: ["Complete protection", "Travel-ready", "Organized storage"],
     },
   ],
 
@@ -436,10 +475,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Safety",
       id: "life-vest",
-      name: "Awake Life Vest",
-      price: 5756, // €290 * 19.85 = R5,756
-      priceExVAT: 5005,
-      costEUR: 290,
+      name: "Life Vest (CE Certified)",
+      price: 9700, // Retail inc-VAT R9,620 rounded up
+      priceExVAT: 8400, // Retail ex-VAT R8,365 rounded up
+      costEUR: 485, // Landed cost R6,196 / 19.85 * 1.15 rounded up (20% duty)
       category: "accessories",
       image: AWAKE_IMAGES.accessories.lifeVest,
       description: "CE certified life vest designed for water sports. Safety meets style with Awake branding.",
@@ -447,42 +486,42 @@ export const PRODUCTS = {
       features: ["Safety certified", "Comfortable", "Stylish"],
     },
     {
-      categoryTag: "Safety",
-      id: "impact-vest",
-      name: "Awake x ION Impact Vest",
-      price: 3970, // €200 * 19.85 = R3,970
-      priceExVAT: 3452,
-      costEUR: 200,
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.impactVest,
-      description: "Collaboration with ION for premium impact protection. Designed for active water sports.",
-      specs: ["Impact protection", "Flexible design", "ION quality", "Awake branding"],
-      features: ["Premium protection", "Comfortable fit", "Collaboration piece"],
-    },
-    {
       categoryTag: "Storage",
-      id: "inflatable-dock",
-      name: "Awake Inflatable Dock",
-      price: 47640, // €2,400 * 19.85 = R47,640
-      priceExVAT: 41426,
-      costEUR: 2400,
+      id: "awake-dock",
+      name: "Awake Dock (Floating)",
+      price: 78300, // Retail inc-VAT R78,298 rounded up
+      priceExVAT: 68100, // Retail ex-VAT R68,085 rounded up
+      costEUR: 3950, // Landed cost R50,433 / 19.85 * 1.15 rounded up (20% duty)
       category: "accessories",
       image: AWAKE_IMAGES.accessories.inflatableDock,
-      description: "Floating inflatable dock system for easy water access. Perfect for launching and docking your Awake.",
-      specs: ["Inflatable design", "Stable platform", "Easy setup", "Durable materials"],
+      description: "Floating dock system for easy water access. Perfect for launching and docking your Awake.",
+      specs: ["Floating design", "Stable platform", "Easy setup", "Durable materials"],
       features: ["Easy access", "Portable", "Stable"],
     },
     {
       categoryTag: "Storage",
       id: "wall-mount",
-      name: "Awake RÄVIK Wall Mount",
-      price: 17865, // €900 * 19.85 = R17,865
-      priceExVAT: 15535,
-      costEUR: 900,
+      name: "Wall Mount",
+      price: 29600, // Retail inc-VAT R29,518 rounded up
+      priceExVAT: 25700, // Retail ex-VAT R25,668 rounded up
+      costEUR: 1490, // Landed cost R19,013 / 19.85 * 1.15 rounded up (20% duty)
       category: "accessories",
       image: AWAKE_IMAGES.accessories.wallMount,
       description: "Premium wall mounting system for RÄVIK boards. Display your board as art when not in use.",
       specs: ["Secure mounting", "Premium finish", "Easy installation", "Board protection"],
+      features: ["Display quality", "Secure storage", "Space-saving"],
+    },
+    {
+      categoryTag: "Storage",
+      id: "board-stand",
+      name: "Board Stand",
+      price: 16200, // Retail inc-VAT R16,169 rounded up
+      priceExVAT: 14100, // Retail ex-VAT R14,060 rounded up
+      costEUR: 815, // Landed cost R10,415 / 19.85 * 1.15 rounded up (20% duty)
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.wallMount,
+      description: "Premium board stand for displaying your Awake board.",
+      specs: ["Stable design", "Premium finish", "Easy assembly", "Board protection"],
       features: ["Display quality", "Secure storage", "Space-saving"],
     },
   ],
@@ -491,11 +530,11 @@ export const PRODUCTS = {
   electronics: [
     {
       categoryTag: "Electronics",
-      id: "flex-hand-controller-4",
-      name: "Awake Flex Hand Controller 4",
-      price: 11711, // €590 * 19.85 = R11,711
-      priceExVAT: 10183,
-      costEUR: 590,
+      id: "flex-hand-controller",
+      name: "Flex Hand Controller",
+      price: 16300, // Retail inc-VAT R16,224 rounded up
+      priceExVAT: 14200, // Retail ex-VAT R14,108 rounded up
+      costEUR: 820, // Landed cost R10,450 / 19.85 * 1.15 rounded up
       category: "accessories",
       image: AWAKE_IMAGES.accessories.handController,
       description: "Latest generation wireless hand controller with ergonomic design and precise throttle control.",
@@ -504,25 +543,11 @@ export const PRODUCTS = {
     },
     {
       categoryTag: "Electronics",
-      id: "brabus-hand-controller",
-      name: "BRABUS Hand Controller",
-      price: 13696, // €690 * 19.85 = R13,696
-      priceExVAT: 11910,
-      costEUR: 690,
-      category: "accessories",
-      image: AWAKE_IMAGES.brabus.handController,
-      badge: "Limited Edition",
-      description: "Exclusive BRABUS hand controller with signature styling and premium finishes.",
-      specs: ["Wireless operation", "BRABUS design", "Premium materials", "LED display"],
-      features: ["Exclusive styling", "Ergonomic grip", "Limited edition"],
-    },
-    {
-      categoryTag: "Electronics",
       id: "battery-charger",
-      name: "Awake Flex Battery Charger",
-      price: 17865, // €900 * 19.85 = R17,865
-      priceExVAT: 15535,
-      costEUR: 900,
+      name: "Battery Charger",
+      price: 24700, // Retail inc-VAT R24,662 rounded up
+      priceExVAT: 21500, // Retail ex-VAT R21,445 rounded up
+      costEUR: 1245, // Landed cost R15,885 / 19.85 * 1.15 rounded up
       category: "accessories",
       image: AWAKE_IMAGES.accessories.charger,
       description: "Fast battery charger for all Awake batteries. Charges LR 4 and XR 4 batteries efficiently.",
@@ -532,10 +557,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Electronics",
       id: "controller-charger",
-      name: "Awake Flex Hand Controller Charger",
-      price: 3970, // €200 * 19.85 = R3,970
-      priceExVAT: 3452,
-      costEUR: 200,
+      name: "Controller Charger",
+      price: 5700, // Retail inc-VAT R5,628 rounded up
+      priceExVAT: 4900, // Retail ex-VAT R4,894 rounded up
+      costEUR: 285, // Landed cost R3,625 / 19.85 * 1.15 rounded up
       category: "accessories",
       image: AWAKE_IMAGES.accessories.controllerCharger,
       description: "Dedicated charger for Awake hand controllers with USB connectivity.",
@@ -549,10 +574,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Parts",
       id: "ravik-fins",
-      name: "Awake RÄVIK Fins (Set of 3)",
-      price: 3970, // €200 * 19.85 = R3,970
-      priceExVAT: 3452,
-      costEUR: 200,
+      name: "RÄVIK Fins (Set of 3)",
+      price: 5700, // Retail inc-VAT R5,628 rounded up
+      priceExVAT: 4900, // Retail ex-VAT R4,894 rounded up
+      costEUR: 285, // Landed cost R3,625 / 19.85 * 1.15 rounded up
       category: "accessories",
       image: AWAKE_IMAGES.accessories.ravikFins,
       description: "Standard fin set for RÄVIK jetboards. Set of 3 high-quality fins for optimal performance.",
@@ -562,10 +587,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Parts",
       id: "carbon-fins",
-      name: "Awake Carbon Fins (Set of 3)",
-      price: 5756, // €290 * 19.85 = R5,756
-      priceExVAT: 5005,
-      costEUR: 290,
+      name: "Carbon Fins (Set of 3)",
+      price: 8100, // Retail inc-VAT R8,055 rounded up
+      priceExVAT: 7100, // Retail ex-VAT R7,004 rounded up
+      costEUR: 410, // Landed cost R5,188 / 19.85 * 1.15 rounded up
       category: "accessories",
       image: AWAKE_IMAGES.accessories.carbonFins,
       description: "Premium carbon fiber fin set. Lightweight and ultra-durable for maximum performance.",
@@ -575,10 +600,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Parts",
       id: "foot-straps",
-      name: "Awake Foot Straps",
-      price: 5955, // €300 * 19.85 = R5,955
-      priceExVAT: 5178,
-      costEUR: 300,
+      name: "Foot Straps",
+      price: 8400, // Retail inc-VAT R8,325 rounded up
+      priceExVAT: 7300, // Retail ex-VAT R7,239 rounded up
+      costEUR: 420, // Landed cost R5,362 / 19.85 * 1.15 rounded up
       category: "accessories",
       image: AWAKE_IMAGES.accessories.footStraps,
       description: "Adjustable foot straps for enhanced control and stability on your Awake board.",
@@ -588,10 +613,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Parts",
       id: "beach-mat",
-      name: "Awake Beach Mat",
-      price: 3771, // €190 * 19.85 = R3,771
-      priceExVAT: 3279,
-      costEUR: 190,
+      name: "Beach Mat (5% duty)",
+      price: 5700, // Retail inc-VAT R5,614 rounded up
+      priceExVAT: 4900, // Retail ex-VAT R4,882 rounded up
+      costEUR: 285, // Landed cost R3,616 / 19.85 * 1.15 rounded up (5% duty)
       category: "accessories",
       image: AWAKE_IMAGES.accessories.beachMat,
       description: "Portable beach mat for protecting your board and gear. Perfect for beach sessions.",
@@ -644,10 +669,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Apparel",
       id: "tshirt",
-      name: "Awake T-Shirt",
-      price: 1588, // €80 * 19.85 = R1,588
-      priceExVAT: 1381,
-      costEUR: 80,
+      name: "T-shirt",
+      price: 3300, // Retail inc-VAT R3,283 rounded up
+      priceExVAT: 2900, // Retail ex-VAT R2,855 rounded up
+      costEUR: 165, // Landed cost R2,115 / 19.85 * 1.15 rounded up (45% duty)
       category: "apparel",
       image: AWAKE_IMAGES.accessories.tshirt,
       description: "Official Awake branded t-shirt. Premium quality cotton with Awake logo.",
@@ -657,10 +682,10 @@ export const PRODUCTS = {
     {
       categoryTag: "Apparel",
       id: "cap",
-      name: "Awake Cap",
-      price: 794, // €40 * 19.85 = R794
-      priceExVAT: 691,
-      costEUR: 40,
+      name: "Cap",
+      price: 1700, // Retail inc-VAT R1,689 rounded up
+      priceExVAT: 1500, // Retail ex-VAT R1,469 rounded up
+      costEUR: 85, // Landed cost R1,088 / 19.85 * 1.15 rounded up (45% duty)
       category: "apparel",
       image: AWAKE_IMAGES.accessories.cap,
       description: "Branded Awake cap. Perfect for sunny days on the water.",
