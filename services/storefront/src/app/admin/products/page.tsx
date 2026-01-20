@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAdminStore } from '@/store/admin'
-import { useProductsStore } from '@/store/products'
+import { useProductsStore, EditableProduct } from '@/store/products'
+import ProductEditModal from '@/components/admin/ProductEditModal'
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function AdminProductsPage() {
   const router = useRouter()
@@ -11,8 +13,8 @@ export default function AdminProductsPage() {
   const { products, updateProduct } = useProductsStore()
   const [mounted, setMounted] = useState(false)
   const [filter, setFilter] = useState('all')
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editForm, setEditForm] = useState<any>({})
+  const [editingProduct, setEditingProduct] = useState<EditableProduct | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -25,23 +27,26 @@ export default function AdminProductsPage() {
     return null
   }
 
-  const filteredProducts = filter === 'all' 
-    ? products 
+  const filteredProducts = filter === 'all'
+    ? products
     : products.filter(p => (p.categoryTag || p.category) === filter)
 
   const categories = ['all', ...Array.from(new Set(products.map(p => p.categoryTag || p.category)))]
 
-  const startEdit = (product: any) => {
-    setEditingId(product.id)
-    setEditForm(product)
+  const startEdit = (product: EditableProduct) => {
+    setEditingProduct(product)
+    setIsModalOpen(true)
   }
 
-  const saveEdit = () => {
-    if (editingId) {
-      updateProduct(editingId, editForm)
-      setEditingId(null)
-      setEditForm({})
-    }
+  const handleSave = (product: EditableProduct) => {
+    updateProduct(product.id, product)
+    setIsModalOpen(false)
+    setEditingProduct(null)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setEditingProduct(null)
   }
 
   const calculateMargin = (product: any) => {
@@ -128,143 +133,60 @@ export default function AdminProductsPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredProducts.map((product) => (
                 <tr key={product.id}>
-                  {editingId === product.id ? (
-                    <>
-                      <td className="px-6 py-4">
-                        <input
-                          type="text"
-                          value={editForm.image}
-                          onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
-                          placeholder="Image URL or paste from clipboard"
-                          className="w-full px-2 py-1 border rounded text-xs mb-2"
-                        />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0]
-                            if (file) {
-                              const reader = new FileReader()
-                              reader.onloadend = () => {
-                                setEditForm({ ...editForm, image: reader.result as string })
-                              }
-                              reader.readAsDataURL(file)
-                            }
-                          }}
-                          className="w-full px-2 py-1 border rounded text-xs"
-                        />
-                        {editForm.image && (
-                          <img src={editForm.image} alt="" className="w-16 h-16 object-cover mt-2 rounded" />
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <input
-                          type="text"
-                          value={editForm.name}
-                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                          className="w-full px-2 py-1 border rounded"
-                        />
-                      </td>
-                      <td className="px-6 py-4">
-                        <textarea
-                          value={editForm.description}
-                          onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                          className="w-full px-2 py-1 border rounded text-sm"
-                          rows={3}
-                        />
-                      </td>
-                      <td className="px-6 py-4">
-                        <input
-                          type="number"
-                          value={editForm.price}
-                          onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) })}
-                          className="w-24 px-2 py-1 border rounded"
-                        />
-                      </td>
-                      <td className="px-6 py-4">
-                        <input
-                          type="number"
-                          value={editForm.costEUR || ''}
-                          onChange={(e) => setEditForm({ ...editForm, costEUR: Number(e.target.value) })}
-                          className="w-24 px-2 py-1 border rounded"
-                        />
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {calculateMargin(editForm)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {calculateProfit(editForm)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <input
-                          type="number"
-                          value={editForm.stockQuantity}
-                          onChange={(e) => setEditForm({ ...editForm, stockQuantity: Number(e.target.value) })}
-                          className="w-16 px-2 py-1 border rounded"
-                        />
-                      </td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={saveEdit}
-                          className="text-green-600 hover:text-green-900 mr-2"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Cancel
-                        </button>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-6 py-4">
-                        <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded" />
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                        <div className="text-sm text-gray-500">{product.categoryTag || product.category}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600 max-w-xs truncate">{product.description}</div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        R{product.price.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {product.costEUR ? `€${product.costEUR.toLocaleString()}` : 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {calculateMargin(product)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {calculateProfit(product)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {product.stockQuantity}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => startEdit(product)}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    </>
-                  )}
+                  <td className="px-6 py-4">
+                    <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded" />
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                    <div className="text-sm text-gray-500">{product.categoryTag || product.category}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-gray-600 max-w-xs truncate" dangerouslySetInnerHTML={{ __html: product.description || '' }} />
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    R{product.price.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {product.costEUR ? `€${product.costEUR.toLocaleString()}` : 'N/A'}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {calculateMargin(product)}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {calculateProfit(product)}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {product.stockQuantity}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <button
+                      onClick={() => startEdit(product)}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
+                      Edit
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </main>
+
+      {/* Product Edit Modal */}
+      <ProductEditModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        product={editingProduct}
+        onSave={handleSave}
+      />
+
+      {/* Toast Notifications */}
+      <Toaster position="top-right" />
     </div>
   )
 }

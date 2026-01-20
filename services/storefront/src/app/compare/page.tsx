@@ -26,7 +26,7 @@ const products = [
     name: 'RÄVIK 3',
     category: 'Jetboard',
     price: 245000,
-    image: AWAKE_IMAGES.products.ravik3,
+    image: AWAKE_IMAGES.ravik.explore,
     specs: {
       topSpeed: '50 km/h',
       range: '40 min',
@@ -41,7 +41,7 @@ const products = [
     name: 'VINGA 2',
     category: 'eFoil',
     price: 195000,
-    image: AWAKE_IMAGES.products.vinga2,
+    image: AWAKE_IMAGES.vinga.adventure,
     specs: {
       topSpeed: '40 km/h',
       range: '90 min',

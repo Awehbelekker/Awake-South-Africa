@@ -36,7 +36,7 @@ const blogPosts = [
     id: 'battery-care-tips',
     title: 'How to Maximize Your Awake Battery Life',
     excerpt: 'Pro tips for charging, storing, and maintaining your Awake battery packs for optimal performance and longevity.',
-    image: AWAKE_IMAGES.accessories.battery,
+    image: AWAKE_IMAGES.batteries.flexXR4,
     date: '2025-12-20',
     category: 'Maintenance',
     readTime: '4 min read',
