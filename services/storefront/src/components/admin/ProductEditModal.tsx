@@ -227,7 +227,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                   {/* Description with Rich Text Editor */}
                   <RichTextEditor
                     label="Description"
-                    value={formData.description}
+                    value={formData.description || ''}
                     onChange={(value) => handleChange('description', value)}
                     placeholder="Enter product description..."
                   />
@@ -236,7 +236,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                   {/* Specs Array Editor */}
                   <ArrayFieldEditor
                     label="Specifications"
-                    values={formData.specs}
+                    values={formData.specs || []}
                     onChange={(values) => handleChange('specs', values)}
                     placeholder="Add specification"
                   />
@@ -245,7 +245,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                   {/* Features Array Editor */}
                   <ArrayFieldEditor
                     label="Features"
-                    values={formData.features}
+                    values={formData.features || []}
                     onChange={(values) => handleChange('features', values)}
                     placeholder="Add feature"
                   />
