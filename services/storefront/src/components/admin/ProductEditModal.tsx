@@ -59,10 +59,10 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
     try {
       // Validate
       const result = validateProduct(formData);
-      
+
       if (!result.success) {
         const fieldErrors: Record<string, string> = {};
-        result.error.errors.forEach((err) => {
+        result.error.issues.forEach((err) => {
           if (err.path[0]) {
             fieldErrors[err.path[0] as string] = err.message;
           }
