@@ -1,23 +1,42 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAdminStore } from '@/store/admin'
 
 export default function AdminLoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const { login } = useAdminStore()
+  const [mounted, setMounted] = useState(false)
+  const { login, isAuthenticated } = useAdminStore()
   const router = useRouter()
+
+  useEffect(() => {
+    setMounted(true)
+    // If already authenticated, redirect to dashboard
+    if (isAuthenticated) {
+      router.push('/admin/dashboard')
+    }
+  }, [isAuthenticated, router])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (login(password)) {
+    setError('')
+
+    const success = login(password)
+    console.log('Login attempt:', { password, success })
+
+    if (success) {
+      console.log('Login successful, redirecting...')
       router.push('/admin/dashboard')
     } else {
       setError('Invalid password')
       setPassword('')
     }
+  }
+
+  if (!mounted) {
+    return null
   }
 
   return (

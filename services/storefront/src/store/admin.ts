@@ -43,10 +43,16 @@ export const useAdminStore = create<AdminStore>()(
         })),
       login: (password) => {
         // Simple password check - in production use proper auth
+        console.log('Login attempt with password:', password)
+        console.log('Expected password:', 'awake2026admin')
+        console.log('Match:', password === 'awake2026admin')
+
         if (password === 'awake2026admin') {
           set({ isAuthenticated: true })
+          console.log('Authentication set to true')
           return true
         }
+        console.log('Authentication failed')
         return false
       },
       logout: () => set({ isAuthenticated: false }),
