@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAdminStore } from '@/store/admin'
 import { useProductsStore } from '@/store/products'
+import MediaLibraryBrowser from '@/components/admin/MediaLibraryBrowser'
 
 export default function AdminDashboard() {
   const router = useRouter()
   const { isAuthenticated, logout, settings, updateSettings } = useAdminStore()
   const { products } = useProductsStore()
   const [mounted, setMounted] = useState(false)
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -93,6 +95,15 @@ export default function AdminDashboard() {
             <div className="mt-4 text-blue-600 font-medium">View all products →</div>
           </Link>
 
+          <button
+            onClick={() => setShowMediaLibrary(true)}
+            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow text-left"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">📁 Media Library</h3>
+            <p className="text-gray-600">Browse and manage all product images and videos</p>
+            <div className="mt-4 text-blue-600 font-medium">Open library →</div>
+          </button>
+
           <Link
             href="/admin/settings"
             className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
@@ -129,6 +140,13 @@ export default function AdminDashboard() {
             })}
           </div>
         </div>
+
+        {/* Media Library Browser */}
+        <MediaLibraryBrowser
+          isOpen={showMediaLibrary}
+          onClose={() => setShowMediaLibrary(false)}
+          type="all"
+        />
       </main>
     </div>
   )
