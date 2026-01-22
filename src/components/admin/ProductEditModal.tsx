@@ -144,7 +144,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                         type="text"
                         value={formData.name}
                         onChange={(e) => handleChange('name', e.target.value)}
-                        className={`mt-1 block w-full px-3 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`mt-1 block w-full px-3 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900`}
                       />
                       {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                     </div>
@@ -155,7 +155,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                         type="text"
                         value={formData.category}
                         onChange={(e) => handleChange('category', e.target.value)}
-                        className={`mt-1 block w-full px-3 py-2 border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`mt-1 block w-full px-3 py-2 border ${errors.category ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900`}
                       />
                       {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
                     </div>
@@ -170,7 +170,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                         step="0.01"
                         value={formData.price}
                         onChange={(e) => handleChange('price', parseFloat(e.target.value))}
-                        className={`mt-1 block w-full px-3 py-2 border ${errors.price ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`mt-1 block w-full px-3 py-2 border ${errors.price ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900`}
                       />
                       {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
                     </div>
@@ -182,7 +182,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                         step="0.01"
                         value={formData.priceExVAT}
                         onChange={(e) => handleChange('priceExVAT', parseFloat(e.target.value))}
-                        className={`mt-1 block w-full px-3 py-2 border ${errors.priceExVAT ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`mt-1 block w-full px-3 py-2 border ${errors.priceExVAT ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900`}
                       />
                       {errors.priceExVAT && <p className="text-red-500 text-sm mt-1">{errors.priceExVAT}</p>}
                     </div>
@@ -194,7 +194,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                         step="0.01"
                         value={formData.costEUR}
                         onChange={(e) => handleChange('costEUR', parseFloat(e.target.value))}
-                        className={`mt-1 block w-full px-3 py-2 border ${errors.costEUR ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`mt-1 block w-full px-3 py-2 border ${errors.costEUR ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900`}
                       />
                       {errors.costEUR && <p className="text-red-500 text-sm mt-1">{errors.costEUR}</p>}
                     </div>
@@ -208,7 +208,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                         type="number"
                         value={formData.stockQuantity}
                         onChange={(e) => handleChange('stockQuantity', parseInt(e.target.value))}
-                        className={`mt-1 block w-full px-3 py-2 border ${errors.stockQuantity ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`mt-1 block w-full px-3 py-2 border ${errors.stockQuantity ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900`}
                       />
                       {errors.stockQuantity && <p className="text-red-500 text-sm mt-1">{errors.stockQuantity}</p>}
                     </div>
@@ -218,7 +218,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                       <select
                         value={formData.skillLevel}
                         onChange={(e) => handleChange('skillLevel', e.target.value)}
-                        className={`mt-1 block w-full px-3 py-2 border ${errors.skillLevel ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`mt-1 block w-full px-3 py-2 border ${errors.skillLevel ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900`}
                       >
                         <option value="Beginner">Beginner</option>
                         <option value="Intermediate">Intermediate</option>
@@ -289,7 +289,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                       type="text"
                       value={formData.image}
                       onChange={(e) => handleChange('image', e.target.value)}
-                      className={`mt-1 block w-full px-3 py-2 border ${errors.image ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                      className={`mt-1 block w-full px-3 py-2 border ${errors.image ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900`}
                       placeholder="https://example.com/image.jpg"
                     />
                     {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
