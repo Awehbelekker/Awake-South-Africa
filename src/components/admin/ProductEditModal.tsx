@@ -5,6 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { EditableProduct } from '@/store/products';
 import ArrayFieldEditor from './ArrayFieldEditor';
 import RichTextEditor from './RichTextEditor';
+import MediaManager from './MediaManager';
 import { validateProduct } from '@/lib/validation/productValidation';
 import toast from 'react-hot-toast';
 
@@ -23,7 +24,11 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
 
   useEffect(() => {
     if (product) {
-      setFormData({ ...product });
+      setFormData({ 
+        ...product,
+        images: product.images || [],
+        videos: product.videos || [],
+      });
       setHasUnsavedChanges(false);
     }
   }, [product]);
@@ -251,9 +256,35 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                   />
                   {errors.features && <p className="text-red-500 text-sm mt-1">{errors.features}</p>}
 
-                  {/* Image URL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Image URL</label>
+                  {/* Media Management Section */}
+                  <div className="border-t pt-4 mt-4">
+                    <h4 className="text-lg font-medium text-gray-900 mb-4">Media Management</h4>
+                    
+                    {/* Product Images */}
+                    <MediaManager
+                      type="image"
+                      items={formData.images || []}
+                      onChange={(items) => handleChange('images', items)}
+                      label="Product Images"
+                      maxItems={10}
+                    />
+
+                    {/* Product Videos */}
+                    <div className="mt-6">
+                      <MediaManager
+                        type="video"
+                        items={formData.videos || []}
+                        onChange={(items) => handleChange('videos', items)}
+                        label="Product Videos"
+                        maxItems={5}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Legacy Image URL (for backward compatibility) */}
+                  <div className="border-t pt-4 mt-4">
+                    <label className="block text-sm font-medium text-gray-700">Legacy Image URL (Backward Compatibility)</label>
+                    <p className="text-xs text-gray-500 mb-2">Use the Media Management section above for new images. This field is kept for backward compatibility.</p>
                     <input
                       type="text"
                       value={formData.image}

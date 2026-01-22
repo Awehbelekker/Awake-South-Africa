@@ -3,6 +3,16 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { PRODUCTS as DEFAULT_PRODUCTS } from '@/lib/constants'
 
+export interface MediaFile {
+  id: string
+  url: string
+  type: 'image' | 'video'
+  name?: string
+  source?: 'upload' | 'drive' | 'url'
+  driveId?: string
+  thumbnail?: string
+}
+
 export interface EditableProduct {
   id: string
   name: string
@@ -12,7 +22,9 @@ export interface EditableProduct {
   category: string
   categoryTag?: string
   description?: string
-  image?: string
+  image?: string // Primary image (backward compatibility)
+  images?: MediaFile[] // Multiple images
+  videos?: MediaFile[] // Product videos
   badge?: string
   battery?: string
   skillLevel?: string
