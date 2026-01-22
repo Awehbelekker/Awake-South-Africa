@@ -8,6 +8,7 @@ import { useAdminStore } from '@/store/admin'
 import { useDemoLocationsStore, DemoLocation } from '@/store/demoLocations'
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import toast from 'react-hot-toast'
+import GoogleDrivePicker from '@/components/admin/GoogleDrivePicker'
 
 export default function AdminLocationsPage() {
   const router = useRouter()
@@ -41,9 +42,9 @@ export default function AdminLocationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 pt-20">
       {/* Header */}
-      <header className="bg-white shadow">
+      <header className="bg-white shadow fixed top-0 left-0 right-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <Link href="/admin/dashboard" className="text-blue-600 hover:text-blue-800">
@@ -64,7 +65,7 @@ export default function AdminLocationsPage() {
               })
               setShowEditModal(true)
             }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2 relative z-50"
           >
             <Plus className="w-4 h-4" />
             Add Location
@@ -72,7 +73,7 @@ export default function AdminLocationsPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
         {/* Locations Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {locations.map((location) => (
@@ -82,10 +83,11 @@ export default function AdminLocationsPage() {
             >
               <div className="relative h-48">
                 <Image
-                  src={location.image || '/images/placeholder.png'}
+                  src={location.image || 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'}
                   alt={location.name}
                   fill
                   className="object-cover"
+                  unoptimized
                 />
                 {!location.active && (
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
@@ -177,8 +179,18 @@ function LocationEditModal({
     onClose()
   }
 
+  const handleDriveSelect = (files: Array<{ id: string; name: string; url: string; mimeType: string; thumbnailUrl?: string }>) => {
+    if (files.length > 0) {
+      const file = files[0]
+      // Use the direct link or thumbnail
+      const imageUrl = file.thumbnailUrl || file.url || `https://drive.google.com/uc?id=${file.id}`
+      setFormData({ ...formData, image: imageUrl })
+      toast.success('Image selected from Google Drive!')
+    }
+  }
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <h2 className="text-2xl font-bold mb-6">
@@ -194,7 +206,7 @@ function LocationEditModal({
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                 placeholder="e.g., Langebaan"
               />
             </div>
@@ -207,28 +219,51 @@ function LocationEditModal({
                 type="text"
                 value={formData.area}
                 onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                 placeholder="e.g., West Coast"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Image URL *
+                Image *
               </label>
+              
+              {/* Google Drive Picker Button */}
+              <div className="mb-3">
+                <GoogleDrivePicker
+                  onSelect={handleDriveSelect}
+                  accept="image"
+                  multiSelect={false}
+                  label="Select from Google Drive"
+                />
+              </div>
+
+              {/* OR divider */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex-1 border-t border-gray-300"></div>
+                <span className="text-sm text-gray-500">OR</span>
+                <div className="flex-1 border-t border-gray-300"></div>
+              </div>
+
+              {/* URL Input */}
               <input
                 type="text"
                 value={formData.image}
                 onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                 placeholder="https://example.com/image.jpg"
               />
               {formData.image && (
-                <div className="mt-2">
+                <div className="mt-3">
+                  <p className="text-xs text-gray-500 mb-2">Preview:</p>
                   <img
                     src={formData.image}
                     alt="Preview"
-                    className="h-32 object-cover rounded"
+                    className="h-32 w-full object-cover rounded border border-gray-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
                   />
                 </div>
               )}
@@ -241,7 +276,7 @@ function LocationEditModal({
               <textarea
                 value={formData.description || ''}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                 rows={3}
                 placeholder="Brief description of the location..."
               />
@@ -255,7 +290,7 @@ function LocationEditModal({
                 type="number"
                 value={formData.price || 1500}
                 onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
               />
             </div>
 
