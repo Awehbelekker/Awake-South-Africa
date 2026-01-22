@@ -59,39 +59,19 @@ function ProductsContent() {
 
   return (
     <>
-      {/* Stats Banner */}
-      <div className="bg-awake-gray rounded-xl p-6 mb-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div>
-          <div className="text-3xl font-bold text-accent-primary">{jetboardsCount}</div>
-          <div className="text-sm text-gray-400">Jetboards</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-accent-primary">{efoilsCount}</div>
-          <div className="text-sm text-gray-400">eFoils</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-accent-primary">{wingsCount}</div>
-          <div className="text-sm text-gray-400">Wing Kits</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-accent-primary">{allProducts.filter(p => p.inStock).length}</div>
-          <div className="text-sm text-gray-400">Total Products</div>
-        </div>
-      </div>
-
-      {/* Category Filter */}
+      {/* Category Filter - Simplified */}
       <div className="flex flex-wrap justify-center gap-3 mb-12">
         {categories.map((category) => (
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className={`px-5 py-3 rounded-lg font-medium transition-all ${
+            className={`px-6 py-3 rounded-full font-medium transition-all ${
               selectedCategory === category.id
-                ? 'bg-accent-primary text-awake-black'
-                : 'bg-awake-gray text-white hover:bg-awake-gray/80'
+                ? 'bg-accent-primary text-awake-black shadow-lg shadow-accent-primary/20'
+                : 'bg-awake-gray text-white hover:bg-white/10 border border-white/10'
             }`}
           >
-            {category.name} <span className="text-sm opacity-70">({category.count})</span>
+            {category.name}
           </button>
         ))}
       </div>
@@ -243,9 +223,9 @@ export default function ProductsPage() {
   return (
     <main className="min-h-screen bg-awake-black text-white py-20 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Complete Product Catalog</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Explore Our Collection</h1>
         <p className="text-xl text-gray-400 text-center mb-12">
-          Official Awake products with South African pricing (December 2025)
+          Premium electric watersports with South African support
         </p>
 
         <Suspense fallback={
