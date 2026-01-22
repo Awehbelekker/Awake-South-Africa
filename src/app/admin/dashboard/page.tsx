@@ -39,9 +39,9 @@ export default function AdminDashboard() {
   const categories = Array.from(new Set(products.map(p => p.categoryTag || p.category)))
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow">
+    <div className="min-h-screen bg-gray-100 pt-20">
+      {/* Admin Header - positioned below main site header */}
+      <header className="bg-white shadow fixed top-20 left-0 right-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Awake SA Admin</h1>
           <div className="flex gap-4 items-center">
@@ -61,7 +61,8 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content - with padding for both headers */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">

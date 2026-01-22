@@ -280,13 +280,13 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
       {/* Editor or Preview */}
       {showPreview ? (
         <div 
-          className="prose max-w-none p-4 border border-gray-300 rounded-b-md min-h-[200px] bg-white"
+          className="prose prose-slate max-w-none p-4 border border-gray-300 rounded-b-md min-h-[200px] bg-white text-gray-900"
           dangerouslySetInnerHTML={{ __html: value || '<p class="text-gray-400">No content to preview</p>' }}
         />
       ) : (
         <EditorContent 
           editor={editor}
-          className="prose max-w-none p-4 border border-gray-300 rounded-b-md min-h-[200px] bg-white focus-within:ring-2 focus-within:ring-blue-500"
+          className="prose prose-slate max-w-none p-4 border border-gray-300 rounded-b-md min-h-[200px] bg-white text-gray-900 focus-within:ring-2 focus-within:ring-blue-500 [&_.ProseMirror]:text-gray-900 [&_.ProseMirror]:outline-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400"
         />
       )}
 
@@ -294,14 +294,14 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
       {showLinkDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-            <h3 className="text-lg font-medium mb-4">Add Link</h3>
+            <h3 className="text-lg font-medium mb-4 text-gray-900">Add Link</h3>
             <input
               type="url"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && addLink()}
               placeholder="https://example.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 text-gray-900 placeholder:text-gray-400"
               autoFocus
             />
             <div className="flex gap-2 justify-end">
@@ -331,14 +331,14 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
       {showImageDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-            <h3 className="text-lg font-medium mb-4">Add Image</h3>
+            <h3 className="text-lg font-medium mb-4 text-gray-900">Add Image</h3>
             <input
               type="url"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && addImage()}
               placeholder="https://example.com/image.jpg"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 text-gray-900 placeholder:text-gray-400"
               autoFocus
             />
             {imageUrl && (

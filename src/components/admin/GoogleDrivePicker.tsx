@@ -103,10 +103,10 @@ export default function GoogleDrivePicker({
           ? 'bg-blue-600 text-white hover:bg-blue-700'
           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
       }`}
-      title={!isConfigured ? 'Google Drive not configured' : label}
+      title={!isConfigured ? 'Google Drive not configured. Add credentials to .env.local' : label}
     >
       <Cloud className="w-4 h-4" />
-      {label}
+      {isConfigured ? label : '🔒 Google Drive (Not Configured)'}
     </button>
   );
 }

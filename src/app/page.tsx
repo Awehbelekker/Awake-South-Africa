@@ -21,7 +21,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-awake-black">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0">
           <Image src={AWAKE_IMAGES.hero.main} alt="Awake Electric Surfboard" fill className="object-cover opacity-60" priority />
           <div className="absolute inset-0 bg-gradient-to-b from-awake-black/60 via-awake-black/30 to-awake-black/80" />
