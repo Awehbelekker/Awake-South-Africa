@@ -71,17 +71,35 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
 
   const addLink = () => {
     if (linkUrl) {
-      editor.chain().focus().setLink({ href: linkUrl }).run();
-      setLinkUrl('');
-      setShowLinkDialog(false);
+      try {
+        const url = new URL(linkUrl);
+        // Only allow http and https protocols
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          return; // Silently ignore invalid protocols
+        }
+        editor.chain().focus().setLink({ href: linkUrl }).run();
+        setLinkUrl('');
+        setShowLinkDialog(false);
+      } catch {
+        // Invalid URL, don't add
+      }
     }
   };
 
   const addImage = () => {
     if (imageUrl) {
-      editor.chain().focus().setImage({ src: imageUrl }).run();
-      setImageUrl('');
-      setShowImageDialog(false);
+      try {
+        const url = new URL(imageUrl);
+        // Only allow http and https protocols for security
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          return; // Silently ignore invalid protocols
+        }
+        editor.chain().focus().setImage({ src: imageUrl }).run();
+        setImageUrl('');
+        setShowImageDialog(false);
+      } catch {
+        // Invalid URL, don't add
+      }
     }
   };
 

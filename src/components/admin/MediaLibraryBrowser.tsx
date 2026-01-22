@@ -5,6 +5,9 @@ import { useProductsStore, MediaFile } from '@/store/products';
 import { X, Search, Image as ImageIcon, Video, ExternalLink, Copy, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+// Placeholder image as data URL
+const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="150"%3E%3Crect width="200" height="150" fill="%23f3f4f6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="%239ca3af"%3ENo Preview%3C/text%3E%3C/svg%3E';
+
 interface MediaLibraryBrowserProps {
   isOpen: boolean;
   onClose: () => void;
@@ -158,7 +161,7 @@ export default function MediaLibraryBrowser({ isOpen, onClose, onSelect, type = 
                         alt={media.name || 'Image'}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/images/placeholder.png';
+                          (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
                         }}
                       />
                     ) : (

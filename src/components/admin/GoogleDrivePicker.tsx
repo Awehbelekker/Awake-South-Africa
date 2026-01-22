@@ -5,6 +5,11 @@ import useDrivePicker from 'react-google-drive-picker';
 import { Cloud } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+// Placeholder values for unconfigured credentials
+const PLACEHOLDER_CLIENT_ID = 'your-client-id.apps.googleusercontent.com';
+const PLACEHOLDER_API_KEY = 'your-api-key';
+const PLACEHOLDER_APP_ID = 'your-app-id';
+
 interface GoogleDrivePickerProps {
   onSelect: (files: Array<{ id: string; name: string; url: string; mimeType: string; thumbnailUrl?: string }>) => void;
   multiSelect?: boolean;
@@ -26,9 +31,9 @@ export default function GoogleDrivePicker({
 
   // Check if Google Drive credentials are configured
   const isConfigured = clientId && apiKey && appId && 
-    clientId !== 'your-client-id.apps.googleusercontent.com' &&
-    apiKey !== 'your-api-key' &&
-    appId !== 'your-app-id';
+    clientId !== PLACEHOLDER_CLIENT_ID &&
+    apiKey !== PLACEHOLDER_API_KEY &&
+    appId !== PLACEHOLDER_APP_ID;
 
   const handleOpenPicker = () => {
     if (!isConfigured) {

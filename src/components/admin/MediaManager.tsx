@@ -6,6 +6,9 @@ import GoogleDrivePicker from './GoogleDrivePicker';
 import { X, Upload, Image as ImageIcon, Video, ExternalLink, MoveUp, MoveDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+// Placeholder image as data URL (1x1 transparent pixel)
+const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="150"%3E%3Crect width="200" height="150" fill="%23f3f4f6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="%239ca3af"%3ENo Preview%3C/text%3E%3C/svg%3E';
+
 interface MediaManagerProps {
   type: 'image' | 'video';
   items: MediaFile[];
@@ -26,7 +29,12 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
 
     // Basic URL validation
     try {
-      new URL(urlInput);
+      const url = new URL(urlInput);
+      // Only allow http and https protocols
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        toast.error('Only HTTP and HTTPS URLs are allowed');
+        return;
+      }
     } catch {
       toast.error('Invalid URL format');
       return;
@@ -76,9 +84,16 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
 
     try {
       const newItems: MediaFile[] = [];
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit for localStorage
       
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        
+        // Check file size
+        if (file.size > MAX_FILE_SIZE) {
+          toast.error(`${file.name} is too large (max 5MB). Use Google Drive for larger files.`);
+          continue;
+        }
         
         // Validate file type
         if (type === 'image' && !file.type.startsWith('image/')) {
@@ -201,7 +216,7 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
                     alt={item.name || `Image ${index + 1}`}
                     className="w-full h-full object-contain"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/placeholder.png';
+                      (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
                     }}
                   />
                 ) : (
