@@ -3,8 +3,12 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { AWAKE_IMAGES, SA_CONTENT } from '@/lib/constants'
+import { useDemoLocationsStore } from '@/store/demoLocations'
 
 export default function DemoPage() {
+  const { locations } = useDemoLocationsStore()
+  const activeLocations = locations.filter(loc => loc.active)
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,10 +20,36 @@ export default function DemoPage() {
   })
   const [submitted, setSubmitted] = useState(false)
 
+  // Get selected location details
+  const selectedLocation = activeLocations.find(loc => loc.name === formData.location)
+  const locationPrice = selectedLocation?.price || 1500
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // In production, this would submit to an API
-    console.log('Demo booking:', formData)
+    
+    // Prepare WhatsApp message
+    const whatsappNumber = SA_CONTENT.contact.whatsapp.replace(/[^0-9]/g, '') // Remove non-numeric characters
+    const message = `
+🏄 *DEMO BOOKING REQUEST*
+
+*Name:* ${formData.name}
+*Email:* ${formData.email}
+*Phone:* ${formData.phone}
+
+*Location:* ${formData.location}
+*Price:* R${locationPrice.toLocaleString()}
+*Preferred Date:* ${formData.date}
+*Experience Level:* ${formData.experience || 'Not specified'}
+
+${formData.message ? `*Additional Notes:*\n${formData.message}` : ''}
+
+Please confirm availability and pricing.
+    `.trim()
+
+    // Open WhatsApp with pre-filled message
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
+    
     setSubmitted(true)
   }
 
@@ -27,17 +57,27 @@ export default function DemoPage() {
     return (
       <main className="min-h-screen bg-awake-black text-white flex items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <div className="text-6xl mb-6">🎉</div>
-          <h1 className="text-3xl font-bold mb-4">Booking Received!</h1>
+          <div className="text-6xl mb-6">✅</div>
+          <h1 className="text-3xl font-bold mb-4">WhatsApp Opened!</h1>
           <p className="text-gray-400 mb-8">
-            Thanks for your interest! We'll contact you within 24 hours to confirm your demo session.
+            Your booking details have been prepared. Please send the WhatsApp message to confirm your demo session.
           </p>
-          <a
-            href="/"
-            className="inline-block bg-accent-primary text-awake-black px-8 py-3 rounded-lg font-bold"
-          >
-            Back to Home
-          </a>
+          <div className="flex flex-col gap-3">
+            <a
+              href={`https://wa.me/${SA_CONTENT.contact.whatsapp.replace(/[^0-9]/g, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700"
+            >
+              📱 Open WhatsApp Again
+            </a>
+            <a
+              href="/"
+              className="inline-block bg-accent-primary text-awake-black px-8 py-3 rounded-lg font-bold hover:bg-accent-secondary"
+            >
+              Back to Home
+            </a>
+          </div>
         </div>
       </main>
     )
@@ -93,21 +133,42 @@ export default function DemoPage() {
               </ul>
 
               <div className="mt-8 p-6 bg-awake-gray rounded-lg">
-                <h3 className="font-bold mb-3">Demo Locations</h3>
+                <h3 className="font-bold mb-3">Available Locations</h3>
                 <ul className="space-y-2 text-gray-400">
-                  {SA_CONTENT.demoLocations.map((location, i) => (
-                    <li key={i}>📍 {location}</li>
+                  {activeLocations.map((location) => (
+                    <li key={location.id} className="flex justify-between">
+                      <span>📍 {location.name} ({location.area})</span>
+                      <span className="text-accent-primary font-bold">R{location.price?.toLocaleString()}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="mt-6 p-6 bg-awake-gray rounded-lg">
-                <h3 className="font-bold mb-3">Pricing</h3>
-                <p className="text-2xl font-bold text-accent-primary">R1,500</p>
-                <p className="text-sm text-gray-400 mt-1">
-                  Fully redeemable against purchase
+              <div className="mt-6 p-6 bg-green-900/20 border border-green-500/30 rounded-lg">
+                <h3 className="font-bold mb-3 flex items-center gap-2">
+                  <span className="text-2xl">📱</span>
+                  WhatsApp Booking
+                </h3>
+                <p className="text-sm text-gray-300">
+                  After submitting, your booking details will be sent via WhatsApp to our team for instant confirmation.
                 </p>
               </div>
+
+              {selectedLocation && (
+                <div className="mt-6 p-6 bg-accent-primary/10 border border-accent-primary/30 rounded-lg">
+                  <h3 className="font-bold mb-2">Selected Location</h3>
+                  <p className="text-xl font-bold text-accent-primary">
+                    {selectedLocation.name}
+                  </p>
+                  <p className="text-sm text-gray-400">{selectedLocation.area}</p>
+                  <p className="text-2xl font-bold text-accent-primary mt-3">
+                    R{locationPrice.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Fully redeemable against purchase
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Form */}
@@ -121,7 +182,7 @@ export default function DemoPage() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary"
+                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary text-white"
                   />
                 </div>
                 <div>
@@ -131,7 +192,7 @@ export default function DemoPage() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary"
+                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary text-white"
                   />
                 </div>
                 <div>
@@ -141,7 +202,8 @@ export default function DemoPage() {
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary"
+                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary text-white"
+                    placeholder="+27..."
                   />
                 </div>
                 <div>
@@ -150,11 +212,13 @@ export default function DemoPage() {
                     required
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary"
+                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary text-white"
                   >
                     <option value="">Select location...</option>
-                    {SA_CONTENT.demoLocations.map((location, i) => (
-                      <option key={i} value={location}>{location}</option>
+                    {activeLocations.map((location) => (
+                      <option key={location.id} value={location.name}>
+                        {location.name} - R{location.price?.toLocaleString()}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -165,7 +229,8 @@ export default function DemoPage() {
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary"
+                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary text-white"
+                    min={new Date().toISOString().split('T')[0]}
                   />
                 </div>
                 <div>
@@ -173,13 +238,13 @@ export default function DemoPage() {
                   <select
                     value={formData.experience}
                     onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary"
+                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary text-white"
                   >
                     <option value="">Select...</option>
-                    <option value="none">No experience</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
+                    <option value="No experience">No experience</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
                   </select>
                 </div>
                 <div>
@@ -188,15 +253,20 @@ export default function DemoPage() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary"
+                    className="w-full px-4 py-3 bg-awake-black border border-white/10 rounded-lg focus:outline-none focus:border-accent-primary text-white"
+                    placeholder="Any special requirements or questions..."
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-accent-primary text-awake-black py-4 rounded-lg font-bold hover:bg-accent-secondary transition-colors"
+                  className="w-full bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                 >
-                  Request Booking
+                  <span>📱</span>
+                  Book via WhatsApp
                 </button>
+                <p className="text-xs text-gray-400 text-center">
+                  Your details will be sent to our WhatsApp for instant confirmation
+                </p>
               </form>
             </div>
           </div>

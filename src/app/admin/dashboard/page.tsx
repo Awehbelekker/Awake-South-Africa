@@ -85,7 +85,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Link
             href="/admin/products"
             className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
@@ -93,6 +93,15 @@ export default function AdminDashboard() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Manage Products</h3>
             <p className="text-gray-600">Edit products, prices, inventory, and costs</p>
             <div className="mt-4 text-blue-600 font-medium">View all products →</div>
+          </Link>
+
+          <Link
+            href="/admin/locations"
+            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">📍 Demo Locations</h3>
+            <p className="text-gray-600">Manage demo ride locations, images, and pricing</p>
+            <div className="mt-4 text-blue-600 font-medium">Manage locations →</div>
           </Link>
 
           <button
