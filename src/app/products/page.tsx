@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
 import { useWishlistStore } from '@/store/wishlist'
 import { useProductsStore } from '@/store/products'
+import { Zap, Wind, Package, Sparkles } from 'lucide-react'
 
 function ProductsContent() {
   const searchParams = useSearchParams()
@@ -22,14 +23,19 @@ function ProductsContent() {
   }, [])
 
   if (!mounted) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-gray-600">Loading products...</div>
+    return <div className="min-h-screen bg-awake-black flex items-center justify-center">
+      <div className="text-gray-400">Loading your adventure...</div>
     </div>
   }
 
-  const filteredProducts = selectedCategory === 'all' 
+  // Accessory categories grouped together
+  const accessoryCategories = ['batteries', 'wings', 'parts', 'apparel', 'accessories', 'Batteries', 'Wings', 'Parts', 'Apparel', 'Accessories']
+
+  const filteredProducts = selectedCategory === 'all'
     ? allProducts.filter(p => p.inStock)
-    : allProducts.filter(p => p.inStock && (p.categoryTag === selectedCategory || p.category === selectedCategory));
+    : selectedCategory === 'accessories'
+      ? allProducts.filter(p => p.inStock && accessoryCategories.includes(p.categoryTag || p.category || ''))
+      : allProducts.filter(p => p.inStock && (p.categoryTag === selectedCategory || p.category === selectedCategory));
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-ZA', {
@@ -41,59 +47,64 @@ function ProductsContent() {
 
   const isInWishlist = (id: string) => wishlistItems.some(item => item.id === id)
 
-  // Get unique categories from products
-  const categoryTags = Array.from(new Set(allProducts.map(p => p.categoryTag || p.category)))
-  
-  const categories = [
-    { id: 'all', name: 'All Products', count: allProducts.filter(p => p.inStock).length },
-    ...categoryTags.map(tag => ({
-      id: tag,
-      name: tag.charAt(0).toUpperCase() + tag.slice(1),
-      count: allProducts.filter(p => p.inStock && (p.categoryTag === tag || p.category === tag)).length
-    }))
-  ].filter(c => c.count > 0)
-
-  const jetboardsCount = allProducts.filter(p => p.inStock && (p.categoryTag === 'jetboards' || p.category === 'Jetboards')).length
-  const efoilsCount = allProducts.filter(p => p.inStock && (p.categoryTag === 'efoils' || p.category === 'eFoils')).length
-  const wingsCount = allProducts.filter(p => p.inStock && (p.categoryTag === 'wings' || p.category === 'Wings')).length
+  // Simplified customer-focused categories
+  const mainCategories = [
+    {
+      id: 'all',
+      name: 'All Products',
+      icon: Sparkles,
+      description: 'Browse our complete collection'
+    },
+    {
+      id: 'jetboards',
+      name: 'Jetboards',
+      icon: Zap,
+      description: 'High-speed surface riding'
+    },
+    {
+      id: 'efoils',
+      name: 'eFoils',
+      icon: Wind,
+      description: 'Fly above the water'
+    },
+    {
+      id: 'accessories',
+      name: 'Gear & Accessories',
+      icon: Package,
+      description: 'Complete your setup'
+    },
+  ]
 
   return (
     <>
-      {/* Stats Banner */}
-      <div className="bg-awake-gray rounded-xl p-6 mb-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div>
-          <div className="text-3xl font-bold text-accent-primary">{jetboardsCount}</div>
-          <div className="text-sm text-gray-400">Jetboards</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-accent-primary">{efoilsCount}</div>
-          <div className="text-sm text-gray-400">eFoils</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-accent-primary">{wingsCount}</div>
-          <div className="text-sm text-gray-400">Wing Kits</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-accent-primary">{allProducts.filter(p => p.inStock).length}</div>
-          <div className="text-sm text-gray-400">Total Products</div>
-        </div>
-      </div>
+      {/* Inspirational Category Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        {mainCategories.map((category) => {
+          const Icon = category.icon
+          const isActive = selectedCategory === category.id ||
+            (category.id === 'accessories' && ['batteries', 'wings', 'parts', 'apparel'].includes(selectedCategory))
 
-      {/* Category Filter */}
-      <div className="flex flex-wrap justify-center gap-3 mb-12">
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            onClick={() => setSelectedCategory(category.id)}
-            className={`px-5 py-3 rounded-lg font-medium transition-all ${
-              selectedCategory === category.id
-                ? 'bg-accent-primary text-awake-black'
-                : 'bg-awake-gray text-white hover:bg-awake-gray/80'
-            }`}
-          >
-            {category.name} <span className="text-sm opacity-70">({category.count})</span>
-          </button>
-        ))}
+          return (
+            <button
+              key={category.id}
+              onClick={() => setSelectedCategory(category.id)}
+              className={`group relative p-6 rounded-2xl text-left transition-all duration-300 overflow-hidden ${
+                isActive
+                  ? 'bg-gradient-to-br from-accent-primary to-accent-secondary text-awake-black shadow-lg shadow-accent-primary/25'
+                  : 'bg-awake-gray hover:bg-awake-gray/80 text-white hover:shadow-lg'
+              }`}
+            >
+              <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl transition-opacity ${
+                isActive ? 'bg-white/20 opacity-100' : 'bg-accent-primary/10 opacity-0 group-hover:opacity-100'
+              }`} />
+              <Icon className={`w-8 h-8 mb-3 relative z-10 ${isActive ? 'text-awake-black' : 'text-accent-primary'}`} />
+              <h3 className="font-bold text-lg relative z-10">{category.name}</h3>
+              <p className={`text-sm mt-1 relative z-10 ${isActive ? 'text-awake-black/70' : 'text-gray-400'}`}>
+                {category.description}
+              </p>
+            </button>
+          )
+        })}
       </div>
 
       {/* Products Grid */}
@@ -206,34 +217,61 @@ function ProductsContent() {
       </div>
 
       {filteredProducts.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-400 text-lg">No products found in this category.</p>
+        <div className="text-center py-16">
+          <div className="text-6xl mb-4">🏄‍♂️</div>
+          <h3 className="text-xl font-bold mb-2">No products in this category yet</h3>
+          <p className="text-gray-400 mb-6">Check out our other amazing products or contact us for special requests.</p>
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className="px-6 py-3 bg-accent-primary text-awake-black rounded-lg font-bold hover:bg-accent-secondary transition-colors"
+          >
+            View All Products
+          </button>
         </div>
       )}
 
-      {/* Finance CTA */}
-      <div className="mt-16 bg-gradient-to-r from-accent-primary/20 to-accent-secondary/20 rounded-2xl p-8 text-center">
-        <h2 className="text-2xl font-bold mb-4">Finance Options Available</h2>
-        <p className="text-gray-300 mb-6">
-          Split your purchase with PayFast PayJustNow. 0% interest, 3 easy payments.
-        </p>
-        <Link
-          href="/contact"
-          className="inline-block bg-white text-awake-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors"
-        >
-          Enquire Now
-        </Link>
+      {/* Finance & Support CTA */}
+      <div className="mt-16 grid md:grid-cols-2 gap-6">
+        <div className="bg-gradient-to-br from-accent-primary/20 to-cyan-500/10 rounded-2xl p-8 border border-accent-primary/20">
+          <h3 className="text-2xl font-bold mb-3">Flexible Payment Options</h3>
+          <p className="text-gray-300 mb-6">
+            Make your dream board a reality with 0% interest financing through PayJustNow. Split into 3 easy payments.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-block bg-accent-primary text-awake-black px-6 py-3 rounded-lg font-bold hover:bg-accent-secondary transition-colors"
+          >
+            Learn More
+          </Link>
+        </div>
+        <div className="bg-awake-gray rounded-2xl p-8 border border-white/5">
+          <h3 className="text-2xl font-bold mb-3">Need Help Choosing?</h3>
+          <p className="text-gray-300 mb-6">
+            Our team of watersports experts is here to help you find the perfect board for your skill level and riding style.
+          </p>
+          <Link
+            href="/demo"
+            className="inline-block bg-white/10 text-white px-6 py-3 rounded-lg font-bold hover:bg-white/20 transition-colors border border-white/20"
+          >
+            Book a Demo Ride
+          </Link>
+        </div>
       </div>
 
-      {/* Price Info */}
-      <div className="mt-8 bg-awake-gray rounded-xl p-6">
-        <h3 className="font-bold mb-3 text-center">📋 Pricing Information</h3>
-        <ul className="text-sm text-gray-400 space-y-2 max-w-2xl mx-auto">
-          <li>✓ All prices include 15% VAT</li>
-          <li>✓ Customs duties calculated per product category</li>
-          <li>✓ Exchange rate: R19.85/EUR (December 2025)</li>
-          <li>✓ Free standard shipping on complete boards</li>
-        </ul>
+      {/* Trust Badges */}
+      <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-gray-400">
+        <div className="flex items-center gap-2">
+          <span className="text-accent-primary">✓</span> All prices include VAT
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-accent-primary">✓</span> Free shipping on boards
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-accent-primary">✓</span> 2 Year Warranty
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-accent-primary">✓</span> SA Support & Service
+        </div>
       </div>
     </>
   )
@@ -241,22 +279,45 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <main className="min-h-screen bg-awake-black text-white py-20 px-4">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Complete Product Catalog</h1>
-        <p className="text-xl text-gray-400 text-center mb-12">
-          Official Awake products with South African pricing (December 2025)
-        </p>
+    <main className="min-h-screen bg-awake-black text-white">
+      {/* Hero Section */}
+      <section className="relative py-24 px-4 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-accent-primary/5 via-transparent to-transparent" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl" />
 
-        <Suspense fallback={
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-primary"></div>
-            <p className="mt-4 text-gray-400">Loading products...</p>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
+              <span className="w-2 h-2 bg-accent-primary rounded-full animate-pulse" />
+              <span className="text-sm text-gray-300">Official Awake Distributor for South Africa</span>
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">
+              Explore Our
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-cyan-400">
+                Collection
+              </span>
+            </h1>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Premium electric surfboards, eFoils, and accessories. Find your perfect ride and experience the future of watersports.
+            </p>
           </div>
-        }>
-          <ProductsContent />
-        </Suspense>
-      </div>
+        </div>
+      </section>
+
+      {/* Products Section */}
+      <section className="px-4 pb-20">
+        <div className="max-w-7xl mx-auto">
+          <Suspense fallback={
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-primary"></div>
+              <p className="mt-4 text-gray-400">Loading your adventure...</p>
+            </div>
+          }>
+            <ProductsContent />
+          </Suspense>
+        </div>
+      </section>
     </main>
   )
 }
