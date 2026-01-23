@@ -55,7 +55,7 @@ export default function Error({
         
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-500">
-            Still having issues? <Link href="/support" className="text-blue-600 hover:text-blue-800 underline">Contact Support</Link>
+            Still having issues? <Link href="/contact" className="text-blue-600 hover:text-blue-800 underline">Contact Support</Link>
           </p>
         </div>
       </div>
