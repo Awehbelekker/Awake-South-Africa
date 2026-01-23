@@ -140,6 +140,7 @@ export default function HomePage() {
                   src={loc.image}
                   alt={loc.name}
                   fill
+                  unoptimized
                   className="object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-awake-black via-awake-black/50 to-transparent" />
