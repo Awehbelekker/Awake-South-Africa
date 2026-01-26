@@ -44,7 +44,7 @@ export default function HomePage() {
             Experience the thrill of electric surfboarding with premium RÄVIK Jetboards and VINGA eFoils. Now available in South Africa.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-32">
             <Link href="/products" className="group px-8 py-4 bg-accent-primary text-awake-black font-semibold rounded-lg hover:bg-accent-primary/90 transition-all flex items-center gap-2">
               Explore Boards <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -53,7 +53,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-8 md:gap-12 text-sm text-gray-300">
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12 text-sm text-gray-300 mb-16">
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-accent-primary flex-shrink-0" />
               <span>2 Year Warranty</span>
