@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@medusajs/medusa-js": "^6.1.8",
+    "@supabase/supabase-js": "^2.91.1",
     "@tiptap/extension-color": "^3.16.0",
     "@tiptap/extension-highlight": "^3.16.0",
     "@tiptap/extension-image": "^3.16.0",
