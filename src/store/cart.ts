@@ -7,21 +7,27 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
+  variantId?: string; // Medusa variant ID for API operations
+  lineItemId?: string; // Medusa line item ID for updates
 }
 
 interface CartState {
   items: CartItem[];
+  medusaCartId: string | null;
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   total: () => number;
+  setMedusaCartId: (id: string | null) => void;
+  syncFromMedusa: (items: CartItem[], cartId: string) => void;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      medusaCartId: null,
 
       addItem: (item) => {
         set((state) => {
@@ -49,9 +55,14 @@ export const useCartStore = create<CartState>()(
         }));
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], medusaCartId: null }),
 
       total: () => get().items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+
+      setMedusaCartId: (id) => set({ medusaCartId: id }),
+
+      // Sync cart state from Medusa response
+      syncFromMedusa: (items, cartId) => set({ items, medusaCartId: cartId }),
     }),
     { name: "awake-cart" }
   )

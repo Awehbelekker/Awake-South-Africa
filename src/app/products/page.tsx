@@ -6,8 +6,9 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
 import { useWishlistStore } from '@/store/wishlist'
+import { useProducts } from '@/lib/medusa-hooks'
 import { useProductsStore } from '@/store/products'
-import { Zap, Wind, Package, Sparkles } from 'lucide-react'
+import { Zap, Wind, Package, Sparkles, Loader2 } from 'lucide-react'
 
 function ProductsContent() {
   const searchParams = useSearchParams()
@@ -15,17 +16,28 @@ function ProductsContent() {
   const [selectedCategory, setSelectedCategory] = useState(categoryFilter || 'all')
   const { addItem } = useCartStore()
   const { addItem: addToWishlist, items: wishlistItems } = useWishlistStore()
-  const { products: allProducts } = useProductsStore()
+
+  // Try Medusa API first, fall back to local store
+  const { data: medusaProducts, isLoading, error } = useProducts()
+  const { products: localProducts } = useProductsStore()
+
+  // Use Medusa products if available, otherwise fall back to local
+  const allProducts = medusaProducts && medusaProducts.length > 0 ? medusaProducts : localProducts
+
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
-    return <div className="min-h-screen bg-awake-black flex items-center justify-center">
-      <div className="text-gray-400">Loading your adventure...</div>
-    </div>
+  // Show loading state while fetching from Medusa
+  if (!mounted || isLoading) {
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center">
+        <Loader2 className="w-12 h-12 text-accent-primary animate-spin mb-4" />
+        <div className="text-gray-400">Loading your adventure...</div>
+      </div>
+    )
   }
 
   // Accessory categories grouped together
