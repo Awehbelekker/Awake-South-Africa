@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import useDrivePicker from 'react-google-drive-picker';
 import { Cloud } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -24,20 +24,44 @@ export default function GoogleDrivePicker({
   label = 'Select from Google Drive'
 }: GoogleDrivePickerProps) {
   const [openPicker, authResponse] = useDrivePicker();
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID;
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY;
   const appId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_APP_ID;
 
   // Check if Google Drive credentials are configured
-  const isConfigured = clientId && apiKey && appId && 
-    clientId !== PLACEHOLDER_CLIENT_ID &&
-    apiKey !== PLACEHOLDER_API_KEY &&
-    appId !== PLACEHOLDER_APP_ID;
+  // More lenient check - just verify they exist and are not empty/placeholder
+  const isConfigured = !!(
+    clientId && 
+    apiKey && 
+    appId && 
+    clientId.length > 10 &&
+    apiKey.length > 10 &&
+    appId.length > 5 &&
+    !clientId.includes('your-client-id') &&
+    !apiKey.includes('your-api-key') &&
+    !appId.includes('your-app-id')
+  );
+
+  // Debug logging (only in development)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const info = `Config check: ${isConfigured ? 'YES' : 'NO'} | ClientID: ${clientId ? 'SET' : 'MISSING'} | ApiKey: ${apiKey ? 'SET' : 'MISSING'} | AppID: ${appId ? 'SET' : 'MISSING'}`;
+      setDebugInfo(info);
+      console.log('[GoogleDrivePicker]', info);
+    }
+  }, [clientId, apiKey, appId, isConfigured]);
 
   const handleOpenPicker = () => {
     if (!isConfigured) {
-      toast.error('Google Drive is not configured. Please add credentials to .env.local');
+      const missing = [];
+      if (!clientId || clientId.includes('your-client-id')) missing.push('CLIENT_ID');
+      if (!apiKey || apiKey.includes('your-api-key')) missing.push('API_KEY');
+      if (!appId || appId.includes('your-app-id')) missing.push('APP_ID');
+      
+      toast.error(`Google Drive not configured. Missing: ${missing.join(', ')}. Check Vercel environment variables.`);
+      console.error('[GoogleDrivePicker] Configuration error:', { clientId, apiKey, appId });
       return;
     }
 
@@ -94,19 +118,27 @@ export default function GoogleDrivePicker({
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleOpenPicker}
-      disabled={!isConfigured}
-      className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-        isConfigured
-          ? 'bg-blue-600 text-white hover:bg-blue-700'
-          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-      }`}
-      title={!isConfigured ? 'Google Drive not configured. Add credentials to .env.local' : label}
-    >
-      <Cloud className="w-4 h-4" />
-      {isConfigured ? label : '🔒 Google Drive (Not Configured)'}
-    </button>
+    <div className="inline-block">
+      <button
+        type="button"
+        onClick={handleOpenPicker}
+        disabled={!isConfigured}
+        className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+          isConfigured
+            ? 'bg-blue-600 text-white hover:bg-blue-700'
+            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+        }`}
+        title={!isConfigured ? 'Google Drive not configured. Check Vercel environment variables.' : label}
+      >
+        <Cloud className="w-4 h-4" />
+        {isConfigured ? label : '🔒 Google Drive (Not Configured)'}
+      </button>
+      {/* Show debug info in development */}
+      {process.env.NODE_ENV === 'development' && debugInfo && (
+        <div className="text-xs text-gray-500 mt-1 max-w-md">
+          {debugInfo}
+        </div>
+      )}
+    </div>
   );
 }
