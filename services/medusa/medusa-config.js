@@ -33,6 +33,16 @@ const DATABASE_URL = process.env.DATABASE_URL || "postgres://localhost/medusa-st
 // Redis configuration
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
+// Debug: Log database connection (without password)
+if (process.env.NODE_ENV === "production") {
+  const dbUrlParts = DATABASE_URL.match(/^(postgresql?:\/\/)([^:]+):([^@]+)@(.+)$/);
+  if (dbUrlParts) {
+    console.log(`[medusa-config] Connecting to database: ${dbUrlParts[1]}${dbUrlParts[2]}:****@${dbUrlParts[4]}`);
+  } else {
+    console.log(`[medusa-config] DATABASE_URL format: ${DATABASE_URL.substring(0, 20)}...`);
+  }
+}
+
 const plugins = [
   `medusa-fulfillment-manual`,
   `medusa-payment-manual`,
@@ -86,9 +96,16 @@ const projectConfig = {
   store_cors: STORE_CORS,
   database_url: DATABASE_URL,
   admin_cors: ADMIN_CORS,
-  database_extra: process.env.NODE_ENV !== "development"
-    ? { ssl: { rejectUnauthorized: false } }
-    : {},
+  database_type: "postgres",
+  database_extra:
+    process.env.NODE_ENV === "production" || DATABASE_URL.includes("supabase")
+      ? {
+          ssl: {
+            rejectUnauthorized: false
+          },
+          connectionTimeoutMillis: 10000,
+        }
+      : {},
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */
