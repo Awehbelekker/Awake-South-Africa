@@ -54,20 +54,30 @@ const plugins = [
   },
 ];
 
-const modules = {
-  eventBus: {
-    resolve: "@medusajs/event-bus-redis",
-    options: {
-      redisUrl: REDIS_URL
+// Use Redis modules in production if REDIS_URL is set, otherwise use local/inmemory
+const modules = REDIS_URL && REDIS_URL !== "redis://localhost:6379"
+  ? {
+      eventBus: {
+        resolve: "@medusajs/event-bus-redis",
+        options: {
+          redisUrl: REDIS_URL
+        }
+      },
+      cacheService: {
+        resolve: "@medusajs/cache-redis",
+        options: {
+          redisUrl: REDIS_URL
+        }
+      },
     }
-  },
-  cacheService: {
-    resolve: "@medusajs/cache-redis",
-    options: {
-      redisUrl: REDIS_URL
-    }
-  },
-};
+  : {
+      eventBus: {
+        resolve: "@medusajs/event-bus-local",
+      },
+      cacheService: {
+        resolve: "@medusajs/cache-inmemory",
+      },
+    };
 
 /** @type {import('@medusajs/medusa').ConfigModule["projectConfig"]} */
 const projectConfig = {
