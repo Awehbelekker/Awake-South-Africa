@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, ShoppingCart, Heart, User, ChevronDown } from "lucide-react";
@@ -30,6 +31,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const pathname = usePathname();
 
   const { items: cartItems } = useCartStore();
   const { isAuthenticated, user } = useAuthStore();
@@ -37,11 +39,18 @@ export default function Header() {
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+  // Hide header on admin pages
+  const isAdminPage = pathname?.startsWith('/admin');
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  if (isAdminPage) {
+    return null; // Don't render header on admin pages
+  }
 
   return (
     <header

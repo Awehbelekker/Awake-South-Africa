@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAdminStore } from '@/store/admin'
 import { useProductsStore } from '@/store/products'
+import MediaLibraryBrowser from '@/components/admin/MediaLibraryBrowser'
 
 export default function AdminDashboard() {
   const router = useRouter()
   const { isAuthenticated, logout, settings, updateSettings } = useAdminStore()
   const { products } = useProductsStore()
   const [mounted, setMounted] = useState(false)
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -38,14 +40,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow">
+      {/* Admin Header - standalone, not positioned below site header */}
+      <header className="bg-white shadow fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Awake SA Admin</h1>
           <div className="flex gap-4 items-center">
-            <Link href="/" className="text-blue-600 hover:text-blue-800">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
               View Store
-            </Link>
+            </a>
             <button
               onClick={() => {
                 logout()
@@ -59,7 +61,8 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content - with padding for admin header only */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
@@ -83,7 +86,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Link
             href="/admin/products"
             className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
@@ -92,6 +95,24 @@ export default function AdminDashboard() {
             <p className="text-gray-600">Edit products, prices, inventory, and costs</p>
             <div className="mt-4 text-blue-600 font-medium">View all products →</div>
           </Link>
+
+          <Link
+            href="/admin/locations"
+            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">📍 Demo Locations</h3>
+            <p className="text-gray-600">Manage demo ride locations, images, and pricing</p>
+            <div className="mt-4 text-blue-600 font-medium">Manage locations →</div>
+          </Link>
+
+          <button
+            onClick={() => setShowMediaLibrary(true)}
+            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow text-left"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">📁 Media Library</h3>
+            <p className="text-gray-600">Browse and manage all product images and videos</p>
+            <div className="mt-4 text-blue-600 font-medium">Open library →</div>
+          </button>
 
           <Link
             href="/admin/settings"
@@ -129,6 +150,13 @@ export default function AdminDashboard() {
             })}
           </div>
         </div>
+
+        {/* Media Library Browser */}
+        <MediaLibraryBrowser
+          isOpen={showMediaLibrary}
+          onClose={() => setShowMediaLibrary(false)}
+          type="all"
+        />
       </main>
     </div>
   )

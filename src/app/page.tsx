@@ -1,13 +1,27 @@
+'use client'
+
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import { ArrowRight, Zap, Shield, Waves, Battery, Phone, MapPin } from "lucide-react";
 import { AWAKE_IMAGES, PRODUCTS, SA_CONTENT } from "@/lib/constants";
+import { useDemoLocationsStore } from "@/store/demoLocations";
 
 export default function HomePage() {
+  const { locations } = useDemoLocationsStore()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Use active locations from store if mounted, otherwise use default
+  const displayLocations = mounted ? locations.filter(loc => loc.active) : SA_CONTENT.demo.locations
+
   return (
     <main className="min-h-screen bg-awake-black">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0">
           <Image src={AWAKE_IMAGES.hero.main} alt="Awake Electric Surfboard" fill className="object-cover opacity-60" priority />
           <div className="absolute inset-0 bg-gradient-to-b from-awake-black/60 via-awake-black/30 to-awake-black/80" />
@@ -30,7 +44,7 @@ export default function HomePage() {
             Experience the thrill of electric surfboarding with premium RÄVIK Jetboards and VINGA eFoils. Now available in South Africa.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-32">
             <Link href="/products" className="group px-8 py-4 bg-accent-primary text-awake-black font-semibold rounded-lg hover:bg-accent-primary/90 transition-all flex items-center gap-2">
               Explore Boards <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -39,10 +53,19 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-8 mt-16 text-sm text-gray-400">
-            <div className="flex items-center gap-2"><Shield className="w-5 h-5 text-accent-primary" /><span>2 Year Warranty</span></div>
-            <div className="flex items-center gap-2"><MapPin className="w-5 h-5 text-accent-primary" /><span>SA Support & Service</span></div>
-            <div className="flex items-center gap-2"><Phone className="w-5 h-5 text-accent-primary" /><span>WhatsApp Support</span></div>
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12 text-sm text-gray-300 mb-16">
+            <div className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-accent-primary flex-shrink-0" />
+              <span>2 Year Warranty</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-accent-primary flex-shrink-0" />
+              <span>SA Support & Service</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Phone className="w-5 h-5 text-accent-primary flex-shrink-0" />
+              <span>WhatsApp Support</span>
+            </div>
           </div>
         </div>
       </section>
@@ -112,20 +135,37 @@ export default function HomePage() {
 
       {/* Demo CTA */}
       <section className="py-24 px-4 bg-awake-dark">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Experience It Yourself</h2>
-          <p className="text-xl text-gray-300 mb-8">Book a demo ride at one of our South African locations</p>
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            {SA_CONTENT.demo.locations.map((loc) => (
-              <div key={loc.name} className="px-4 py-2 bg-white/5 rounded-lg border border-white/10">
-                <span className="text-white font-medium">{loc.name}</span>
-                <span className="text-gray-400 ml-2 text-sm">({loc.area})</span>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Experience It Yourself</h2>
+            <p className="text-xl text-gray-300 mb-8">Book a demo ride at one of our South African locations</p>
+          </div>
+          
+          {/* Location Cards with Images */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
+            {displayLocations.map((loc) => (
+              <div key={loc.name} className="group relative overflow-hidden rounded-xl aspect-[4/3] border border-white/10 hover:border-accent-primary/50 transition-all">
+                <Image
+                  src={loc.image}
+                  alt={loc.name}
+                  fill
+                  unoptimized
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-awake-black via-awake-black/50 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="text-white font-bold text-lg">{loc.name}</h3>
+                  <p className="text-gray-300 text-sm">{loc.area}</p>
+                </div>
               </div>
             ))}
           </div>
-          <Link href="/demo" className="inline-flex items-center gap-2 px-8 py-4 bg-accent-primary text-awake-black font-semibold rounded-lg hover:bg-accent-primary/90">
-            Book Your Demo Ride <ArrowRight className="w-5 h-5" />
-          </Link>
+
+          <div className="text-center">
+            <Link href="/demo" className="inline-flex items-center gap-2 px-8 py-4 bg-accent-primary text-awake-black font-semibold rounded-lg hover:bg-accent-primary/90">
+              Book Your Demo Ride <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
       </section>
 

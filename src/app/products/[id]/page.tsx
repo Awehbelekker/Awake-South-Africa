@@ -124,8 +124,9 @@ export default function ProductDetailPage() {
       {/* Product Detail */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <div className="grid md:grid-cols-2 gap-12">
-          {/* Product Image Gallery */}
+          {/* Left Column - Product Images & Ride Profile */}
           <div>
+            {/* Product Image Gallery */}
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900 mb-4">
               <Image
                 src={productGallery[selectedImage]}
@@ -141,7 +142,7 @@ export default function ProductDetailPage() {
               )}
             </div>
             {/* Thumbnail Gallery */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-4 gap-3 mb-8">
               {productGallery.map((img, idx) => (
                 <button
                   key={idx}
@@ -161,9 +162,41 @@ export default function ProductDetailPage() {
                 </button>
               ))}
             </div>
+
+            {/* Ride Profile Section - Moved here under images */}
+            <div className="py-8 px-6 bg-awake-gray rounded-2xl">
+              <h2 className="text-2xl font-bold mb-8 text-center">Ride Profile</h2>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-accent-primary mb-2">🏁</div>
+                  <div className="text-2xl font-bold mb-1">{rideProfile.topSpeed}</div>
+                  <div className="text-xs text-gray-400">Top Speed</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-accent-primary mb-2">📏</div>
+                  <div className="text-2xl font-bold mb-1">{rideProfile.range}</div>
+                  <div className="text-xs text-gray-400">Range</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-accent-primary mb-2">⏱️</div>
+                  <div className="text-2xl font-bold mb-1">{rideProfile.rideTime}</div>
+                  <div className="text-xs text-gray-400">Ride Time</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-accent-primary mb-2">⚖️</div>
+                  <div className="text-2xl font-bold mb-1">{rideProfile.weight}</div>
+                  <div className="text-xs text-gray-400">Weight</div>
+                </div>
+                <div className="text-center col-span-2">
+                  <div className="text-3xl font-bold text-accent-primary mb-2">⚡</div>
+                  <div className="text-2xl font-bold mb-1">{rideProfile.chargingTime}</div>
+                  <div className="text-xs text-gray-400">Charging Time</div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Product Info */}
+          {/* Right Column - Product Info */}
           <div className="flex flex-col">
             <div className="mb-4">
               <span className="text-accent-primary text-sm font-medium">
@@ -276,40 +309,6 @@ export default function ProductDetailPage() {
               >
                 Book a Demo →
               </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Ride Profile Section */}
-        <div className="mt-24 py-16 bg-awake-gray rounded-2xl">
-          <div className="px-8">
-            <h2 className="text-3xl font-bold mb-12 text-center">Ride Profile</h2>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent-primary mb-2">🏁</div>
-                <div className="text-3xl font-bold mb-1">{rideProfile.topSpeed}</div>
-                <div className="text-sm text-gray-400">Top Speed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent-primary mb-2">📏</div>
-                <div className="text-3xl font-bold mb-1">{rideProfile.range}</div>
-                <div className="text-sm text-gray-400">Range</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent-primary mb-2">⏱️</div>
-                <div className="text-3xl font-bold mb-1">{rideProfile.rideTime}</div>
-                <div className="text-sm text-gray-400">Ride Time</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent-primary mb-2">⚖️</div>
-                <div className="text-3xl font-bold mb-1">{rideProfile.weight}</div>
-                <div className="text-sm text-gray-400">Weight</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-accent-primary mb-2">⚡</div>
-                <div className="text-3xl font-bold mb-1">{rideProfile.chargingTime}</div>
-                <div className="text-sm text-gray-400">Charging</div>
-              </div>
             </div>
           </div>
         </div>
