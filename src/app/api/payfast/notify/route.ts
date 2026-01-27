@@ -1,12 +1,89 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
+// Medusa Admin API URL
+const MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000';
+const MEDUSA_ADMIN_SECRET = process.env.MEDUSA_ADMIN_SECRET || '';
+
+// Capture payment in Medusa (marks order as paid)
+async function capturePaymentInMedusa(orderId: string): Promise<boolean> {
+  try {
+    // Get order details to find payment ID
+    const orderResponse = await fetch(`${MEDUSA_BACKEND_URL}/admin/orders/${orderId}`, {
+      headers: {
+        'Authorization': `Bearer ${MEDUSA_ADMIN_SECRET}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!orderResponse.ok) {
+      console.error('Failed to fetch order from Medusa:', await orderResponse.text());
+      return false;
+    }
+
+    const { order } = await orderResponse.json();
+
+    // Check if order has payments to capture
+    if (!order.payments || order.payments.length === 0) {
+      console.log('No payments found for order:', orderId);
+      return false;
+    }
+
+    // Capture the payment
+    const paymentId = order.payments[0].id;
+    const captureResponse = await fetch(`${MEDUSA_BACKEND_URL}/admin/orders/${orderId}/capture`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${MEDUSA_ADMIN_SECRET}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!captureResponse.ok) {
+      console.error('Failed to capture payment in Medusa:', await captureResponse.text());
+      return false;
+    }
+
+    console.log(`Payment captured successfully for order ${orderId}`);
+    return true;
+  } catch (error) {
+    console.error('Error capturing payment in Medusa:', error);
+    return false;
+  }
+}
+
+// Add note to order with PayFast transaction details
+async function addPayFastNoteToOrder(orderId: string, payfastData: Record<string, string>): Promise<void> {
+  try {
+    const note = `PayFast Payment Confirmed
+- Transaction ID: ${payfastData.pf_payment_id || 'N/A'}
+- Amount: R${payfastData.amount_gross || '0'}
+- Payment Status: ${payfastData.payment_status}
+- Payment Date: ${new Date().toISOString()}`;
+
+    await fetch(`${MEDUSA_BACKEND_URL}/admin/notes`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${MEDUSA_ADMIN_SECRET}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        resource_type: 'order',
+        resource_id: orderId,
+        value: note,
+      }),
+    });
+  } catch (error) {
+    console.error('Failed to add note to order:', error);
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
     const params = new URLSearchParams(body);
     const data: Record<string, string> = {};
-    
+
     params.forEach((value, key) => {
       data[key] = value;
     });
@@ -19,7 +96,7 @@ export async function POST(request: NextRequest) {
     const passPhrase = process.env.PAYFAST_PASSPHRASE || '';
     let pfParamString = '';
     const sortedKeys = Object.keys(data).sort();
-    
+
     for (const key of sortedKeys) {
       if (data[key] !== '') {
         pfParamString += `${key}=${encodeURIComponent(data[key].trim()).replace(/%20/g, '+')}&`;
@@ -27,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     pfParamString = pfParamString.slice(0, -1);
-    
+
     if (passPhrase) {
       pfParamString += `&passphrase=${encodeURIComponent(passPhrase.trim()).replace(/%20/g, '+')}`;
     }
@@ -39,23 +116,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    // Verify payment status
+    // Extract payment data
     const paymentStatus = data.payment_status;
-    const paymentId = data.m_payment_id;
+    const orderId = data.m_payment_id; // This is the Medusa order ID (e.g., "order_xxx")
     const amount = data.amount_gross;
+    const payfastPaymentId = data.pf_payment_id;
 
     console.log('PayFast Payment Notification:', {
-      paymentId,
+      orderId,
+      payfastPaymentId,
       status: paymentStatus,
       amount,
     });
 
-    // Here you would:
-    // 1. Update your database with payment status
-    // 2. Send confirmation email
-    // 3. Process the order
+    // Only process COMPLETE payments
+    if (paymentStatus === 'COMPLETE') {
+      // Check if this is a Medusa order ID (starts with "order_")
+      if (orderId && orderId.startsWith('order_')) {
+        // Capture payment in Medusa
+        const captured = await capturePaymentInMedusa(orderId);
 
-    // For now, just log and return success
+        if (captured) {
+          // Add PayFast transaction note to order
+          await addPayFastNoteToOrder(orderId, data);
+          console.log(`Order ${orderId} payment captured and noted`);
+        }
+      } else {
+        // Legacy order ID format (AWK-xxx), log for manual processing
+        console.log(`Legacy order format detected: ${orderId}. Manual processing may be required.`);
+      }
+    } else {
+      console.log(`Payment not complete. Status: ${paymentStatus}`);
+    }
+
+    // PayFast expects a 200 OK response
     return NextResponse.json({ success: true });
 
   } catch (error) {

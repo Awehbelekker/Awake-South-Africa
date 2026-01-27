@@ -237,3 +237,8 @@ export async function logoutCustomer() {
   await medusaClient.auth.deleteSession()
 }
 
+// Get customer orders
+export async function getCustomerOrders() {
+  const { orders } = await medusaClient.customers.listOrders()
+  return orders
+}
