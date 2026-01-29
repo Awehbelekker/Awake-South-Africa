@@ -1,0 +1,19 @@
+# Ignore old monorepo structure
+services/
+
+# Ignore Docker files
+docker/
+Dockerfile*
+docker-compose.yml
+
+# Ignore documentation
+*.md
+!README.md
+
+# Ignore examples
+examples/
+
+# Ignore scripts
+*.sh
+deploy*.ps1
+
