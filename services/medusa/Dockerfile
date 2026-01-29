@@ -14,8 +14,11 @@ RUN npm ci && npm cache clean --force
 # Copy source code
 COPY . .
 
-# Build the server (not full build to avoid admin rebuild)
+# Build the server
 RUN npm run build:server
+
+# Pre-build admin dashboard during Docker build (more memory available)
+RUN npx medusa-admin build
 
 # Expose port
 EXPOSE 9000

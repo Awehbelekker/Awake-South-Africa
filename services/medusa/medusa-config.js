@@ -56,7 +56,8 @@ const plugins = [
     resolve: "@medusajs/admin",
     /** @type {import('@medusajs/admin').PluginOptions} */
     options: {
-      autoRebuild: true,
+      // Disable auto-rebuild in production to save memory
+      autoRebuild: process.env.NODE_ENV !== "production",
       develop: {
         open: process.env.OPEN_BROWSER !== "false",
       },
