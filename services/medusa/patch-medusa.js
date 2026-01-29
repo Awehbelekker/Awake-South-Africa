@@ -9,8 +9,18 @@ const servicesToPatch = [
   "tax-provider.js",
 ];
 
-const search = "return [4 /*yield*/, model.update({}, { is_installed: false })];";
-const replacement = "return [4 /*yield*/, Promise.resolve()];";
+// Patterns to search for (different services use different variable names)
+const searchPatterns = [
+  {
+    search: "return [4 /*yield*/, model.update({}, { is_installed: false })];",
+    replacement: "return [4 /*yield*/, Promise.resolve()];",
+  },
+  {
+    search: "return [4 /*yield*/, fulfillmentProviderRepo.update({}, { is_ins",
+    replacement: "return [4 /*yield*/, Promise.resolve()]; // fulfillmentProviderRepo.update({}, { is_ins",
+    partial: true, // This line is truncated in the compiled code, so we do partial match
+  },
+];
 
 let patchedCount = 0;
 let skippedCount = 0;
@@ -34,20 +44,55 @@ for (const serviceFile of servicesToPatch) {
   }
 
   let src = fs.readFileSync(targetPath, "utf8");
+  let patched = false;
 
-  if (src.includes(replacement)) {
-    console.log(`  [OK] ${serviceFile} - already patched`);
-    skippedCount++;
+  // Try each search pattern
+  for (const pattern of searchPatterns) {
+    if (pattern.partial) {
+      // For partial matches, check if the pattern exists and replace the whole line
+      if (src.includes(pattern.search)) {
+        // Find the line and replace it
+        const lines = src.split("\n");
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].includes(pattern.search)) {
+            // Replace the entire line
+            const indent = lines[i].match(/^\s*/)[0];
+            lines[i] = indent + pattern.replacement;
+            patched = true;
+            break;
+          }
+        }
+        if (patched) {
+          src = lines.join("\n");
+          break;
+        }
+      }
+    } else {
+      // Exact match
+      if (src.includes(pattern.replacement)) {
+        console.log(`  [OK] ${serviceFile} - already patched`);
+        skippedCount++;
+        patched = "skip";
+        break;
+      }
+      if (src.includes(pattern.search)) {
+        src = src.replace(pattern.search, pattern.replacement);
+        patched = true;
+        break;
+      }
+    }
+  }
+
+  if (patched === "skip") {
     continue;
   }
 
-  if (!src.includes(search)) {
+  if (!patched) {
     console.log(`  [SKIP] ${serviceFile} - pattern not found (may not need patching)`);
     notFoundCount++;
     continue;
   }
 
-  src = src.replace(search, replacement);
   fs.writeFileSync(targetPath, src, "utf8");
   console.log(`  [PATCHED] ${serviceFile} - disabled bulk is_installed reset`);
   patchedCount++;
