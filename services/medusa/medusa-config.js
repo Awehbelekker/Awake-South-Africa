@@ -105,8 +105,6 @@ const projectConfig = {
             rejectUnauthorized: false
           },
           connectionTimeoutMillis: 10000,
-          // Use separate schema for Medusa to avoid conflicts with existing tables
-          schema: "medusa",
         }
       : {},
   database_logging: process.env.NODE_ENV !== "production" ? ["query", "error"] : ["error"],
