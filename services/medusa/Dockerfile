@@ -1,5 +1,6 @@
 FROM node:18-alpine
 
+# Force rebuild: 2026-01-29-v2
 WORKDIR /app
 
 # Install dependencies required for node-gyp and native modules
