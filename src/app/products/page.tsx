@@ -30,8 +30,20 @@ function ProductsContent() {
     setMounted(true)
   }, [])
 
-  // Show loading state while fetching from Medusa
-  if (!mounted || isLoading) {
+  // Show loading state only if mounted is false OR (isLoading AND no error AND no local products)
+  // This ensures we fall back to local products if API fails
+  if (!mounted) {
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center">
+        <Loader2 className="w-12 h-12 text-accent-primary animate-spin mb-4" />
+        <div className="text-gray-400">Loading your adventure...</div>
+      </div>
+    )
+  }
+
+  // If still loading from API but we have local products, use them
+  // Only show loading if we have no products at all
+  if (isLoading && localProducts.length === 0) {
     return (
       <div className="min-h-[400px] flex flex-col items-center justify-center">
         <Loader2 className="w-12 h-12 text-accent-primary animate-spin mb-4" />
