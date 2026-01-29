@@ -15,6 +15,9 @@ RUN npm ci && npm cache clean --force
 # Copy source code
 COPY . .
 
+# Patch Medusa's compiled PaymentProviderService to avoid Supabase bulk-update issue
+RUN node patch-medusa.js
+
 # Build the server
 RUN npm run build:server
 
