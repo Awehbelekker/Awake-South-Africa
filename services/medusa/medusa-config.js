@@ -56,7 +56,8 @@ const plugins = [
     resolve: "@medusajs/admin",
     /** @type {import('@medusajs/admin').PluginOptions} */
     options: {
-      autoRebuild: true,
+      // Disable auto-rebuild in production to save memory
+      autoRebuild: process.env.NODE_ENV !== "production",
       develop: {
         open: process.env.OPEN_BROWSER !== "false",
       },
@@ -106,6 +107,7 @@ const projectConfig = {
           connectionTimeoutMillis: 10000,
         }
       : {},
+  database_logging: process.env.NODE_ENV !== "production" ? ["query", "error"] : ["error"],
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */

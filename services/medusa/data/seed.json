@@ -1,14 +1,7 @@
 {
   "store": {
-    "currencies": [
-      {
-        "code": "ZAR",
-        "symbol": "R",
-        "symbol_native": "R",
-        "name": "South African Rand"
-      }
-    ],
-    "default_currency_code": "ZAR",
+    "currencies": ["zar"],
+    "default_currency_code": "zar",
     "swap_link_template": "https://awakesa.co.za/products/{handle}"
   },
   "users": [
@@ -21,21 +14,14 @@
   "regions": [
     {
       "name": "South Africa",
-      "currency_code": "ZAR",
+      "currency_code": "zar",
       "tax_rate": 15,
-      "payment_providers": [
-        {
-          "id": "manual"
-        }
-      ],
-      "fulfillment_providers": [
-        {
-          "id": "manual"
-        }
-      ],
-      "countries": ["ZA"]
+      "payment_providers": ["manual"],
+      "fulfillment_providers": ["manual"],
+      "countries": ["za"]
     }
   ],
+  "shipping_options": [],
   "products": [
     {
       "title": "RÄVIK Explore XR 4",
@@ -69,7 +55,7 @@
           "prices": [
             {
               "amount": 24113900,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -118,7 +104,7 @@
           "prices": [
             {
               "amount": 34902400,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -167,7 +153,7 @@
           "prices": [
             {
               "amount": 40296700,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -217,7 +203,7 @@
           "prices": [
             {
               "amount": 45221600,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -266,7 +252,7 @@
           "prices": [
             {
               "amount": 32205200,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -315,7 +301,7 @@
           "prices": [
             {
               "amount": 36250900,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -364,7 +350,7 @@
           "prices": [
             {
               "amount": 34902400,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -413,7 +399,7 @@
           "prices": [
             {
               "amount": 38948100,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
