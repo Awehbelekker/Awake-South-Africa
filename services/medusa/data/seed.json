@@ -16,17 +16,9 @@
       "name": "South Africa",
       "currency_code": "zar",
       "tax_rate": 15,
-      "payment_providers": [
-        {
-          "id": "manual"
-        }
-      ],
-      "fulfillment_providers": [
-        {
-          "id": "manual"
-        }
-      ],
-      "countries": ["ZA"]
+      "payment_providers": ["manual"],
+      "fulfillment_providers": ["manual"],
+      "countries": ["za"]
     }
   ],
   "products": [
