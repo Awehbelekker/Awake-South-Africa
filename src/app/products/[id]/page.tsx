@@ -1,10 +1,12 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useState } from "react";
-import { PRODUCTS } from "@/lib/constants";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
 import { useWishlistStore } from "@/store/wishlist";
+import { useProductsStore } from "@/store/products";
+import { useProduct } from "@/lib/medusa-hooks";
+import { Loader2 } from "lucide-react";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -13,23 +15,35 @@ export default function ProductDetailPage() {
   const { items: wishlistItems, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlistStore();
   const [selectedImage, setSelectedImage] = useState(0);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Find the product from all categories
-  const allProducts = [
-    ...PRODUCTS.jetboards,
-    ...PRODUCTS.limitedEdition,
-    ...PRODUCTS.efoils,
-    ...PRODUCTS.batteries,
-    ...PRODUCTS.boardsOnly,
-    ...PRODUCTS.wings,
-    ...PRODUCTS.bags,
-    ...PRODUCTS.safetyStorage,
-    ...PRODUCTS.electronics,
-    ...PRODUCTS.parts,
-    ...PRODUCTS.apparel,
-  ];
+  const productId = typeof params.id === 'string' ? params.id : '';
 
-  const product = allProducts.find(p => p.id === params.id);
+  // Try Medusa API first
+  const { data: medusaProduct, isLoading: medusaLoading, error: medusaError } = useProduct(productId);
+
+  // Fall back to local store
+  const { getProductById, products: localProducts } = useProductsStore();
+  const localProduct = getProductById(productId);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Determine which product to use: Medusa first, then local
+  const product = medusaProduct || localProduct;
+
+  // Show loading state
+  if (!mounted || (medusaLoading && !localProduct)) {
+    return (
+      <div className="min-h-screen bg-awake-black text-white pt-32 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-accent-primary animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -46,6 +60,9 @@ export default function ProductDetailPage() {
       </div>
     );
   }
+
+  // Get related products from local store for "You May Also Like" section
+  const allLocalProducts = localProducts;
 
   const formatPrice = (price: number) => `R${price.toLocaleString()}`;
   const isInWishlist = wishlistItems.some(item => item.id === product.id);
@@ -376,8 +393,8 @@ export default function ProductDetailPage() {
         <div className="mt-24">
           <h2 className="text-3xl font-bold mb-8">You May Also Like</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {allProducts
-              .filter(p => p.id !== product.id && ((p as any).categoryTag === (product as any).categoryTag || p.category === product.category))
+            {allLocalProducts
+              .filter(p => p.id !== product.id && ((p as any).categoryTag === (product as any).categoryTag || p.category === (product as any).category))
               .slice(0, 3)
               .map((relatedProduct) => (
                 <div
