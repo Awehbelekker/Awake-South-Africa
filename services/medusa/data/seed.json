@@ -1,14 +1,7 @@
 {
   "store": {
-    "currencies": [
-      {
-        "code": "ZAR",
-        "symbol": "R",
-        "symbol_native": "R",
-        "name": "South African Rand"
-      }
-    ],
-    "default_currency_code": "ZAR",
+    "currencies": ["zar"],
+    "default_currency_code": "zar",
     "swap_link_template": "https://awakesa.co.za/products/{handle}"
   },
   "users": [
@@ -21,7 +14,7 @@
   "regions": [
     {
       "name": "South Africa",
-      "currency_code": "ZAR",
+      "currency_code": "zar",
       "tax_rate": 15,
       "payment_providers": [
         {
