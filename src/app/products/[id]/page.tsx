@@ -121,7 +121,7 @@ export default function ProductDetailPage() {
         id: product.id,
         name: product.name,
         price: product.price,
-        image: product.image,
+        image: product.image || '/placeholder-product.jpg',
       });
     }
   };
@@ -294,7 +294,7 @@ export default function ProductDetailPage() {
                     id: product.id,
                     name: product.name,
                     price: product.price,
-                    image: product.image,
+                    image: product.image || '/placeholder-product.jpg',
                     quantity: 1,
                   });
                   router.push("/cart");
