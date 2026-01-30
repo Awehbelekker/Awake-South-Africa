@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+// Cache bust: 2026-01-30
 const nextConfig = {
   // output: 'standalone',
   images: {
