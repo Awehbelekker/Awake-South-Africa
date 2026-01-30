@@ -12,3 +12,6 @@ Thumbs.db
 backups/
 *.sql
 tmp/
+
+# Old monorepo structure - DO NOT include in builds
+services/storefront/
