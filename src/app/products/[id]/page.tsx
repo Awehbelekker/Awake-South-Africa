@@ -2,10 +2,10 @@
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useCartStore } from "@/store/cart";
-import { useWishlistStore } from "@/store/wishlist";
-import { useProductsStore } from "@/store/products";
-import { useProduct } from "@/lib/medusa-hooks";
+import { useCartStore } from "../../../store/cart";
+import { useWishlistStore } from "../../../store/wishlist";
+import { useProductsStore } from "../../../store/products";
+import { useProduct } from "../../../lib/medusa-hooks";
 import { Loader2 } from "lucide-react";
 
 export default function ProductDetailPage() {

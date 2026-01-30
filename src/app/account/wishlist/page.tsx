@@ -2,8 +2,8 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useWishlistStore } from '@/store/wishlist'
-import { useCartStore } from '@/store/cart'
+import { useWishlistStore } from '../../../store/wishlist'
+import { useCartStore } from '../../../store/cart'
 
 export default function WishlistPage() {
   const { items, removeItem, clearWishlist } = useWishlistStore()

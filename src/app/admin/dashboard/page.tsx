@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useAdminStore } from '@/store/admin'
-import { useProductsStore } from '@/store/products'
-import MediaLibraryBrowser from '@/components/admin/MediaLibraryBrowser'
+import { useAdminStore } from '../../../store/admin'
+import { useProductsStore } from '../../../store/products'
+import MediaLibraryBrowser from '../../../components/admin/MediaLibraryBrowser'
 
 export default function AdminDashboard() {
   const router = useRouter()
