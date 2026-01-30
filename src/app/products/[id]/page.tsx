@@ -69,11 +69,12 @@ export default function ProductDetailPage() {
 
   // Image gallery from Awake website - 4 angles per product
   // TO CUSTOMIZE: Replace these URLs with actual product images for each specific product
+  const defaultImage = product.image || '/placeholder-product.jpg';
   const productGallery = [
-    product.image, // Main product image
-    product.image, // Side angle - update with actual side view URL
-    product.image, // Top angle - update with actual top view URL  
-    product.image, // Action shot - update with rider using product URL
+    defaultImage, // Main product image
+    defaultImage, // Side angle - update with actual side view URL
+    defaultImage, // Top angle - update with actual top view URL
+    defaultImage, // Action shot - update with rider using product URL
   ];
 
   // Product videos - YouTube embed IDs
@@ -83,21 +84,21 @@ export default function ProductDetailPage() {
     {
       id: 'demo',
       title: 'Product Demo',
-      thumbnail: product.image,
+      thumbnail: defaultImage,
       embedId: 'dQw4w9WgXcQ', // REPLACE with actual demo video ID
       duration: '2:30'
     },
     {
       id: 'features',
-      title: 'Features Walkthrough', 
-      thumbnail: product.image,
+      title: 'Features Walkthrough',
+      thumbnail: defaultImage,
       embedId: 'dQw4w9WgXcQ', // REPLACE with actual features video ID
       duration: '3:15'
     },
     {
       id: 'review',
       title: 'Customer Review',
-      thumbnail: product.image,
+      thumbnail: defaultImage,
       embedId: 'dQw4w9WgXcQ', // REPLACE with actual review video ID
       duration: '4:50'
     },
