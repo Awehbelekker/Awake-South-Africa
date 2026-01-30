@@ -21,6 +21,7 @@
       "countries": ["za"]
     }
   ],
+  "shipping_options": [],
   "products": [
     {
       "title": "RÄVIK Explore XR 4",
@@ -54,7 +55,7 @@
           "prices": [
             {
               "amount": 24113900,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -103,7 +104,7 @@
           "prices": [
             {
               "amount": 34902400,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -152,7 +153,7 @@
           "prices": [
             {
               "amount": 40296700,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -202,7 +203,7 @@
           "prices": [
             {
               "amount": 45221600,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -251,7 +252,7 @@
           "prices": [
             {
               "amount": 32205200,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -300,7 +301,7 @@
           "prices": [
             {
               "amount": 36250900,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -349,7 +350,7 @@
           "prices": [
             {
               "amount": 34902400,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
@@ -398,7 +399,7 @@
           "prices": [
             {
               "amount": 38948100,
-              "currency_code": "ZAR"
+              "currency_code": "zar"
             }
           ],
           "options": [
