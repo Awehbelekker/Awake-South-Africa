@@ -105,6 +105,15 @@ export default function AdminDashboard() {
             <div className="mt-4 text-blue-600 font-medium">Manage locations →</div>
           </Link>
 
+          <Link
+            href="/admin/bookings"
+            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">📅 Demo Bookings</h3>
+            <p className="text-gray-600">View and manage demo ride booking requests</p>
+            <div className="mt-4 text-blue-600 font-medium">View bookings →</div>
+          </Link>
+
           <button
             onClick={() => setShowMediaLibrary(true)}
             className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow text-left"

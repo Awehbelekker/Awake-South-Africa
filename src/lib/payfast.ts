@@ -64,7 +64,7 @@ export function createPayFastPayment(
   const passPhrase = process.env.PAYFAST_PASSPHRASE!;
   const mode = (process.env.NEXT_PUBLIC_PAYFAST_MODE as 'live' | 'sandbox') || 'live';
 
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://storefront-teal-three.vercel.app';
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://awake-south-africa.vercel.app';
 
   const data: Record<string, string> = {
     merchant_id: merchantId,
