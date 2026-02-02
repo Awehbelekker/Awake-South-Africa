@@ -24,397 +24,1120 @@
   "shipping_options": [],
   "products": [
     {
-      "title": "RÄVIK Explore XR 4",
+      "title": "Awake RÄVIK Explore XR 4",
       "subtitle": "Entry-level electric jetboard",
-      "description": "Entry-level electric jetboard with impressive performance. Perfect for beginners and families.",
-      "handle": "ravik-explore-xr4",
+      "description": "Entry-level electric jetboard with impressive performance. Perfect for beginners and families looking to experience the thrill of electric surfing.",
+      "handle": "ravik-explore",
       "is_giftcard": false,
       "weight": 32000,
       "metadata": {
-        "costEUR": 5950,
-        "exchangeRate": 19.85,
+        "costEUR": 12150,
         "category": "jetboards",
         "categoryTag": "Jetboard",
         "skillLevel": "Beginner",
         "battery": "XR 4 (65 min)",
         "specs": ["Max Speed: 50 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Carbon composite construction"],
-        "features": ["Intuitive hand controller", "Quick battery swap", "Durable construction"]
+        "features": ["Intuitive hand controller", "Quick battery swap", "Durable construction", "Perfect for learning"]
       },
-      "images": [
-        "https://awakeboards.com/cdn/shop/files/Ravik_ADVENTURE-22_1_1.png?v=1752232151"
-      ],
-      "options": [
-        {
-          "title": "Configuration"
-        }
-      ],
-      "variants": [
-        {
-          "title": "Standard",
-          "sku": "RAVIK-EXPLORE-XR4",
-          "prices": [
-            {
-              "amount": 24113900,
-              "currency_code": "zar"
-            }
-          ],
-          "options": [
-            {
-              "value": "Standard"
-            }
-          ],
-          "inventory_quantity": 5,
-          "metadata": {
-            "costEUR": 5950,
-            "priceExVAT": 209686,
-            "costZAR": 118108
-          }
-        }
-      ]
+      "images": ["https://awakeboards.com/cdn/shop/files/23RE-FRONT-ICON.jpg?v=1753177232"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "RAVIK-EXPLORE-XR4",
+        "prices": [{ "amount": 24200000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 5,
+        "metadata": { "costEUR": 12150, "priceExVAT": 210500 }
+      }]
     },
     {
-      "title": "RÄVIK Adventure XR 4",
+      "title": "Awake RÄVIK Adventure XR 4",
       "subtitle": "Mid-range performance jetboard",
-      "description": "Mid-range performance jetboard for enthusiasts. Perfect balance of power and versatility for expedition rides.",
-      "handle": "ravik-adventure-xr4",
+      "description": "Mid-range performance jetboard for enthusiasts. Perfect balance of power and versatility for expedition rides and adventure seekers.",
+      "handle": "ravik-adventure",
       "is_giftcard": false,
       "weight": 32000,
       "metadata": {
-        "costEUR": 8450,
-        "exchangeRate": 19.85,
+        "costEUR": 17600,
         "category": "jetboards",
         "categoryTag": "Jetboard",
         "skillLevel": "Intermediate",
         "battery": "XR 4 (65 min)",
         "specs": ["Max Speed: 55 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Advanced motor system"],
-        "features": ["Enhanced power delivery", "Premium build quality", "Extended range"]
+        "features": ["Enhanced power delivery", "Premium build quality", "Extended range", "Adventure-ready"]
       },
-      "images": [
-        "https://awakeboards.com/cdn/shop/files/Ravik_ADVENTURE-22_1_1.png?v=1752232151"
-      ],
-      "options": [
-        {
-          "title": "Configuration"
-        }
-      ],
-      "variants": [
-        {
-          "title": "Standard",
-          "sku": "RAVIK-ADVENTURE-XR4",
-          "prices": [
-            {
-              "amount": 34902400,
-              "currency_code": "zar"
-            }
-          ],
-          "options": [
-            {
-              "value": "Standard"
-            }
-          ],
-          "inventory_quantity": 5,
-          "metadata": {
-            "costEUR": 8450,
-            "priceExVAT": 303499,
-            "costZAR": 167733
-          }
-        }
-      ]
+      "images": ["https://awakeboards.com/cdn/shop/files/15RA-FRONT-ICON.jpg?v=1753177159"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "RAVIK-ADVENTURE-XR4",
+        "prices": [{ "amount": 35000000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 5,
+        "metadata": { "costEUR": 17600, "priceExVAT": 304000 }
+      }]
     },
     {
-      "title": "RÄVIK Ultimate XR 4",
-      "subtitle": "Top-tier performance electric jetboard",
-      "description": "Top-tier performance electric jetboard. Engineered for experienced riders who demand peak performance and agility.",
-      "handle": "ravik-ultimate-xr4",
+      "title": "Awake RÄVIK Ultimate XR 4",
+      "subtitle": "Top-tier performance jetboard",
+      "description": "Top-tier performance electric jetboard. Engineered for experienced riders who demand peak performance and agility on the water.",
+      "handle": "ravik-ultimate",
       "is_giftcard": false,
       "weight": 32000,
       "metadata": {
-        "costEUR": 9750,
-        "exchangeRate": 19.85,
+        "costEUR": 20300,
         "category": "jetboards",
         "categoryTag": "Jetboard",
         "skillLevel": "Expert",
         "battery": "XR 4 (65 min)",
         "specs": ["Max Speed: 60 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Pro-level performance"],
-        "features": ["Maximum acceleration", "Carbon fiber components", "Competition ready"]
+        "features": ["Maximum acceleration", "Carbon fiber components", "Competition ready", "Ultimate performance"]
       },
-      "images": [
-        "https://awakeboards.com/cdn/shop/files/Ravik_ADVENTURE-22_1_1.png?v=1752232151"
-      ],
-      "options": [
-        {
-          "title": "Configuration"
-        }
-      ],
-      "variants": [
-        {
-          "title": "Standard",
-          "sku": "RAVIK-ULTIMATE-XR4",
-          "prices": [
-            {
-              "amount": 40296700,
-              "currency_code": "zar"
-            }
-          ],
-          "options": [
-            {
-              "value": "Standard"
-            }
-          ],
-          "inventory_quantity": 3,
-          "metadata": {
-            "costEUR": 9750,
-            "priceExVAT": 350406,
-            "costZAR": 193538
-          }
-        }
-      ]
+      "images": ["https://awakeboards.com/cdn/shop/files/26RU-FRONT-ICON.jpg?v=1753177019"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "RAVIK-ULTIMATE-XR4",
+        "prices": [{ "amount": 40300000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 3,
+        "metadata": { "costEUR": 20300, "priceExVAT": 351000 }
+      }]
     },
     {
-      "title": "BRABUS Shadow",
-      "subtitle": "Limited Edition - One of 77",
-      "description": "Exclusive BRABUS collaboration - luxury meets performance. One of 77 limited edition boards.",
-      "handle": "brabus-shadow",
+      "title": "Awake RÄVIK S",
+      "subtitle": "Award-winning electric jetboard",
+      "description": "Award-winning electric jetboard with exceptional performance. Perfect for riders seeking a balance of power and control.",
+      "handle": "ravik-s",
       "is_giftcard": false,
       "weight": 32000,
       "metadata": {
-        "costEUR": 10950,
-        "exchangeRate": 19.85,
+        "costEUR": 12990,
+        "category": "jetboards",
+        "categoryTag": "Jetboard",
+        "skillLevel": "Intermediate",
+        "battery": "XR 4 (65 min)",
+        "badge": "Special Offer",
+        "specs": ["Max Speed: 55 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Award-winning design"],
+        "features": ["Proven performance", "Reliable construction", "Great value", "Award winner"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/products/Awake_RAVIKS_Awards2021_3.jpg?v=1746783254"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "RAVIK-S",
+        "prices": [{ "amount": 25785100, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 4,
+        "metadata": { "costEUR": 12990, "priceExVAT": 224218 }
+      }]
+    },
+    {
+      "title": "BRABUS Shadow (Limited)",
+      "subtitle": "Limited Edition - One of 77",
+      "description": "Exclusive BRABUS collaboration - luxury meets performance. One of only 77 limited edition boards worldwide. Features signature BRABUS design and premium finishes.",
+      "handle": "brabus-shadow-explore",
+      "is_giftcard": false,
+      "weight": 32000,
+      "metadata": {
+        "costEUR": 22800,
         "category": "jetboards",
         "categoryTag": "Limited Edition",
         "skillLevel": "Expert",
         "battery": "XR 4 (65 min)",
         "badge": "Limited Edition",
-        "specs": ["Max Speed: 60 km/h", "Exclusive BRABUS Design", "Carbon Fiber", "Premium finishes"],
-        "features": ["Numbered limited edition", "Signature BRABUS styling", "Collector's item"]
+        "specs": ["Max Speed: 60 km/h", "Exclusive BRABUS Design", "Carbon Fiber", "Premium finishes", "Limited to 77 units"],
+        "features": ["Numbered limited edition", "Signature BRABUS styling", "Collector's item", "Exclusive design"]
       },
-      "images": [
-        "https://awakeboards.com/cdn/shop/files/BRABUSx3.png?v=1754380085"
-      ],
-      "options": [
-        {
-          "title": "Configuration"
-        }
-      ],
-      "variants": [
-        {
-          "title": "Limited Edition",
-          "sku": "BRABUS-SHADOW-LE",
-          "prices": [
-            {
-              "amount": 45221600,
-              "currency_code": "zar"
-            }
-          ],
-          "options": [
-            {
-              "value": "Limited Edition"
-            }
-          ],
-          "inventory_quantity": 2,
-          "metadata": {
-            "costEUR": 10950,
-            "priceExVAT": 393231,
-            "costZAR": 217358
-          }
-        }
-      ]
+      "images": ["https://awakeboards.com/cdn/shop/files/BRABUS-BP-FRONT-1000x1000_b14c8e8c-1aee-499a-9a60-1abe055b7c4f.png?v=1756807453"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Limited Edition",
+        "sku": "BRABUS-SHADOW-LE",
+        "prices": [{ "amount": 45300000, "currency_code": "zar" }],
+        "options": [{ "value": "Limited Edition" }],
+        "inventory_quantity": 2,
+        "metadata": { "costEUR": 22800, "priceExVAT": 394000 }
+      }]
     },
     {
-      "title": "VINGA Adventure LR 4",
+      "title": "Awake VINGA Adventure LR 4",
       "subtitle": "Extended range eFoil",
-      "description": "Extended range eFoil for long sessions. Perfect for learning and exploring.",
+      "description": "Extended range eFoil for long sessions. Perfect for learning and exploring the world of electric foiling with extended battery life.",
       "handle": "vinga-adventure-lr4",
       "is_giftcard": false,
       "weight": 28000,
       "metadata": {
-        "costEUR": 7800,
-        "exchangeRate": 19.85,
+        "costEUR": 16250,
         "category": "efoils",
         "categoryTag": "eFoil",
         "skillLevel": "Beginner to Intermediate",
         "battery": "LR 4 (90 min)",
         "specs": ["Max Speed: 40 km/h", "Battery: 90 min ride time", "Silent operation", "Stable foil design"],
-        "features": ["Long battery life", "Easy to learn", "Smooth ride"]
+        "features": ["Long battery life", "Easy to learn", "Smooth ride", "Extended range"]
       },
-      "images": [
-        "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150"
-      ],
-      "options": [
-        {
-          "title": "Configuration"
-        }
-      ],
-      "variants": [
-        {
-          "title": "Standard",
-          "sku": "VINGA-ADV-LR4",
-          "prices": [
-            {
-              "amount": 32205200,
-              "currency_code": "zar"
-            }
-          ],
-          "options": [
-            {
-              "value": "Standard"
-            }
-          ],
-          "inventory_quantity": 4,
-          "metadata": {
-            "costEUR": 7800,
-            "priceExVAT": 280045,
-            "costZAR": 154830
-          }
-        }
-      ]
+      "images": ["https://awakeboards.com/cdn/shop/files/VINGA-ADV-ICON-TRANS.png?v=1749122346"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "VINGA-ADV-LR4",
+        "prices": [{ "amount": 32300000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 4,
+        "metadata": { "costEUR": 16250, "priceExVAT": 281000 }
+      }]
     },
     {
-      "title": "VINGA Adventure XR 4",
+      "title": "Awake VINGA Adventure XR 4",
       "subtitle": "Performance eFoil",
-      "description": "Performance-focused eFoil with XR battery. Enhanced stability and range for longer explorations.",
+      "description": "Performance-focused eFoil with XR battery. Enhanced stability and range for longer explorations with compact design.",
       "handle": "vinga-adventure-xr4",
       "is_giftcard": false,
       "weight": 28000,
       "metadata": {
-        "costEUR": 8780,
-        "exchangeRate": 19.85,
+        "costEUR": 18300,
         "category": "efoils",
         "categoryTag": "eFoil",
         "skillLevel": "Intermediate",
         "battery": "XR 4 (65 min)",
         "specs": ["Max Speed: 40 km/h", "Battery: 65 min ride time", "Silent operation", "Responsive control"],
-        "features": ["Compact battery", "Travel-friendly", "Precision handling"]
+        "features": ["Compact battery", "Travel-friendly", "Precision handling", "Easy to transport"]
       },
-      "images": [
-        "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150"
-      ],
-      "options": [
-        {
-          "title": "Configuration"
-        }
-      ],
-      "variants": [
-        {
-          "title": "Standard",
-          "sku": "VINGA-ADV-XR4",
-          "prices": [
-            {
-              "amount": 36250900,
-              "currency_code": "zar"
-            }
-          ],
-          "options": [
-            {
-              "value": "Standard"
-            }
-          ],
-          "inventory_quantity": 4,
-          "metadata": {
-            "costEUR": 8780,
-            "priceExVAT": 315225,
-            "costZAR": 174283
-          }
-        }
-      ]
+      "images": ["https://awakeboards.com/cdn/shop/files/VINGA-ADV-ICON-TRANS.png?v=1749122346"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "VINGA-ADV-XR4",
+        "prices": [{ "amount": 36300000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 4,
+        "metadata": { "costEUR": 18300, "priceExVAT": 316000 }
+      }]
     },
     {
-      "title": "VINGA Ultimate LR 4",
+      "title": "Awake VINGA Ultimate LR 4",
       "subtitle": "Advanced eFoil",
-      "description": "Advanced eFoil with extended ride time. Advanced performance and dynamic control.",
+      "description": "Advanced eFoil with extended ride time. Advanced performance and dynamic control for serious riders.",
       "handle": "vinga-ultimate-lr4",
       "is_giftcard": false,
       "weight": 28000,
       "metadata": {
-        "costEUR": 8450,
-        "exchangeRate": 19.85,
+        "costEUR": 17600,
         "category": "efoils",
         "categoryTag": "eFoil",
         "skillLevel": "Intermediate to Expert",
         "battery": "LR 4 (90 min)",
         "specs": ["Max Speed: 45 km/h", "Battery: 90 min ride time", "Advanced control", "Premium wings"],
-        "features": ["High performance", "Long sessions", "Professional grade"]
+        "features": ["High performance", "Long sessions", "Professional grade", "Extended range"]
       },
-      "images": [
-        "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150"
-      ],
-      "options": [
-        {
-          "title": "Configuration"
-        }
-      ],
-      "variants": [
-        {
-          "title": "Standard",
-          "sku": "VINGA-ULT-LR4",
-          "prices": [
-            {
-              "amount": 34902400,
-              "currency_code": "zar"
-            }
-          ],
-          "options": [
-            {
-              "value": "Standard"
-            }
-          ],
-          "inventory_quantity": 3,
-          "metadata": {
-            "costEUR": 8450,
-            "priceExVAT": 303499,
-            "costZAR": 167733
-          }
-        }
-      ]
+      "images": ["https://awakeboards.com/cdn/shop/files/VINGA-ULT-ICON-TRANS.png?v=1749122454"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "VINGA-ULT-LR4",
+        "prices": [{ "amount": 35000000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 3,
+        "metadata": { "costEUR": 17600, "priceExVAT": 304000 }
+      }]
     },
     {
-      "title": "VINGA Ultimate XR 4",
+      "title": "Awake VINGA Ultimate XR 4",
       "subtitle": "Top-spec eFoil",
-      "description": "Top-spec eFoil with ultimate performance. For those seeking peak performance and control.",
+      "description": "Top-spec eFoil with ultimate performance. For those seeking peak performance and control with competition-grade features.",
       "handle": "vinga-ultimate-xr4",
       "is_giftcard": false,
       "weight": 28000,
       "metadata": {
-        "costEUR": 9430,
-        "exchangeRate": 19.85,
+        "costEUR": 19650,
         "category": "efoils",
         "categoryTag": "eFoil",
         "skillLevel": "Expert",
         "battery": "XR 4 (65 min)",
         "specs": ["Max Speed: 45 km/h", "Battery: 65 min ride time", "Advanced control", "Carbon construction"],
-        "features": ["Maximum speed", "Precision foiling", "Competition ready"]
+        "features": ["Maximum speed", "Precision foiling", "Competition ready", "Expert-level"]
       },
-      "images": [
-        "https://awakeboards.com/cdn/shop/files/Vinga_ULTIMATE-26_1.png?v=1752232150"
-      ],
-      "options": [
-        {
-          "title": "Configuration"
-        }
-      ],
-      "variants": [
-        {
-          "title": "Standard",
-          "sku": "VINGA-ULT-XR4",
-          "prices": [
-            {
-              "amount": 38948100,
-              "currency_code": "zar"
-            }
-          ],
-          "options": [
-            {
-              "value": "Standard"
-            }
-          ],
-          "inventory_quantity": 3,
-          "metadata": {
-            "costEUR": 9430,
-            "priceExVAT": 338679,
-            "costZAR": 187186
-          }
-        }
-      ]
+      "images": ["https://awakeboards.com/cdn/shop/files/VINGA-ULT-ICON-TRANS.png?v=1749122454"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "VINGA-ULT-XR4",
+        "prices": [{ "amount": 39000000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 3,
+        "metadata": { "costEUR": 19650, "priceExVAT": 339000 }
+      }]
+    },
+    {
+      "title": "Awake Flex Battery LR 4 (90 min)",
+      "subtitle": "Long range battery",
+      "description": "Long range battery - 90 minutes ride time. Perfect for extended sessions on the water with quick swap design.",
+      "handle": "flex-battery-lr4",
+      "is_giftcard": false,
+      "weight": 15000,
+      "metadata": {
+        "costEUR": 4000,
+        "category": "batteries",
+        "categoryTag": "Battery",
+        "specs": ["90 min runtime", "Quick swap design", "LED indicators", "Waterproof"],
+        "features": ["Extended range", "Fast charging", "Durable construction"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/BP4-hanging_2.png?v=1746783004"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "FLEX-BATTERY-LR4",
+        "prices": [{ "amount": 7900000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 8,
+        "metadata": { "costEUR": 4000, "priceExVAT": 69000 }
+      }]
+    },
+    {
+      "title": "Awake Flex Battery XR 4 (65 min)",
+      "subtitle": "Extended range battery",
+      "description": "Extended range battery - 65 minutes ride time. Compact design with fast charging capability.",
+      "handle": "flex-battery-xr4",
+      "is_giftcard": false,
+      "weight": 12000,
+      "metadata": {
+        "costEUR": 6200,
+        "category": "batteries",
+        "categoryTag": "Battery",
+        "specs": ["65 min runtime", "Compact design", "Fast charging", "LED status display"],
+        "features": ["Lightweight", "Quick swap", "Reliable performance"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/BP4-hanging_2.png?v=1746783004"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "FLEX-BATTERY-XR4",
+        "prices": [{ "amount": 12200000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 8,
+        "metadata": { "costEUR": 6200, "priceExVAT": 107000 }
+      }]
+    },
+    {
+      "title": "BRABUS Battery XR 4",
+      "subtitle": "Limited Edition battery",
+      "description": "Exclusive BRABUS battery with signature styling. 65 minutes ride time with premium finishes.",
+      "handle": "brabus-battery-xr4",
+      "is_giftcard": false,
+      "weight": 12000,
+      "metadata": {
+        "costEUR": 4500,
+        "category": "batteries",
+        "categoryTag": "Battery",
+        "badge": "Limited Edition",
+        "specs": ["65 min runtime", "BRABUS design", "Fast charging", "Premium finish"],
+        "features": ["Exclusive styling", "Quick swap", "Limited edition"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/BRABUS-BP-FRONT.347.png?v=1754237284"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Limited Edition",
+        "sku": "BRABUS-BATTERY-XR4",
+        "prices": [{ "amount": 8932500, "currency_code": "zar" }],
+        "options": [{ "value": "Limited Edition" }],
+        "inventory_quantity": 4,
+        "metadata": { "costEUR": 4500, "priceExVAT": 77674 }
+      }]
+    },
+    {
+      "title": "RÄVIK Explore (Board Only)",
+      "subtitle": "Board without battery",
+      "description": "RÄVIK Explore board without battery. For those who already have a compatible battery.",
+      "handle": "ravik-explore-board",
+      "is_giftcard": false,
+      "weight": 25000,
+      "metadata": {
+        "category": "boards",
+        "categoryTag": "Board Only",
+        "specs": ["Board only", "No battery included", "Compatible with LR4/XR4"],
+        "features": ["Replacement board", "Upgrade option"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/23RE-FRONT-ICON.jpg?v=1753177232"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Board Only",
+        "sku": "RAVIK-EXPLORE-BOARD",
+        "prices": [{ "amount": 13300000, "currency_code": "zar" }],
+        "options": [{ "value": "Board Only" }],
+        "inventory_quantity": 3,
+        "metadata": { "priceExVAT": 116000 }
+      }]
+    },
+    {
+      "title": "RÄVIK Adventure (Board Only)",
+      "subtitle": "Board without battery",
+      "description": "RÄVIK Adventure board without battery. For those who already have a compatible battery.",
+      "handle": "ravik-adventure-board",
+      "is_giftcard": false,
+      "weight": 25000,
+      "metadata": {
+        "category": "boards",
+        "categoryTag": "Board Only",
+        "specs": ["Board only", "No battery included", "Compatible with LR4/XR4"],
+        "features": ["Replacement board", "Upgrade option"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/15RA-FRONT-ICON.jpg?v=1753177159"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Board Only",
+        "sku": "RAVIK-ADVENTURE-BOARD",
+        "prices": [{ "amount": 21400000, "currency_code": "zar" }],
+        "options": [{ "value": "Board Only" }],
+        "inventory_quantity": 3,
+        "metadata": { "priceExVAT": 186000 }
+      }]
+    },
+    {
+      "title": "RÄVIK Ultimate (Board Only)",
+      "subtitle": "Board without battery",
+      "description": "RÄVIK Ultimate board without battery. For those who already have a compatible battery.",
+      "handle": "ravik-ultimate-board",
+      "is_giftcard": false,
+      "weight": 25000,
+      "metadata": {
+        "category": "boards",
+        "categoryTag": "Board Only",
+        "specs": ["Board only", "No battery included", "Compatible with LR4/XR4"],
+        "features": ["Replacement board", "Upgrade option"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/26RU-FRONT-ICON.jpg?v=1753177019"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Board Only",
+        "sku": "RAVIK-ULTIMATE-BOARD",
+        "prices": [{ "amount": 24100000, "currency_code": "zar" }],
+        "options": [{ "value": "Board Only" }],
+        "inventory_quantity": 2,
+        "metadata": { "priceExVAT": 210000 }
+      }]
+    },
+    {
+      "title": "VINGA Adventure (Board Only)",
+      "subtitle": "Board without battery",
+      "description": "VINGA Adventure eFoil board without battery. For those who already have a compatible battery.",
+      "handle": "vinga-adventure-board",
+      "is_giftcard": false,
+      "weight": 22000,
+      "metadata": {
+        "category": "boards",
+        "categoryTag": "Board Only",
+        "specs": ["Board only", "No battery included", "Compatible with LR4/XR4"],
+        "features": ["Replacement board", "Upgrade option"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/VINGA-ADV-ICON-TRANS.png?v=1749122346"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Board Only",
+        "sku": "VINGA-ADVENTURE-BOARD",
+        "prices": [{ "amount": 24100000, "currency_code": "zar" }],
+        "options": [{ "value": "Board Only" }],
+        "inventory_quantity": 2,
+        "metadata": { "priceExVAT": 210000 }
+      }]
+    },
+    {
+      "title": "VINGA Ultimate (Board Only)",
+      "subtitle": "Board without battery",
+      "description": "VINGA Ultimate eFoil board without battery. For those who already have a compatible battery.",
+      "handle": "vinga-ultimate-board",
+      "is_giftcard": false,
+      "weight": 22000,
+      "metadata": {
+        "category": "boards",
+        "categoryTag": "Board Only",
+        "specs": ["Board only", "No battery included", "Compatible with LR4/XR4"],
+        "features": ["Replacement board", "Upgrade option"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/VINGA-ULT-ICON-TRANS.png?v=1749122454"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Board Only",
+        "sku": "VINGA-ULTIMATE-BOARD",
+        "prices": [{ "amount": 25500000, "currency_code": "zar" }],
+        "options": [{ "value": "Board Only" }],
+        "inventory_quantity": 2,
+        "metadata": { "priceExVAT": 222000 }
+      }]
+    },
+    {
+      "title": "CRUISE 1600 Wing Kit",
+      "subtitle": "Versatile eFoil wing",
+      "description": "CRUISE 1600 wing kit for versatile eFoil performance. Ideal for various water conditions.",
+      "handle": "cruise-1600-wing-kit",
+      "is_giftcard": false,
+      "weight": 3000,
+      "metadata": {
+        "costEUR": 1370,
+        "category": "wings",
+        "categoryTag": "Wing Kit",
+        "specs": ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
+        "features": ["All-around performance", "Durable", "Smooth ride"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/POWDERWING-1800.png?v=1746783196"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "CRUISE-1600-WING",
+        "prices": [{ "amount": 2720000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 6,
+        "metadata": { "costEUR": 1370, "priceExVAT": 23700 }
+      }]
+    },
+    {
+      "title": "POWDER 1800 Wing Kit",
+      "subtitle": "Versatile eFoil wing",
+      "description": "POWDER 1800 wing kit for versatile eFoil performance. Ideal for various water conditions.",
+      "handle": "powder-1800-wing-kit",
+      "is_giftcard": false,
+      "weight": 3000,
+      "metadata": {
+        "costEUR": 1370,
+        "category": "wings",
+        "categoryTag": "Wing Kit",
+        "specs": ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
+        "features": ["All-around performance", "Durable", "Smooth ride"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/POWDERWING-1800.png?v=1746783196"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "POWDER-1800-WING",
+        "prices": [{ "amount": 2720000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 6,
+        "metadata": { "costEUR": 1370, "priceExVAT": 23700 }
+      }]
+    },
+    {
+      "title": "POWDER 1400 Wing Kit",
+      "subtitle": "Versatile eFoil wing",
+      "description": "POWDER 1400 wing kit for versatile eFoil performance. Ideal for various water conditions.",
+      "handle": "powder-1400-wing-kit",
+      "is_giftcard": false,
+      "weight": 2500,
+      "metadata": {
+        "costEUR": 1370,
+        "category": "wings",
+        "categoryTag": "Wing Kit",
+        "specs": ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
+        "features": ["All-around performance", "Durable", "Smooth ride"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/POWDERWING-1800.png?v=1746783196"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "POWDER-1400-WING",
+        "prices": [{ "amount": 2720000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 6,
+        "metadata": { "costEUR": 1370, "priceExVAT": 23700 }
+      }]
+    },
+    {
+      "title": "FLUID 1300 Wing Kit",
+      "subtitle": "High-speed eFoil wing",
+      "description": "FLUID 1300 wing kit for high-speed eFoil performance. Designed for speed and agility.",
+      "handle": "fluid-1300-wing-kit",
+      "is_giftcard": false,
+      "weight": 2500,
+      "metadata": {
+        "costEUR": 1370,
+        "category": "wings",
+        "categoryTag": "Wing Kit",
+        "specs": ["High-speed design", "Carbon fiber", "Precision engineering", "Aerodynamic"],
+        "features": ["Maximum speed", "Responsive", "Competition-ready"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/FLUIDWING-1300.png?v=1746783197"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "FLUID-1300-WING",
+        "prices": [{ "amount": 2720000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 5,
+        "metadata": { "costEUR": 1370, "priceExVAT": 23700 }
+      }]
+    },
+    {
+      "title": "FLUID 1000 Wing Kit",
+      "subtitle": "High-speed eFoil wing",
+      "description": "FLUID 1000 wing kit for high-speed eFoil performance. Designed for speed and agility.",
+      "handle": "fluid-1000-wing-kit",
+      "is_giftcard": false,
+      "weight": 2000,
+      "metadata": {
+        "costEUR": 1370,
+        "category": "wings",
+        "categoryTag": "Wing Kit",
+        "specs": ["High-speed design", "Carbon fiber", "Precision engineering", "Aerodynamic"],
+        "features": ["Maximum speed", "Responsive", "Competition-ready"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/FLUIDWING-1300.png?v=1746783197"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "FLUID-1000-WING",
+        "prices": [{ "amount": 2720000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 5,
+        "metadata": { "costEUR": 1370, "priceExVAT": 23700 }
+      }]
+    },
+    {
+      "title": "Board Bag Kit (RÄVIK/VINGA)",
+      "subtitle": "Protective board bag",
+      "description": "Protective bag kit for RÄVIK jetboards and VINGA eFoils. Includes board bag and accessories storage.",
+      "handle": "board-bag-kit",
+      "is_giftcard": false,
+      "weight": 5000,
+      "metadata": {
+        "costEUR": 985,
+        "category": "accessories",
+        "categoryTag": "Bag",
+        "specs": ["Padded protection", "Weather resistant", "Multiple compartments", "Durable zippers"],
+        "features": ["Full protection", "Easy transport", "Quality materials"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/Awake_cf66763e-fec1-45c2-944f-d9f5e22ae397.png?v=1752232003"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "BOARD-BAG-KIT",
+        "prices": [{ "amount": 1950000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 10,
+        "metadata": { "costEUR": 985, "priceExVAT": 17000 }
+      }]
+    },
+    {
+      "title": "Battery Bag",
+      "subtitle": "Safe battery transport",
+      "description": "Dedicated battery bag for safe transport of Awake batteries.",
+      "handle": "battery-bag",
+      "is_giftcard": false,
+      "weight": 2000,
+      "metadata": {
+        "costEUR": 485,
+        "category": "accessories",
+        "categoryTag": "Bag",
+        "specs": ["Battery specific", "Padded protection", "Comfortable straps", "Compact design"],
+        "features": ["Safe transport", "Comfortable carry", "Durable"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/Awake_cf66763e-fec1-45c2-944f-d9f5e22ae397.png?v=1752232003"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "BATTERY-BAG",
+        "prices": [{ "amount": 970000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 15,
+        "metadata": { "costEUR": 485, "priceExVAT": 8400 }
+      }]
+    },
+    {
+      "title": "Premium Travel Bag",
+      "subtitle": "Complete protection",
+      "description": "Premium travel bag for complete protection during transport.",
+      "handle": "premium-travel-bag",
+      "is_giftcard": false,
+      "weight": 6000,
+      "metadata": {
+        "costEUR": 815,
+        "category": "accessories",
+        "categoryTag": "Bag",
+        "specs": ["Premium materials", "Padded interior", "Weather resistant", "Multiple compartments"],
+        "features": ["Complete protection", "Travel-ready", "Organized storage"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/Awake_cf66763e-fec1-45c2-944f-d9f5e22ae397.png?v=1752232003"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "PREMIUM-TRAVEL-BAG",
+        "prices": [{ "amount": 1620000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 8,
+        "metadata": { "costEUR": 815, "priceExVAT": 14100 }
+      }]
+    },
+    {
+      "title": "Life Vest (CE Certified)",
+      "subtitle": "Safety vest",
+      "description": "CE certified life vest designed for water sports. Safety meets style with Awake branding.",
+      "handle": "life-vest",
+      "is_giftcard": false,
+      "weight": 1500,
+      "metadata": {
+        "costEUR": 485,
+        "category": "accessories",
+        "categoryTag": "Safety",
+        "specs": ["CE certified", "Adjustable fit", "Comfortable design", "Awake branding"],
+        "features": ["Safety certified", "Comfortable", "Stylish"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/AwakeISO50Nvest.jpg?v=1746783055"],
+      "options": [{ "title": "Size" }],
+      "variants": [{
+        "title": "Universal",
+        "sku": "LIFE-VEST",
+        "prices": [{ "amount": 970000, "currency_code": "zar" }],
+        "options": [{ "value": "Universal" }],
+        "inventory_quantity": 20,
+        "metadata": { "costEUR": 485, "priceExVAT": 8400 }
+      }]
+    },
+    {
+      "title": "Awake Dock (Floating)",
+      "subtitle": "Floating dock system",
+      "description": "Floating dock system for easy water access. Perfect for launching and docking your Awake.",
+      "handle": "awake-dock",
+      "is_giftcard": false,
+      "weight": 30000,
+      "metadata": {
+        "costEUR": 3950,
+        "category": "accessories",
+        "categoryTag": "Storage",
+        "specs": ["Floating design", "Stable platform", "Easy setup", "Durable materials"],
+        "features": ["Easy access", "Portable", "Stable"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/awake-dock_1000x1000_842f6d11-759d-41c7-88a4-0e13eca3f7ce.png?v=1753182891"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "AWAKE-DOCK",
+        "prices": [{ "amount": 7830000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 3,
+        "metadata": { "costEUR": 3950, "priceExVAT": 68100 }
+      }]
+    },
+    {
+      "title": "Wall Mount",
+      "subtitle": "Board storage",
+      "description": "Premium wall mounting system for RÄVIK boards. Display your board as art when not in use.",
+      "handle": "wall-mount",
+      "is_giftcard": false,
+      "weight": 5000,
+      "metadata": {
+        "costEUR": 1490,
+        "category": "accessories",
+        "categoryTag": "Storage",
+        "specs": ["Secure mounting", "Premium finish", "Easy installation", "Board protection"],
+        "features": ["Display quality", "Secure storage", "Space-saving"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/products/Wallmountfront.jpg?v=1746783248"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "WALL-MOUNT",
+        "prices": [{ "amount": 2960000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 10,
+        "metadata": { "costEUR": 1490, "priceExVAT": 25700 }
+      }]
+    },
+    {
+      "title": "Board Stand",
+      "subtitle": "Board display",
+      "description": "Premium board stand for displaying your Awake board.",
+      "handle": "board-stand",
+      "is_giftcard": false,
+      "weight": 4000,
+      "metadata": {
+        "costEUR": 815,
+        "category": "accessories",
+        "categoryTag": "Storage",
+        "specs": ["Stable design", "Premium finish", "Easy assembly", "Board protection"],
+        "features": ["Display quality", "Secure storage", "Space-saving"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/products/Wallmountfront.jpg?v=1746783248"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "BOARD-STAND",
+        "prices": [{ "amount": 1620000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 8,
+        "metadata": { "costEUR": 815, "priceExVAT": 14100 }
+      }]
+    },
+    {
+      "title": "Flex Hand Controller",
+      "subtitle": "Wireless controller",
+      "description": "Latest generation wireless hand controller with ergonomic design and precise throttle control.",
+      "handle": "flex-hand-controller",
+      "is_giftcard": false,
+      "weight": 500,
+      "metadata": {
+        "costEUR": 820,
+        "category": "accessories",
+        "categoryTag": "Electronics",
+        "specs": ["Wireless operation", "Ergonomic design", "Precise throttle", "LED indicators"],
+        "features": ["Easy to use", "Waterproof", "Long battery life"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/HC4-Hanging.png?v=1746782996"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "FLEX-HAND-CONTROLLER",
+        "prices": [{ "amount": 1630000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 12,
+        "metadata": { "costEUR": 820, "priceExVAT": 14200 }
+      }]
+    },
+    {
+      "title": "Battery Charger",
+      "subtitle": "Fast battery charger",
+      "description": "Fast battery charger for all Awake batteries. Charges LR 4 and XR 4 batteries efficiently.",
+      "handle": "battery-charger",
+      "is_giftcard": false,
+      "weight": 3000,
+      "metadata": {
+        "costEUR": 1245,
+        "category": "accessories",
+        "categoryTag": "Electronics",
+        "specs": ["Fast charging", "Universal compatibility", "LED status", "Safety features"],
+        "features": ["Quick charge", "Compact design", "Safe operation"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/Awake_kontroler_2_-_stor.jpg?v=1746783243"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "BATTERY-CHARGER",
+        "prices": [{ "amount": 2470000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 10,
+        "metadata": { "costEUR": 1245, "priceExVAT": 21500 }
+      }]
+    },
+    {
+      "title": "Controller Charger",
+      "subtitle": "USB charger",
+      "description": "Dedicated charger for Awake hand controllers with USB connectivity.",
+      "handle": "controller-charger",
+      "is_giftcard": false,
+      "weight": 200,
+      "metadata": {
+        "costEUR": 285,
+        "category": "accessories",
+        "categoryTag": "Electronics",
+        "specs": ["USB charging", "LED indicator", "Compact design", "Universal voltage"],
+        "features": ["Easy to use", "Travel-friendly", "Fast charging"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/Awake_kontroler_2_-_stor.jpg?v=1746783243"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "CONTROLLER-CHARGER",
+        "prices": [{ "amount": 570000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 15,
+        "metadata": { "costEUR": 285, "priceExVAT": 4900 }
+      }]
+    },
+    {
+      "title": "RÄVIK Fins (Set of 3)",
+      "subtitle": "Standard fin set",
+      "description": "Standard fin set for RÄVIK jetboards. Set of 3 high-quality fins for optimal performance.",
+      "handle": "ravik-fins",
+      "is_giftcard": false,
+      "weight": 500,
+      "metadata": {
+        "costEUR": 285,
+        "category": "accessories",
+        "categoryTag": "Parts",
+        "specs": ["Set of 3 fins", "RÄVIK specific", "Durable material", "Easy installation"],
+        "features": ["Reliable performance", "Easy to replace", "Quality construction"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/products/FinsRSiso.jpg?v=1746783249"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Set of 3",
+        "sku": "RAVIK-FINS",
+        "prices": [{ "amount": 570000, "currency_code": "zar" }],
+        "options": [{ "value": "Set of 3" }],
+        "inventory_quantity": 20,
+        "metadata": { "costEUR": 285, "priceExVAT": 4900 }
+      }]
+    },
+    {
+      "title": "Carbon Fins (Set of 3)",
+      "subtitle": "Premium carbon fins",
+      "description": "Premium carbon fiber fin set. Lightweight and ultra-durable for maximum performance.",
+      "handle": "carbon-fins",
+      "is_giftcard": false,
+      "weight": 400,
+      "metadata": {
+        "costEUR": 410,
+        "category": "accessories",
+        "categoryTag": "Parts",
+        "specs": ["Carbon fiber", "Set of 3 fins", "Lightweight", "High strength"],
+        "features": ["Premium material", "Enhanced performance", "Long-lasting"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/CARBON_FINS.png?v=1746783193"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Set of 3",
+        "sku": "CARBON-FINS",
+        "prices": [{ "amount": 810000, "currency_code": "zar" }],
+        "options": [{ "value": "Set of 3" }],
+        "inventory_quantity": 15,
+        "metadata": { "costEUR": 410, "priceExVAT": 7100 }
+      }]
+    },
+    {
+      "title": "Foot Straps",
+      "subtitle": "Adjustable straps",
+      "description": "Adjustable foot straps for enhanced control and stability on your Awake board.",
+      "handle": "foot-straps",
+      "is_giftcard": false,
+      "weight": 500,
+      "metadata": {
+        "costEUR": 420,
+        "category": "accessories",
+        "categoryTag": "Parts",
+        "specs": ["Adjustable fit", "Comfortable padding", "Secure attachment", "Durable straps"],
+        "features": ["Enhanced control", "Comfortable", "Easy adjustment"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/products/Bindingstop.jpg?v=1746783251"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "FOOT-STRAPS",
+        "prices": [{ "amount": 840000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 20,
+        "metadata": { "costEUR": 420, "priceExVAT": 7300 }
+      }]
+    },
+    {
+      "title": "Beach Mat",
+      "subtitle": "Portable mat",
+      "description": "Portable beach mat for protecting your board and gear. Perfect for beach sessions.",
+      "handle": "beach-mat",
+      "is_giftcard": false,
+      "weight": 1000,
+      "metadata": {
+        "costEUR": 285,
+        "category": "accessories",
+        "categoryTag": "Parts",
+        "specs": ["Portable design", "Water resistant", "Awake branding", "Compact storage"],
+        "features": ["Board protection", "Easy to carry", "Durable"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/AWAKE-MATT.png?v=1753949058"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "BEACH-MAT",
+        "prices": [{ "amount": 570000, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 25,
+        "metadata": { "costEUR": 285, "priceExVAT": 4900 }
+      }]
+    },
+    {
+      "title": "Awake Jetboard Tube",
+      "subtitle": "Inflatable tube",
+      "description": "Inflatable tube accessory for towing behind your jetboard. Add extra fun to your sessions.",
+      "handle": "jetboard-tube",
+      "is_giftcard": false,
+      "weight": 5000,
+      "metadata": {
+        "costEUR": 590,
+        "category": "accessories",
+        "categoryTag": "Parts",
+        "specs": ["Inflatable design", "Durable construction", "Easy inflation", "Tow attachment"],
+        "features": ["Extra fun", "Durable", "Easy to use"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/AWAKE-MATT.png?v=1753949058"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "JETBOARD-TUBE",
+        "prices": [{ "amount": 1171100, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 8,
+        "metadata": { "costEUR": 590, "priceExVAT": 10183 }
+      }]
+    },
+    {
+      "title": "Competition Power Key",
+      "subtitle": "Performance unlock",
+      "description": "Competition power key for unlocking maximum performance on your Awake board.",
+      "handle": "competition-power-key",
+      "is_giftcard": false,
+      "weight": 100,
+      "metadata": {
+        "costEUR": 190,
+        "category": "accessories",
+        "categoryTag": "Parts",
+        "specs": ["Performance unlock", "Competition mode", "Easy installation", "Secure attachment"],
+        "features": ["Maximum power", "Competition ready", "Easy to use"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/CPK.png?v=1746783195"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "COMPETITION-POWER-KEY",
+        "prices": [{ "amount": 377100, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 15,
+        "metadata": { "costEUR": 190, "priceExVAT": 3279 }
+      }]
+    },
+    {
+      "title": "Awake Power Key Leash",
+      "subtitle": "Safety leash",
+      "description": "Safety leash for your power key. Prevents loss during water sessions.",
+      "handle": "power-key-leash",
+      "is_giftcard": false,
+      "weight": 50,
+      "metadata": {
+        "costEUR": 190,
+        "category": "accessories",
+        "categoryTag": "Parts",
+        "specs": ["Safety leash", "Secure attachment", "Durable cord", "Easy to use"],
+        "features": ["Prevents loss", "Secure", "Durable"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/products/PKLfront.jpg?v=1746783250"],
+      "options": [{ "title": "Configuration" }],
+      "variants": [{
+        "title": "Standard",
+        "sku": "POWER-KEY-LEASH",
+        "prices": [{ "amount": 377100, "currency_code": "zar" }],
+        "options": [{ "value": "Standard" }],
+        "inventory_quantity": 20,
+        "metadata": { "costEUR": 190, "priceExVAT": 3279 }
+      }]
+    },
+    {
+      "title": "T-shirt",
+      "subtitle": "Official merchandise",
+      "description": "Official Awake branded t-shirt. Premium quality cotton with Awake logo.",
+      "handle": "tshirt",
+      "is_giftcard": false,
+      "weight": 300,
+      "metadata": {
+        "costEUR": 165,
+        "category": "apparel",
+        "categoryTag": "Apparel",
+        "specs": ["Premium cotton", "Awake branding", "Comfortable fit", "Multiple sizes"],
+        "features": ["Comfortable", "Stylish", "Official merchandise"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/products/AwakeT-Shirt_M_Front_Whitebackground.jpg?v=1746783235"],
+      "options": [{ "title": "Size" }],
+      "variants": [{
+        "title": "Medium",
+        "sku": "TSHIRT-M",
+        "prices": [{ "amount": 330000, "currency_code": "zar" }],
+        "options": [{ "value": "Medium" }],
+        "inventory_quantity": 25,
+        "metadata": { "costEUR": 165, "priceExVAT": 2900 }
+      }]
+    },
+    {
+      "title": "Cap",
+      "subtitle": "Branded cap",
+      "description": "Branded Awake cap. Perfect for sunny days on the water.",
+      "handle": "cap",
+      "is_giftcard": false,
+      "weight": 150,
+      "metadata": {
+        "costEUR": 85,
+        "category": "apparel",
+        "categoryTag": "Apparel",
+        "specs": ["Adjustable fit", "Awake logo", "Sun protection", "Quality materials"],
+        "features": ["Sun protection", "Comfortable", "Stylish"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/products/AwakeCapFront_WhiteBackground.jpg?v=1746783233"],
+      "options": [{ "title": "Size" }],
+      "variants": [{
+        "title": "One Size",
+        "sku": "CAP",
+        "prices": [{ "amount": 170000, "currency_code": "zar" }],
+        "options": [{ "value": "One Size" }],
+        "inventory_quantity": 30,
+        "metadata": { "costEUR": 85, "priceExVAT": 1500 }
+      }]
+    },
+    {
+      "title": "Awake Wetsuit",
+      "subtitle": "Full wetsuit",
+      "description": "Full wetsuit designed for water sports. 4/3mm thickness for year-round comfort.",
+      "handle": "wetsuit",
+      "is_giftcard": false,
+      "weight": 2000,
+      "metadata": {
+        "costEUR": 390,
+        "category": "apparel",
+        "categoryTag": "Apparel",
+        "specs": ["4/3mm thickness", "Flexible neoprene", "Awake branding", "Multiple sizes"],
+        "features": ["Warm and comfortable", "Flexible", "Durable"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/FULL-SUIT-4_3_1000x1000_324a4676-bcc2-4eea-9220-3a8763a3efbc.jpg?v=1756381009"],
+      "options": [{ "title": "Size" }],
+      "variants": [{
+        "title": "Medium",
+        "sku": "WETSUIT-M",
+        "prices": [{ "amount": 774100, "currency_code": "zar" }],
+        "options": [{ "value": "Medium" }],
+        "inventory_quantity": 10,
+        "metadata": { "costEUR": 390, "priceExVAT": 6731 }
+      }]
+    },
+    {
+      "title": "Awake Lady's Neo Suit",
+      "subtitle": "Women's neoprene suit",
+      "description": "Women's neoprene suit designed for comfort and style on the water.",
+      "handle": "ladys-neo-suit",
+      "is_giftcard": false,
+      "weight": 1500,
+      "metadata": {
+        "costEUR": 190,
+        "category": "apparel",
+        "categoryTag": "Apparel",
+        "specs": ["Women's fit", "Neoprene material", "Stylish design", "Multiple sizes"],
+        "features": ["Comfortable fit", "Stylish", "Flexible"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/LADIES-SUIT_1000x1000_a2156532-e819-40f3-ba6a-8f03320b377f.jpg?v=1756380888"],
+      "options": [{ "title": "Size" }],
+      "variants": [{
+        "title": "Medium",
+        "sku": "LADYS-NEO-SUIT-M",
+        "prices": [{ "amount": 377100, "currency_code": "zar" }],
+        "options": [{ "value": "Medium" }],
+        "inventory_quantity": 8,
+        "metadata": { "costEUR": 190, "priceExVAT": 3279 }
+      }]
+    },
+    {
+      "title": "Awake Neo Jacket",
+      "subtitle": "Neoprene jacket",
+      "description": "Neoprene jacket for layering. Perfect for cooler water conditions.",
+      "handle": "neo-jacket",
+      "is_giftcard": false,
+      "weight": 1000,
+      "metadata": {
+        "costEUR": 190,
+        "category": "apparel",
+        "categoryTag": "Apparel",
+        "specs": ["Neoprene material", "Layering piece", "Awake branding", "Multiple sizes"],
+        "features": ["Extra warmth", "Flexible", "Comfortable"]
+      },
+      "images": ["https://awakeboards.com/cdn/shop/files/JACKET_1000x1000_8a3ff29f-8d65-475c-a241-7e75b5289579.jpg?v=1756380959"],
+      "options": [{ "title": "Size" }],
+      "variants": [{
+        "title": "Medium",
+        "sku": "NEO-JACKET-M",
+        "prices": [{ "amount": 377100, "currency_code": "zar" }],
+        "options": [{ "value": "Medium" }],
+        "inventory_quantity": 10,
+        "metadata": { "costEUR": 190, "priceExVAT": 3279 }
+      }]
     }
   ]
 }
