@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
 
 export default function AdminSettingsPage() {
@@ -30,19 +30,8 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href="/admin/dashboard" className="text-blue-600 hover:text-blue-800">
-              ← Back
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Store Settings</h1>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+    <AdminLayout title="Settings">
+      <div className="max-w-3xl">
         <div className="bg-white rounded-lg shadow p-6">
           {saved && (
             <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -156,7 +145,7 @@ export default function AdminSettingsPage() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   )
 }

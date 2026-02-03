@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
 import { useBookingsStore, DemoBooking, BookingStatus } from '@/store/bookings'
 import { Check, X, Calendar, Clock, MapPin, Phone, Mail } from 'lucide-react'
@@ -27,12 +27,12 @@ export default function AdminBookingsPage() {
 
   const getStatusColor = (status: BookingStatus) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-      case 'confirmed': return 'bg-green-500/20 text-green-400 border-green-500/30'
-      case 'rejected': return 'bg-red-500/20 text-red-400 border-red-500/30'
-      case 'cancelled': return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
-      case 'completed': return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-      default: return 'bg-gray-500/20 text-gray-400'
+      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-300'
+      case 'confirmed': return 'bg-green-100 text-green-800 border-green-300'
+      case 'rejected': return 'bg-red-100 text-red-800 border-red-300'
+      case 'cancelled': return 'bg-gray-100 text-gray-800 border-gray-300'
+      case 'completed': return 'bg-blue-100 text-blue-800 border-blue-300'
+      default: return 'bg-gray-100 text-gray-800'
     }
   }
 
@@ -42,18 +42,8 @@ export default function AdminBookingsPage() {
   const stats = { pending: bookings.filter(b => b.status === 'pending').length, confirmed: bookings.filter(b => b.status === 'confirmed').length, total: bookings.length }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <AdminLayout title="Demo Bookings">
       <Toaster position="top-right" />
-      <header className="bg-white shadow fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href="/admin/dashboard" className="text-blue-600 hover:text-blue-800">← Back</Link>
-            <h1 className="text-2xl font-bold text-gray-900">Demo Bookings</h1>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-4"><p className="text-sm text-gray-500">Pending</p><p className="text-2xl font-bold text-yellow-600">{stats.pending}</p></div>
           <div className="bg-white rounded-lg shadow p-4"><p className="text-sm text-gray-500">Confirmed</p><p className="text-2xl font-bold text-green-600">{stats.confirmed}</p></div>
@@ -102,8 +92,7 @@ export default function AdminBookingsPage() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+    </AdminLayout>
   )
 }
 

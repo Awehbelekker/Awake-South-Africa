@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
 import { useProductsStore } from '@/store/products'
 
@@ -53,19 +53,7 @@ export default function AdminReportsPage() {
   const topMargin = [...reports].sort((a, b) => b.margin - a.margin).slice(0, 5)
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href="/admin/dashboard" className="text-blue-600 hover:text-blue-800">
-              ← Back
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+    <AdminLayout title="Reports & Analytics">
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
@@ -165,7 +153,6 @@ export default function AdminReportsPage() {
             </table>
           </div>
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   )
 }

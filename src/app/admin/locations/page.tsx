@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import Image from 'next/image'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
 import { useDemoLocationsStore, DemoLocation } from '@/store/demoLocations'
 import { Pencil, Trash2, Plus } from 'lucide-react'
@@ -42,38 +42,28 @@ export default function AdminLocationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href="/admin/dashboard" className="text-blue-600 hover:text-blue-800">
-              ← Back
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Demo Locations</h1>
-          </div>
-          <button
-            onClick={() => {
-              setEditingLocation({
-                id: `location-${Date.now()}`,
-                name: '',
-                area: '',
-                image: '',
-                description: '',
-                price: 1500,
-                active: true,
-              })
-              setShowEditModal(true)
-            }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Add Location
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+    <AdminLayout title="Demo Locations">
+      {/* Add Button */}
+      <div className="flex justify-end mb-6">
+        <button
+          onClick={() => {
+            setEditingLocation({
+              id: `location-${Date.now()}`,
+              name: '',
+              area: '',
+              image: '',
+              description: '',
+              price: 1500,
+              active: true,
+            })
+            setShowEditModal(true)
+          }}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          Add Location
+        </button>
+      </div>
         {/* Locations Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {locations.map((location) => (
@@ -324,6 +314,6 @@ function LocationEditModal({
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   )
 }

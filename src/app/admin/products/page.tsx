@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
 import { useProductsStore, EditableProduct } from '@/store/products'
 import ProductEditModal from '@/components/admin/ProductEditModal'
@@ -65,19 +65,8 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href="/admin/dashboard" className="text-blue-600 hover:text-blue-800">
-              ← Back
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Manage Products</h1>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+    <AdminLayout title="Products">
+      <Toaster position="top-right" />
         {/* Filter */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -175,7 +164,6 @@ export default function AdminProductsPage() {
             </tbody>
           </table>
         </div>
-      </main>
 
       {/* Product Edit Modal */}
       <ProductEditModal
@@ -184,9 +172,6 @@ export default function AdminProductsPage() {
         product={editingProduct}
         onSave={handleSave}
       />
-
-      {/* Toast Notifications */}
-      <Toaster position="top-right" />
-    </div>
+    </AdminLayout>
   )
 }
