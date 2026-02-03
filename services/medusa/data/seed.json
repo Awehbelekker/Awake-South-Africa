@@ -4,13 +4,6 @@
     "default_currency_code": "zar",
     "swap_link_template": "https://awakesa.co.za/products/{handle}"
   },
-  "users": [
-    {
-      "email": "admin@awakesa.co.za",
-      "password": "awake2026admin",
-      "role": "admin"
-    }
-  ],
   "regions": [
     {
       "name": "South Africa",
