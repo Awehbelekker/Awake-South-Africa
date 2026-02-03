@@ -1,4 +1,9 @@
 {
+  "store": {
+    "currencies": ["zar"]
+  },
+  "regions": [],
+  "shipping_options": [],
   "products": [
     {
       "title": "Awake RÄVIK Explore XR 4",
