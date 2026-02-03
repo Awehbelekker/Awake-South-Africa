@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB"/>
+      <stop offset="100%" style="stop-color:#E0F4FF"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0077B6"/>
+      <stop offset="100%" style="stop-color:#023E8A"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="350" fill="url(#sky)"/>
+  <rect y="350" width="800" height="250" fill="url(#water)"/>
+  <ellipse cx="650" cy="100" rx="50" ry="50" fill="#FFD700" opacity="0.9"/>
+  <path d="M0 350 Q200 320 400 350 Q600 380 800 350 L800 400 Q600 370 400 400 Q200 430 0 400 Z" fill="#0096C7" opacity="0.5"/>
+  <text x="400" y="480" font-family="Arial, sans-serif" font-size="32" fill="white" text-anchor="middle" font-weight="bold">Demo Location</text>
+  <text x="400" y="520" font-family="Arial, sans-serif" font-size="18" fill="rgba(255,255,255,0.8)" text-anchor="middle">Upload an image in admin</text>
+</svg>

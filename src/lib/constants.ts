@@ -137,13 +137,13 @@ export const SA_CONTENT = {
   ],
   demo: {
     locations: [
-      { name: "Langebaan", area: "West Coast", image: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800" },
-      { name: "Melkbosstrand", area: "Cape Town", image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800" },
-      { name: "Eden on the Bay", area: "Cape Town", image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800" },
-      { name: "MAC Club", area: "Milnerton", image: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800" },
-      { name: "V&A Waterfront", area: "Cape Town", image: "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=800" },
-      { name: "Clifton Beach", area: "Atlantic Seaboard", image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800" },
-      { name: "Llandudno Beach", area: "Atlantic Seaboard", image: "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=800" },
+      { name: "Langebaan", area: "West Coast", image: "/images/demo/langebaan.svg" },
+      { name: "Melkbosstrand", area: "Cape Town", image: "/images/demo/melkbosstrand.svg" },
+      { name: "Eden on the Bay", area: "Cape Town", image: "/images/demo/eden-on-the-bay.svg" },
+      { name: "MAC Club", area: "Milnerton", image: "/images/demo/mac-club.svg" },
+      { name: "V&A Waterfront", area: "Cape Town", image: "/images/demo/va-waterfront.svg" },
+      { name: "Clifton Beach", area: "Atlantic Seaboard", image: "/images/demo/clifton-beach.svg" },
+      { name: "Llandudno Beach", area: "Atlantic Seaboard", image: "/images/demo/llandudno-beach.svg" },
     ],
   },
   pricing: {

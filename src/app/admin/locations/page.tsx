@@ -73,7 +73,7 @@ export default function AdminLocationsPage() {
             >
               <div className="relative h-48">
                 <Image
-                  src={location.image || 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'}
+                  src={location.image || '/images/demo/placeholder.svg'}
                   alt={location.name}
                   fill
                   className="object-cover"
