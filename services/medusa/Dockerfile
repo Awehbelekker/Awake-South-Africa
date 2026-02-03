@@ -31,12 +31,11 @@ EXPOSE 9000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
   CMD curl -f http://localhost:9000/health || exit 1
 
-# Create start script that runs migrations, seeds data, then starts server
+# Create start script that runs migrations then starts server
+# Note: Seeding is done separately via API script (seed command has bugs)
 RUN echo '#!/bin/sh' > /app/start.sh && \
     echo 'echo "Running migrations..."' >> /app/start.sh && \
     echo 'npx medusa migrations run' >> /app/start.sh && \
-    echo 'echo "Seeding database..."' >> /app/start.sh && \
-    echo 'npx medusa seed -f ./data/seed.json || echo "Seed completed or skipped"' >> /app/start.sh && \
     echo 'echo "Starting Medusa server..."' >> /app/start.sh && \
     echo 'exec npx medusa start' >> /app/start.sh && \
     chmod +x /app/start.sh
