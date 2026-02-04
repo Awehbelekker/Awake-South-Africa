@@ -125,7 +125,6 @@ export default function AdminLocationsPage() {
             <p className="text-gray-500">No demo locations yet. Add your first location!</p>
           </div>
         )}
-      </main>
 
       {/* Edit Modal */}
       {showEditModal && editingLocation && (
@@ -137,7 +136,7 @@ export default function AdminLocationsPage() {
           }}
         />
       )}
-    </div>
+    </AdminLayout>
   )
 }
 
@@ -314,6 +313,6 @@ function LocationEditModal({
           </div>
         </div>
       </div>
-    </AdminLayout>
+    </div>
   )
 }
