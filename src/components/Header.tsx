@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ShoppingCart, Heart, User, ChevronDown } from "lucide-react";
+import { Menu, X, ShoppingCart, Heart, User, ChevronDown, Settings } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { useAuthStore } from "@/store/auth";
 import { useWishlistStore } from "@/store/wishlist";
@@ -162,6 +162,14 @@ export default function Header() {
                 Sign In
               </Link>
             )}
+            {/* Admin Quick Access */}
+            <Link
+              href="/admin"
+              className="hidden md:flex p-2 text-gray-500 hover:text-accent-primary transition-colors"
+              title="Admin Panel"
+            >
+              <Settings className="w-5 h-5" />
+            </Link>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden p-2 text-gray-400 hover:text-white"
@@ -205,6 +213,15 @@ export default function Header() {
                     Sign In
                   </Link>
                 )}
+                {/* Admin Link in Mobile Menu */}
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-3 py-3 text-gray-400 hover:text-accent-primary mt-4"
+                >
+                  <Settings className="w-5 h-5" />
+                  <span>Admin Panel</span>
+                </Link>
               </div>
             </div>
           </div>

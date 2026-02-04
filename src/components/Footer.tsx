@@ -92,7 +92,11 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-500">© {new Date().getFullYear()} Awake Boards South Africa. All rights reserved.</p>
             <div className="flex items-center gap-4 text-sm text-gray-500">
-              <span>Prices include 15% VAT</span><span>•</span><span>Currency: ZAR (R)</span>
+              <span>Prices include 15% VAT</span>
+              <span>•</span>
+              <span>Currency: ZAR (R)</span>
+              <span>•</span>
+              <Link href="/admin" className="hover:text-accent-primary transition-colors">Admin</Link>
             </div>
           </div>
         </div>
