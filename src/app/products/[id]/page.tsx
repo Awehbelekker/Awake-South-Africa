@@ -6,7 +6,7 @@ import { useCartStore } from "../../../store/cart";
 import { useWishlistStore } from "../../../store/wishlist";
 import { useProductsStore } from "../../../store/products";
 import { useProduct } from "../../../lib/medusa-hooks";
-import { Loader2 } from "lucide-react";
+import { Loader2, Play } from "lucide-react";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -67,42 +67,27 @@ export default function ProductDetailPage() {
   const formatPrice = (price: number) => `R${price.toLocaleString()}`;
   const isInWishlist = wishlistItems.some(item => item.id === product.id);
 
-  // Image gallery from Awake website - 4 angles per product
-  // TO CUSTOMIZE: Replace these URLs with actual product images for each specific product
-  const defaultImage = product.image || '/placeholder-product.jpg';
-  const productGallery = [
-    defaultImage, // Main product image
-    defaultImage, // Side angle - update with actual side view URL
-    defaultImage, // Top angle - update with actual top view URL
-    defaultImage, // Action shot - update with rider using product URL
-  ];
+  // Build gallery from product images and videos uploaded in admin
+  const defaultImage = product.image || '/images/awake-default.jpg';
 
-  // Product videos - YouTube embed IDs
-  // TO CUSTOMIZE: Replace embedId with actual YouTube video IDs (the part after watch?v=)
-  // Example: https://www.youtube.com/watch?v=ABC123 -> embedId: 'ABC123'
-  const productVideos = [
-    {
-      id: 'demo',
-      title: 'Product Demo',
-      thumbnail: defaultImage,
-      embedId: 'dQw4w9WgXcQ', // REPLACE with actual demo video ID
-      duration: '2:30'
-    },
-    {
-      id: 'features',
-      title: 'Features Walkthrough',
-      thumbnail: defaultImage,
-      embedId: 'dQw4w9WgXcQ', // REPLACE with actual features video ID
-      duration: '3:15'
-    },
-    {
-      id: 'review',
-      title: 'Customer Review',
-      thumbnail: defaultImage,
-      embedId: 'dQw4w9WgXcQ', // REPLACE with actual review video ID
-      duration: '4:50'
-    },
-  ];
+  // Use uploaded images if available, otherwise use default image
+  const productImages = ('images' in product && product.images && product.images.length > 0)
+    ? product.images.map(img => ({ url: img.url, type: 'image' as const, id: img.id }))
+    : [{ url: defaultImage, type: 'image' as const, id: 'default' }];
+
+  // Use uploaded videos if available
+  const productVideos = ('videos' in product && product.videos && product.videos.length > 0)
+    ? product.videos.map(vid => ({
+        url: vid.url,
+        type: 'video' as const,
+        id: vid.id,
+        thumbnail: vid.thumbnail || defaultImage,
+        name: vid.name || 'Product Video'
+      }))
+    : [];
+
+  // Combined gallery: images first, then videos
+  const productGallery = [...productImages, ...productVideos];
 
   // Ride profile stats - customize per product
   // TO CUSTOMIZE: Update these values based on actual product specifications
@@ -144,15 +129,25 @@ export default function ProductDetailPage() {
         <div className="grid md:grid-cols-2 gap-12">
           {/* Left Column - Product Images & Ride Profile */}
           <div>
-            {/* Product Image Gallery */}
+            {/* Product Image/Video Gallery */}
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900 mb-4">
-              <Image
-                src={productGallery[selectedImage]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
+              {productGallery[selectedImage]?.type === 'video' ? (
+                <video
+                  src={productGallery[selectedImage].url}
+                  controls
+                  autoPlay
+                  className="w-full h-full object-cover"
+                  poster={('thumbnail' in productGallery[selectedImage]) ? (productGallery[selectedImage] as any).thumbnail : undefined}
+                />
+              ) : (
+                <Image
+                  src={productGallery[selectedImage]?.url || defaultImage}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              )}
               {'badge' in product && product.badge && (
                 <div className="absolute top-6 left-6 bg-accent-primary text-awake-black px-4 py-2 rounded-full text-sm font-bold">
                   {product.badge}
@@ -161,9 +156,9 @@ export default function ProductDetailPage() {
             </div>
             {/* Thumbnail Gallery */}
             <div className="grid grid-cols-4 gap-3 mb-8">
-              {productGallery.map((img, idx) => (
+              {productGallery.map((item, idx) => (
                 <button
-                  key={idx}
+                  key={item.id || idx}
                   onClick={() => setSelectedImage(idx)}
                   className={`relative aspect-square rounded-lg overflow-hidden transition-all ${
                     selectedImage === idx
@@ -171,12 +166,26 @@ export default function ProductDetailPage() {
                       : 'ring-1 ring-white/20 hover:ring-white/40'
                   }`}
                 >
-                  <Image
-                    src={img}
-                    alt={`View ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                  />
+                  {item.type === 'video' ? (
+                    <>
+                      <Image
+                        src={('thumbnail' in item && item.thumbnail) ? item.thumbnail : defaultImage}
+                        alt={`Video ${idx + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <Play className="w-8 h-8 text-white" fill="white" />
+                      </div>
+                    </>
+                  ) : (
+                    <Image
+                      src={item.url}
+                      alt={`View ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  )}
                 </button>
               ))}
             </div>

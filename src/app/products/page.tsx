@@ -141,7 +141,9 @@ function ProductsContent() {
             <Link href={`/products/${product.id}`}>
               <div className="relative h-64 overflow-hidden cursor-pointer">
                 <Image
-                  src={product.image || '/images/awake-default.jpg'}
+                  src={('images' in product && product.images && product.images.length > 0)
+                    ? product.images[0].url
+                    : (product.image || '/images/awake-default.jpg')}
                   alt={product.name}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
