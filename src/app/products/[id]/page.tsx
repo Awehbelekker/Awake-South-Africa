@@ -367,13 +367,13 @@ export default function ProductDetailPage() {
               {productVideos.map((video) => (
                 <div
                   key={video.id}
-                  onClick={() => setPlayingVideo(video.embedId)}
+                  onClick={() => setPlayingVideo(video.url)}
                   className="group cursor-pointer"
                 >
                   <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-900 mb-3">
                     <Image
                       src={video.thumbnail}
-                      alt={video.title}
+                      alt={video.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -385,13 +385,9 @@ export default function ProductDetailPage() {
                         </svg>
                       </div>
                     </div>
-                    {/* Duration */}
-                    <div className="absolute bottom-3 right-3 bg-black/80 px-2 py-1 rounded text-xs">
-                      {video.duration}
-                    </div>
                   </div>
                   <h3 className="text-lg font-bold group-hover:text-accent-primary transition-colors">
-                    {video.title}
+                    {video.name}
                   </h3>
                 </div>
               ))}
