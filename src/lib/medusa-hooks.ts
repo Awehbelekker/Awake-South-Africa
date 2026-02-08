@@ -23,6 +23,14 @@ import {
   registerCustomer,
   getCustomer,
   logoutCustomer,
+  adminLogin,
+  adminLogout,
+  getAdminSession,
+  adminGetProducts,
+  adminUpdateProduct,
+  adminUpdateVariant,
+  adminGetOrders,
+  adminGetCustomers,
 } from "./medusa-client"
 
 // Query Keys
@@ -32,6 +40,10 @@ export const queryKeys = {
   productByHandle: (handle: string) => ["product", "handle", handle] as const,
   cart: (id: string) => ["cart", id] as const,
   customer: ["customer"] as const,
+  adminSession: ["admin", "session"] as const,
+  adminProducts: ["admin", "products"] as const,
+  adminOrders: ["admin", "orders"] as const,
+  adminCustomers: ["admin", "customers"] as const,
 }
 
 // ============================================
@@ -221,7 +233,7 @@ export function useRegister() {
 
 export function useLogout() {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: logoutCustomer,
     onSuccess: () => {
@@ -231,3 +243,108 @@ export function useLogout() {
   })
 }
 
+// ============================================
+// ADMIN HOOKS
+// ============================================
+
+export function useAdminSession() {
+  return useQuery({
+    queryKey: queryKeys.adminSession,
+    queryFn: getAdminSession,
+    retry: false,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  })
+}
+
+export function useAdminLogin() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ email, password }: { email: string; password: string }) =>
+      adminLogin(email, password),
+    onSuccess: (user) => {
+      queryClient.setQueryData(queryKeys.adminSession, user)
+    },
+  })
+}
+
+export function useAdminLogout() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: adminLogout,
+    onSuccess: () => {
+      queryClient.setQueryData(queryKeys.adminSession, null)
+      queryClient.invalidateQueries({ queryKey: ["admin"] })
+    },
+  })
+}
+
+export function useAdminProducts() {
+  return useQuery({
+    queryKey: queryKeys.adminProducts,
+    queryFn: () => adminGetProducts(),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  })
+}
+
+export function useAdminUpdateProduct() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string
+      data: {
+        title?: string
+        description?: string
+        thumbnail?: string
+        metadata?: Record<string, unknown>
+      }
+    }) => adminUpdateProduct(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminProducts })
+    },
+  })
+}
+
+export function useAdminUpdateVariant() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      productId,
+      variantId,
+      data,
+    }: {
+      productId: string
+      variantId: string
+      data: {
+        prices?: { amount: number; currency_code: string }[]
+        inventory_quantity?: number
+        metadata?: Record<string, unknown>
+      }
+    }) => adminUpdateVariant(productId, variantId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminProducts })
+    },
+  })
+}
+
+export function useAdminOrders() {
+  return useQuery({
+    queryKey: queryKeys.adminOrders,
+    queryFn: () => adminGetOrders(),
+    staleTime: 1 * 60 * 1000, // 1 minute
+  })
+}
+
+export function useAdminCustomers() {
+  return useQuery({
+    queryKey: queryKeys.adminCustomers,
+    queryFn: () => adminGetCustomers(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}

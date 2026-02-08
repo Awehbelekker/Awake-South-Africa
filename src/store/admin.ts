@@ -1,4 +1,5 @@
 // Admin store for managing products and store details
+// Supports Medusa Admin API auth with localStorage fallback
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -16,8 +17,11 @@ export interface StoreSettings {
 interface AdminStore {
   settings: StoreSettings
   isAuthenticated: boolean
+  adminEmail: string | null
+  authMode: 'medusa' | 'local' // Track which auth mode was used
   updateSettings: (settings: Partial<StoreSettings>) => void
-  login: (password: string) => boolean
+  login: (password: string) => boolean // Legacy local auth (fallback)
+  setMedusaAuth: (email: string) => void // Set auth state after Medusa login
   logout: () => void
 }
 
@@ -37,25 +41,25 @@ export const useAdminStore = create<AdminStore>()(
     (set) => ({
       settings: DEFAULT_SETTINGS,
       isAuthenticated: false,
+      adminEmail: null,
+      authMode: 'local',
       updateSettings: (newSettings) =>
         set((state) => ({
           settings: { ...state.settings, ...newSettings },
         })),
+      // Medusa auth - called after successful Medusa Admin API login
+      setMedusaAuth: (email: string) => {
+        set({ isAuthenticated: true, adminEmail: email, authMode: 'medusa' })
+      },
+      // Legacy local auth - fallback when Medusa is unavailable
       login: (password) => {
-        // Simple password check - in production use proper auth
-        console.log('Login attempt with password:', password)
-        console.log('Expected password:', 'awake2026admin')
-        console.log('Match:', password === 'awake2026admin')
-
         if (password === 'awake2026admin') {
-          set({ isAuthenticated: true })
-          console.log('Authentication set to true')
+          set({ isAuthenticated: true, adminEmail: null, authMode: 'local' })
           return true
         }
-        console.log('Authentication failed')
         return false
       },
-      logout: () => set({ isAuthenticated: false }),
+      logout: () => set({ isAuthenticated: false, adminEmail: null, authMode: 'local' }),
     }),
     {
       name: 'admin-storage',

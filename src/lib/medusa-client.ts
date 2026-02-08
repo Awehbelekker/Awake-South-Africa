@@ -242,3 +242,98 @@ export async function getCustomerOrders() {
   const { orders } = await medusaClient.customers.listOrders()
   return orders
 }
+
+// ============================================
+// ADMIN API FUNCTIONS
+// ============================================
+
+// Admin Authentication
+export async function adminLogin(email: string, password: string) {
+  const response = await medusaClient.admin.auth.createSession({
+    email,
+    password,
+  })
+  return response.user
+}
+
+export async function adminLogout() {
+  await medusaClient.admin.auth.deleteSession()
+}
+
+export async function getAdminSession() {
+  const response = await medusaClient.admin.auth.getSession()
+  return response.user
+}
+
+// Admin Products
+export async function adminGetProducts(limit = 100, offset = 0) {
+  const { products, count } = await medusaClient.admin.products.list({
+    limit,
+    offset,
+  })
+  return { products: products.map((p: any) => convertMedusaProduct(p as unknown as MedusaProduct)), count }
+}
+
+export async function adminGetProduct(id: string) {
+  const { product } = await medusaClient.admin.products.retrieve(id)
+  return convertMedusaProduct(product as unknown as MedusaProduct)
+}
+
+export async function adminUpdateProduct(
+  id: string,
+  data: {
+    title?: string
+    description?: string
+    thumbnail?: string
+    metadata?: Record<string, unknown>
+  }
+) {
+  const { product } = await medusaClient.admin.products.update(id, data)
+  return convertMedusaProduct(product as unknown as MedusaProduct)
+}
+
+export async function adminUpdateVariant(
+  productId: string,
+  variantId: string,
+  data: {
+    prices?: { amount: number; currency_code: string }[]
+    inventory_quantity?: number
+    metadata?: Record<string, unknown>
+  }
+) {
+  const { product } = await medusaClient.admin.products.updateVariant(productId, variantId, data)
+  return convertMedusaProduct(product as unknown as MedusaProduct)
+}
+
+// Admin Orders
+export async function adminGetOrders(limit = 100, offset = 0) {
+  const { orders, count } = await medusaClient.admin.orders.list({
+    limit,
+    offset,
+  })
+  return { orders, count }
+}
+
+export async function adminGetOrder(id: string) {
+  const { order } = await medusaClient.admin.orders.retrieve(id)
+  return order
+}
+
+export async function adminUpdateOrder(id: string, data: Record<string, unknown>) {
+  const { order } = await medusaClient.admin.orders.update(id, data)
+  return order
+}
+
+// Admin Customers
+export async function adminGetCustomers(limit = 100, offset = 0) {
+  const { customers, count } = await medusaClient.admin.customers.list({
+    limit,
+    offset,
+  })
+  return { customers, count }
+}
+
+export async function adminGetCustomer(id: string) {
+  const { customer } = await medusaClient.admin.customers.retrieve(id)
+  return customer
+}
