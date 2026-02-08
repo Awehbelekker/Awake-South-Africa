@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://awake-south-africa.vercel.app"),
   title: "Awake SA | Electric Surfboards South Africa",
   description: "Official Awake Boards distributor for South Africa. Premium RÄVIK Jetboards and VINGA eFoils.",
   keywords: ["electric surfboard", "eFoil", "jetboard", "Awake", "South Africa", "RÄVIK", "VINGA"],
@@ -16,6 +17,12 @@ export const metadata: Metadata = {
     title: "Awake SA | Electric Surfboards South Africa",
     description: "Premium RÄVIK Jetboards and VINGA eFoils now in South Africa.",
     images: [{ url: "https://awakeboards.com/cdn/shop/files/BRABUSx3.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Awake SA | Electric Surfboards South Africa",
+    description: "Premium RÄVIK Jetboards and VINGA eFoils now in South Africa.",
+    images: ["https://awakeboards.com/cdn/shop/files/BRABUSx3.png"],
   },
 };
 
