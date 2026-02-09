@@ -1,13 +1,16 @@
 'use client'
 
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useCallback } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import { useProductsStore, MediaFile } from '@/store/products'
-import { 
-  Search, Upload, Image as ImageIcon, Video, ExternalLink, 
-  Copy, Check, Trash2, FolderOpen, Plus, X, Link as LinkIcon
+import GoogleDrivePicker from '@/components/admin/GoogleDrivePicker'
+import {
+  Search, Upload, Image as ImageIcon, Video, ExternalLink,
+  Copy, Check, Trash2, FolderOpen, Plus, X, Link as LinkIcon, Cloud
 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="150"%3E%3Crect width="200" height="150" fill="%23f3f4f6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="%239ca3af"%3ENo Preview%3C/text%3E%3C/svg%3E'
 
@@ -124,6 +127,169 @@ export default function AdminMediaPage() {
     }
     toast.success('Media removed')
   }
+
+  // Handle Google Drive selection
+  const handleDriveSelect = (files: Array<{ id: string; name: string; url: string; mimeType: string; thumbnailUrl?: string }>) => {
+    if (!selectedProduct) {
+      toast.error('Please select a product first')
+      return
+    }
+    const product = products.find(p => p.id === selectedProduct)
+    if (!product) return
+
+    files.forEach(file => {
+      const isVideo = file.mimeType.startsWith('video/')
+      const newMedia: MediaFile = {
+        id: `drive-${file.id}`,
+        url: file.url,
+        type: isVideo ? 'video' : 'image',
+        name: file.name,
+        source: 'drive',
+        driveId: file.id,
+        thumbnail: file.thumbnailUrl,
+      }
+
+      if (isVideo) {
+        const videos = product.videos || []
+        updateProduct(product.id, { videos: [...videos, newMedia] })
+      } else {
+        const images = product.images || []
+        updateProduct(product.id, { images: [...images, newMedia] })
+      }
+    })
+
+    toast.success(`${files.length} file(s) added from Google Drive`)
+    setShowAddModal(false)
+    setSelectedProduct('')
+  }
+
+  // Handle file upload
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    if (!selectedProduct) {
+      toast.error('Please select a product first')
+      return
+    }
+
+    const product = products.find(p => p.id === selectedProduct)
+    if (!product) return
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name} is too large (max 5MB). Use Google Drive for larger files.`)
+        continue
+      }
+
+      const isVideo = file.type.startsWith('video/')
+      const isImage = file.type.startsWith('image/')
+
+      if (!isVideo && !isImage) {
+        toast.error(`${file.name} is not a valid image or video file`)
+        continue
+      }
+
+      // Convert to base64
+      const reader = new FileReader()
+      const base64 = await new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string)
+        reader.readAsDataURL(file)
+      })
+
+      const newMedia: MediaFile = {
+        id: `upload-${Date.now()}-${i}`,
+        url: base64,
+        type: isVideo ? 'video' : 'image',
+        name: file.name,
+        source: 'upload',
+      }
+
+      if (isVideo) {
+        const videos = product.videos || []
+        updateProduct(product.id, { videos: [...videos, newMedia] })
+      } else {
+        const images = product.images || []
+        updateProduct(product.id, { images: [...images, newMedia] })
+      }
+    }
+
+    toast.success('Files uploaded successfully')
+    setShowAddModal(false)
+    setSelectedProduct('')
+    e.target.value = ''
+  }
+
+  // Drag and drop handlers
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }, [])
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+
+    if (!selectedProduct) {
+      toast.error('Please select a product first')
+      return
+    }
+
+    const product = products.find(p => p.id === selectedProduct)
+    if (!product) return
+
+    const files = Array.from(e.dataTransfer.files)
+
+    for (const file of files) {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name} is too large (max 5MB)`)
+        continue
+      }
+
+      const isVideo = file.type.startsWith('video/')
+      const isImage = file.type.startsWith('image/')
+
+      if (!isVideo && !isImage) {
+        toast.error(`${file.name} is not a valid file type`)
+        continue
+      }
+
+      const reader = new FileReader()
+      const base64 = await new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string)
+        reader.readAsDataURL(file)
+      })
+
+      const newMedia: MediaFile = {
+        id: `upload-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        url: base64,
+        type: isVideo ? 'video' : 'image',
+        name: file.name,
+        source: 'upload',
+      }
+
+      if (isVideo) {
+        const videos = product.videos || []
+        updateProduct(product.id, { videos: [...videos, newMedia] })
+      } else {
+        const images = product.images || []
+        updateProduct(product.id, { images: [...images, newMedia] })
+      }
+    }
+
+    toast.success(`${files.length} file(s) uploaded`)
+    setShowAddModal(false)
+    setSelectedProduct('')
+  }, [selectedProduct, products, updateProduct])
 
   return (
     <AdminLayout title="Media Library">
@@ -246,7 +412,7 @@ export default function AdminMediaPage() {
       {/* Add Media Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">Add Media</h2>
@@ -255,9 +421,10 @@ export default function AdminMediaPage() {
                 </button>
               </div>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-6">
+              {/* Step 1: Select Product */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">1. Select Product *</label>
                 <select
                   value={selectedProduct}
                   onChange={(e) => setSelectedProduct(e.target.value)}
@@ -269,50 +436,105 @@ export default function AdminMediaPage() {
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Media Type</label>
-                <select
-                  value={newMediaType}
-                  onChange={(e) => setNewMediaType(e.target.value as 'image' | 'video')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                >
-                  <option value="image">Image</option>
-                  <option value="video">Video</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">URL *</label>
-                <input
-                  type="url"
-                  value={newMediaUrl}
-                  onChange={(e) => setNewMediaUrl(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input
-                  type="text"
-                  value={newMediaName}
-                  onChange={(e) => setNewMediaName(e.target.value)}
-                  placeholder="Optional display name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
+
+              {selectedProduct && (
+                <>
+                  {/* Drag & Drop Zone */}
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                      isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 mb-2">Drag & drop files here</p>
+                    <p className="text-sm text-gray-500 mb-4">or use the options below</p>
+
+                    <div className="flex flex-wrap justify-center gap-3">
+                      {/* File Upload Button */}
+                      <label className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg cursor-pointer transition-colors">
+                        <Upload className="w-4 h-4" />
+                        Upload Files
+                        <input
+                          type="file"
+                          accept="image/*,video/*"
+                          multiple
+                          onChange={handleFileUpload}
+                          className="hidden"
+                        />
+                      </label>
+
+                      {/* Google Drive Button */}
+                      <GoogleDrivePicker
+                        onSelect={handleDriveSelect}
+                        multiSelect={true}
+                        accept="all"
+                        label="Google Drive"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-4">Max file size: 5MB (use Google Drive for larger files)</p>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 border-t border-gray-300"></div>
+                    <span className="text-sm text-gray-500">OR add by URL</span>
+                    <div className="flex-1 border-t border-gray-300"></div>
+                  </div>
+
+                  {/* URL Input Section */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Media Type</label>
+                      <select
+                        value={newMediaType}
+                        onChange={(e) => setNewMediaType(e.target.value as 'image' | 'video')}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      >
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
+                      <input
+                        type="url"
+                        value={newMediaUrl}
+                        onChange={(e) => setNewMediaUrl(e.target.value)}
+                        placeholder="https://..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Name (optional)</label>
+                      <input
+                        type="text"
+                        value={newMediaName}
+                        onChange={(e) => setNewMediaName(e.target.value)}
+                        placeholder="Display name"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                    <button
+                      onClick={handleAddMedia}
+                      disabled={!newMediaUrl}
+                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <LinkIcon className="w-4 h-4" />
+                      Add from URL
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
-            <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
+            <div className="p-6 border-t bg-gray-50 flex justify-end">
               <button
-                onClick={handleAddMedia}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Add Media
-              </button>
-              <button
-                onClick={() => setShowAddModal(false)}
+                onClick={() => { setShowAddModal(false); setSelectedProduct(''); setNewMediaUrl(''); setNewMediaName(''); }}
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
               >
-                Cancel
+                Close
               </button>
             </div>
           </div>

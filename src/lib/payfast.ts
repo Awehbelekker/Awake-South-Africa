@@ -51,17 +51,40 @@ export function getPayFastUrl(mode: 'live' | 'sandbox' = 'live'): string {
     : 'https://sandbox.payfast.co.za/eng/process';
 }
 
+/**
+ * Tenant-specific PayFast credentials
+ * Used for multi-tenant payment processing
+ */
+export interface TenantPayFastCredentials {
+  merchantId: string;
+  merchantKey: string;
+  passphrase: string;
+}
+
+/**
+ * Create a PayFast payment with optional tenant-specific credentials
+ *
+ * @param amount - Payment amount in ZAR
+ * @param itemName - Name of the item being purchased
+ * @param itemDescription - Description of the item
+ * @param paymentId - Unique payment/order ID (e.g., "order_xxx")
+ * @param userEmail - Customer email
+ * @param userName - Customer name
+ * @param tenantCredentials - Optional tenant-specific PayFast credentials
+ */
 export function createPayFastPayment(
   amount: number,
   itemName: string,
   itemDescription: string,
   paymentId: string,
   userEmail: string,
-  userName: string
+  userName: string,
+  tenantCredentials?: TenantPayFastCredentials | null
 ): { url: string; data: Record<string, string> } {
-  const merchantId = process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_ID!;
-  const merchantKey = process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_KEY!;
-  const passPhrase = process.env.PAYFAST_PASSPHRASE!;
+  // Use tenant credentials if provided, otherwise fall back to env variables
+  const merchantId = tenantCredentials?.merchantId || process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_ID!;
+  const merchantKey = tenantCredentials?.merchantKey || process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_KEY!;
+  const passPhrase = tenantCredentials?.passphrase || process.env.PAYFAST_PASSPHRASE || '';
   const mode = (process.env.NEXT_PUBLIC_PAYFAST_MODE as 'live' | 'sandbox') || 'live';
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://awake-south-africa.vercel.app';
@@ -90,4 +113,37 @@ export function createPayFastPayment(
     url: getPayFastUrl(mode),
     data,
   };
+}
+
+/**
+ * Create PayFast payment using tenant context
+ * This is a convenience wrapper that fetches tenant credentials automatically
+ */
+export async function createTenantPayFastPayment(
+  amount: number,
+  itemName: string,
+  itemDescription: string,
+  paymentId: string,
+  userEmail: string,
+  userName: string,
+  tenantId: string
+): Promise<{ url: string; data: Record<string, string> }> {
+  // Import dynamically to avoid circular dependencies
+  const { getTenantPayFastCredentials } = await import('./supabase-tenants');
+
+  const credentials = await getTenantPayFastCredentials(tenantId);
+
+  return createPayFastPayment(
+    amount,
+    itemName,
+    itemDescription,
+    paymentId,
+    userEmail,
+    userName,
+    credentials ? {
+      merchantId: credentials.merchantId || '',
+      merchantKey: credentials.merchantKey || '',
+      passphrase: credentials.passphrase || '',
+    } : null
+  );
 }

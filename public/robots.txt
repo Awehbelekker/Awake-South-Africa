@@ -5,9 +5,30 @@ Allow: /
 # Disallow admin pages
 Disallow: /admin
 Disallow: /admin/*
+Disallow: /master-admin
+Disallow: /master-admin/*
 
 # Disallow API routes
 Disallow: /api/*
+
+# Disallow checkout and payment pages
+Disallow: /checkout
+Disallow: /payment/*
+Disallow: /cart
+
+# Disallow demo and test pages
+Disallow: /demo
+
+# Allow important pages
+Allow: /products
+Allow: /products/*
+Allow: /about
+Allow: /contact
+Allow: /support
+Allow: /blog
+
+# Sitemap location
+Sitemap: https://awakesa.co.za/sitemap.xml
 
 # Disallow checkout and account pages
 Disallow: /checkout

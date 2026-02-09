@@ -1,0 +1,261 @@
+● Validation Warning:
+
+  Unknown option "coverageThresholds" with value {"global": {"branches": 70, "functions": 70, "lines": 70, "statements": 70}} was found. Did you mean "coverageThreshold"?
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+● Validation Warning:
+
+  Unknown option "coverageThresholds" with value {"global": {"branches": 70, "functions": 70, "lines": 70, "statements": 70}} was found. Did you mean "coverageThreshold"?
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+FAIL src/lib/seo/__tests__/structured-data.test.ts
+  ● Test suite failed to run
+
+    Cannot find module './async.js'
+    Require stack:
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\lib\iterate.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\parallel.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\index.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\form-data\lib\form_data.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\XMLHttpRequest.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\interfaces.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\browser\Window.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\api.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\build\index.js
+    - H:\Awake Store\node_modules\jest-util\build\requireOrImportModule.js
+    - H:\Awake Store\node_modules\jest-util\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\FailedTestsInteractiveMode.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\plugins\FailedTestsInteractive.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\watch.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\cli\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\build\run.js
+    - H:\Awake Store\node_modules\jest-cli\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\bin\jest.js
+    - H:\Awake Store\node_modules\jest\bin\jest.js
+
+      at Object.<anonymous> (node_modules/asynckit/lib/iterate.js:1:13)
+
+FAIL src/lib/seo/__tests__/metadata.test.ts
+  ● Test suite failed to run
+
+    Cannot find module './async.js'
+    Require stack:
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\lib\iterate.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\parallel.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\index.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\form-data\lib\form_data.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\XMLHttpRequest.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\interfaces.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\browser\Window.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\api.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\build\index.js
+    - H:\Awake Store\node_modules\jest-util\build\requireOrImportModule.js
+    - H:\Awake Store\node_modules\jest-util\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\FailedTestsInteractiveMode.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\plugins\FailedTestsInteractive.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\watch.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\cli\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\build\run.js
+    - H:\Awake Store\node_modules\jest-cli\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\bin\jest.js
+    - H:\Awake Store\node_modules\jest\bin\jest.js
+
+      at Object.<anonymous> (node_modules/asynckit/lib/iterate.js:1:13)
+
+FAIL src/lib/ai/__tests__/provider-factory.test.ts
+  ● Test suite failed to run
+
+    Cannot find module './async.js'
+    Require stack:
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\lib\iterate.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\parallel.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\index.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\form-data\lib\form_data.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\XMLHttpRequest.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\interfaces.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\browser\Window.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\api.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\build\index.js
+    - H:\Awake Store\node_modules\jest-util\build\requireOrImportModule.js
+    - H:\Awake Store\node_modules\jest-util\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\FailedTestsInteractiveMode.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\plugins\FailedTestsInteractive.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\watch.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\cli\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\build\run.js
+    - H:\Awake Store\node_modules\jest-cli\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\bin\jest.js
+    - H:\Awake Store\node_modules\jest\bin\jest.js
+
+      at Object.<anonymous> (node_modules/asynckit/lib/iterate.js:1:13)
+
+FAIL src/components/__tests__/OptimizedImage.test.tsx
+  ● Test suite failed to run
+
+    Cannot find module './async.js'
+    Require stack:
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\lib\iterate.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\parallel.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\index.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\form-data\lib\form_data.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\XMLHttpRequest.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\interfaces.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\browser\Window.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\api.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\build\index.js
+    - H:\Awake Store\node_modules\jest-util\build\requireOrImportModule.js
+    - H:\Awake Store\node_modules\jest-util\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\FailedTestsInteractiveMode.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\plugins\FailedTestsInteractive.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\watch.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\cli\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\build\run.js
+    - H:\Awake Store\node_modules\jest-cli\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\bin\jest.js
+    - H:\Awake Store\node_modules\jest\bin\jest.js
+
+      at Object.<anonymous> (node_modules/asynckit/lib/iterate.js:1:13)
+
+FAIL tests/e2e/shopping-cart.spec.ts
+  ● Test suite failed to run
+
+    Cannot find module './async.js'
+    Require stack:
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\lib\iterate.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\parallel.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\index.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\form-data\lib\form_data.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\XMLHttpRequest.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\interfaces.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\browser\Window.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\api.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\build\index.js
+    - H:\Awake Store\node_modules\jest-util\build\requireOrImportModule.js
+    - H:\Awake Store\node_modules\jest-util\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\FailedTestsInteractiveMode.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\plugins\FailedTestsInteractive.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\watch.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\cli\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\build\run.js
+    - H:\Awake Store\node_modules\jest-cli\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\bin\jest.js
+    - H:\Awake Store\node_modules\jest\bin\jest.js
+
+      at Object.<anonymous> (node_modules/asynckit/lib/iterate.js:1:13)
+
+FAIL tests/e2e/seo-performance.spec.ts
+  ● Test suite failed to run
+
+    Cannot find module './async.js'
+    Require stack:
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\lib\iterate.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\parallel.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\index.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\form-data\lib\form_data.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\XMLHttpRequest.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\interfaces.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\browser\Window.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\api.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\build\index.js
+    - H:\Awake Store\node_modules\jest-util\build\requireOrImportModule.js
+    - H:\Awake Store\node_modules\jest-util\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\FailedTestsInteractiveMode.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\plugins\FailedTestsInteractive.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\watch.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\cli\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\build\run.js
+    - H:\Awake Store\node_modules\jest-cli\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\bin\jest.js
+    - H:\Awake Store\node_modules\jest\bin\jest.js
+
+      at Object.<anonymous> (node_modules/asynckit/lib/iterate.js:1:13)
+
+FAIL tests/e2e/product-browsing.spec.ts
+  ● Test suite failed to run
+
+    Cannot find module './async.js'
+    Require stack:
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\lib\iterate.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\parallel.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\index.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\form-data\lib\form_data.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\XMLHttpRequest.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\interfaces.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\browser\Window.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\api.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\build\index.js
+    - H:\Awake Store\node_modules\jest-util\build\requireOrImportModule.js
+    - H:\Awake Store\node_modules\jest-util\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\FailedTestsInteractiveMode.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\plugins\FailedTestsInteractive.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\watch.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\cli\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\build\run.js
+    - H:\Awake Store\node_modules\jest-cli\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\bin\jest.js
+    - H:\Awake Store\node_modules\jest\bin\jest.js
+
+      at Object.<anonymous> (node_modules/asynckit/lib/iterate.js:1:13)
+
+FAIL tests/e2e/homepage.spec.ts
+  ● Test suite failed to run
+
+    Cannot find module './async.js'
+    Require stack:
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\lib\iterate.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\parallel.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\asynckit\index.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\form-data\lib\form_data.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\xhr-utils.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\xhr\XMLHttpRequest-impl.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\XMLHttpRequest.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\interfaces.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\browser\Window.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\api.js
+    - \\ITECCPT-FP1\sales$\Richard.Downing\Awake Store\node_modules\jest-environment-jsdom\build\index.js
+    - H:\Awake Store\node_modules\jest-util\build\requireOrImportModule.js
+    - H:\Awake Store\node_modules\jest-util\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\FailedTestsInteractiveMode.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\plugins\FailedTestsInteractive.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\watch.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\cli\index.js
+    - H:\Awake Store\node_modules\jest-cli\node_modules\@jest\core\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\build\run.js
+    - H:\Awake Store\node_modules\jest-cli\build\index.js
+    - H:\Awake Store\node_modules\jest-cli\bin\jest.js
+    - H:\Awake Store\node_modules\jest\bin\jest.js
+
+      at Object.<anonymous> (node_modules/asynckit/lib/iterate.js:1:13)
+
+Test Suites: 8 failed, 8 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        284.733 s
+Ran all test suites.

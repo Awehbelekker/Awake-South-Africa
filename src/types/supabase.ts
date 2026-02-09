@@ -10,9 +10,157 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      tenants: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          domain: string | null
+          subdomain: string | null
+          custom_domain_verified: boolean
+          ssl_provisioned: boolean
+          logo_url: string | null
+          favicon_url: string | null
+          primary_color: string
+          secondary_color: string
+          accent_color: string
+          email: string | null
+          phone: string | null
+          whatsapp: string | null
+          address: string | null
+          currency: string
+          tax_rate: number
+          timezone: string
+          medusa_store_id: string | null
+          cognicore_business_id: string | null
+          // Legacy PayFast fields (kept for backward compatibility)
+          payfast_merchant_id: string | null
+          payfast_merchant_key: string | null
+          payfast_passphrase: string | null
+          // Google Drive Integration
+          google_drive_client_id: string | null
+          google_drive_client_secret: string | null
+          google_drive_refresh_token: string | null
+          google_drive_folder_id: string | null
+          google_drive_enabled: boolean
+          // OneDrive Integration
+          onedrive_client_id: string | null
+          onedrive_client_secret: string | null
+          onedrive_refresh_token: string | null
+          onedrive_folder_id: string | null
+          onedrive_enabled: boolean
+          is_active: boolean
+          plan: 'basic' | 'pro' | 'enterprise'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          domain?: string | null
+          subdomain?: string | null
+          custom_domain_verified?: boolean
+          ssl_provisioned?: boolean
+          logo_url?: string | null
+          favicon_url?: string | null
+          primary_color?: string
+          secondary_color?: string
+          accent_color?: string
+          email?: string | null
+          phone?: string | null
+          whatsapp?: string | null
+          address?: string | null
+          currency?: string
+          tax_rate?: number
+          timezone?: string
+          medusa_store_id?: string | null
+          cognicore_business_id?: string | null
+          payfast_merchant_id?: string | null
+          payfast_merchant_key?: string | null
+          payfast_passphrase?: string | null
+          google_drive_client_id?: string | null
+          google_drive_client_secret?: string | null
+          google_drive_refresh_token?: string | null
+          google_drive_folder_id?: string | null
+          google_drive_enabled?: boolean
+          onedrive_client_id?: string | null
+          onedrive_client_secret?: string | null
+          onedrive_refresh_token?: string | null
+          onedrive_folder_id?: string | null
+          onedrive_enabled?: boolean
+          is_active?: boolean
+          plan?: 'basic' | 'pro' | 'enterprise'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          slug?: string
+          name?: string
+          domain?: string | null
+          subdomain?: string | null
+          custom_domain_verified?: boolean
+          ssl_provisioned?: boolean
+          logo_url?: string | null
+          favicon_url?: string | null
+          primary_color?: string
+          secondary_color?: string
+          accent_color?: string
+          email?: string | null
+          phone?: string | null
+          whatsapp?: string | null
+          address?: string | null
+          currency?: string
+          tax_rate?: number
+          timezone?: string
+          medusa_store_id?: string | null
+          cognicore_business_id?: string | null
+          payfast_merchant_id?: string | null
+          payfast_merchant_key?: string | null
+          payfast_passphrase?: string | null
+          google_drive_client_id?: string | null
+          google_drive_client_secret?: string | null
+          google_drive_refresh_token?: string | null
+          google_drive_folder_id?: string | null
+          google_drive_enabled?: boolean
+          onedrive_client_id?: string | null
+          onedrive_client_secret?: string | null
+          onedrive_refresh_token?: string | null
+          onedrive_folder_id?: string | null
+          onedrive_enabled?: boolean
+          is_active?: boolean
+          plan?: 'basic' | 'pro' | 'enterprise'
+          updated_at?: string
+        }
+      }
+      admin_users: {
+        Row: {
+          id: string
+          tenant_id: string
+          email: string
+          password_hash: string
+          role: 'admin' | 'super_admin'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          email: string
+          password_hash: string
+          role?: 'admin' | 'super_admin'
+          created_at?: string
+        }
+        Update: {
+          tenant_id?: string
+          email?: string
+          password_hash?: string
+          role?: 'admin' | 'super_admin'
+        }
+      }
       products: {
         Row: {
           id: string
+          tenant_id: string
           name: string
           price: number
           price_ex_vat: number
@@ -35,6 +183,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          tenant_id: string
           name: string
           price: number
           price_ex_vat: number
@@ -218,15 +367,148 @@ export interface Database {
           updated_at?: string
         }
       }
+      payment_gateways: {
+        Row: {
+          id: string
+          code: PaymentGatewayCode
+          name: string
+          description: string | null
+          logo_url: string | null
+          is_active: boolean
+          supported_currencies: string[]
+          documentation_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          code: PaymentGatewayCode
+          name: string
+          description?: string | null
+          logo_url?: string | null
+          is_active?: boolean
+          supported_currencies?: string[]
+          documentation_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          code?: PaymentGatewayCode
+          name?: string
+          description?: string | null
+          logo_url?: string | null
+          is_active?: boolean
+          supported_currencies?: string[]
+          documentation_url?: string | null
+        }
+      }
+      tenant_payment_gateways: {
+        Row: {
+          id: string
+          tenant_id: string
+          gateway_id: string
+          credentials: PaymentGatewayCredentials
+          is_enabled: boolean
+          is_default: boolean
+          is_sandbox: boolean
+          display_order: number
+          webhook_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          gateway_id: string
+          credentials: PaymentGatewayCredentials
+          is_enabled?: boolean
+          is_default?: boolean
+          is_sandbox?: boolean
+          display_order?: number
+          webhook_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          tenant_id?: string
+          gateway_id?: string
+          credentials?: PaymentGatewayCredentials
+          is_enabled?: boolean
+          is_default?: boolean
+          is_sandbox?: boolean
+          display_order?: number
+          webhook_url?: string | null
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      set_tenant_context: {
+        Args: { tenant_id: string }
+        Returns: void
+      }
+      get_tenant_payment_gateways: {
+        Args: { p_tenant_id: string }
+        Returns: Array<{
+          gateway_code: PaymentGatewayCode
+          gateway_name: string
+          is_default: boolean
+          is_sandbox: boolean
+        }>
+      }
     }
     Enums: {
       [_ in never]: never
     }
   }
 }
+
+// Payment Gateway Types
+export type PaymentGatewayCode = 'payfast' | 'peach' | 'yoco' | 'ikhokha' | 'stripe'
+
+// Credentials structure for each gateway
+export interface PayFastCredentials {
+  merchant_id: string
+  merchant_key: string
+  passphrase: string
+}
+
+export interface PeachPaymentsCredentials {
+  entity_id: string
+  access_token: string
+}
+
+export interface YocoCredentials {
+  secret_key: string
+  public_key: string
+}
+
+export interface IKhokhaCredentials {
+  application_id: string
+  application_secret: string
+}
+
+export interface StripeCredentials {
+  secret_key: string
+  publishable_key: string
+  webhook_secret: string
+}
+
+export type PaymentGatewayCredentials =
+  | PayFastCredentials
+  | PeachPaymentsCredentials
+  | YocoCredentials
+  | IKhokhaCredentials
+  | StripeCredentials
+
+// Helper type exports for easier usage
+export type Tenant = Database['public']['Tables']['tenants']['Row']
+export type TenantInsert = Database['public']['Tables']['tenants']['Insert']
+export type TenantUpdate = Database['public']['Tables']['tenants']['Update']
+export type AdminUser = Database['public']['Tables']['admin_users']['Row']
+export type Product = Database['public']['Tables']['products']['Row']
+export type ProductInsert = Database['public']['Tables']['products']['Insert']
+export type ProductUpdate = Database['public']['Tables']['products']['Update']
+export type PaymentGateway = Database['public']['Tables']['payment_gateways']['Row']
+export type TenantPaymentGateway = Database['public']['Tables']['tenant_payment_gateways']['Row']
