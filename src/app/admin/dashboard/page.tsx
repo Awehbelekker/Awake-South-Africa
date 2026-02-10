@@ -8,31 +8,46 @@ import { useProductsStore } from '@/store/products'
 import { useBookingsStore } from '@/store/bookings'
 import { useOrdersStore } from '@/store/orders'
 import { useInvoicesStore } from '@/store/invoices'
+import { useAdminProducts, useAdminOrders } from '@/lib/medusa-hooks'
 import {
   Package, ShoppingCart, Calendar, FileText, AlertTriangle,
-  TrendingUp, Clock, CheckCircle, XCircle, DollarSign
+  TrendingUp, Clock, CheckCircle, XCircle, DollarSign, Database, HardDrive
 } from 'lucide-react'
 
 export default function AdminDashboard() {
-  const { settings } = useAdminStore()
-  const { products } = useProductsStore()
+  const { settings, authMode } = useAdminStore()
+  const { products: localProducts } = useProductsStore()
   const { bookings } = useBookingsStore()
-  const { orders } = useOrdersStore()
+  const { orders: localOrders } = useOrdersStore()
   const { invoices } = useInvoicesStore()
+
+  // Fetch from Medusa Admin API
+  const { data: medusaProductData, isLoading: productsLoading } = useAdminProducts()
+  const { data: medusaOrderData, isLoading: ordersLoading } = useAdminOrders()
+
+  // Use Medusa data when available, fallback to local
+  const medusaProducts = medusaProductData?.products
+  const useMedusaProducts = authMode === 'medusa' && medusaProducts && medusaProducts.length > 0
+  const products = useMedusaProducts ? medusaProducts : localProducts
+
+  const medusaOrders = medusaOrderData?.orders
+  const useMedusaOrders = authMode === 'medusa' && medusaOrders !== undefined
+  const orders = useMedusaOrders ? medusaOrders : localOrders
 
   // Product metrics
   const productMetrics = useMemo(() => {
     const total = products.length
-    const inStock = products.filter(p => p.inStock).length
-    const lowStock = products.filter(p => p.inStock && p.stockQuantity <= 2).length
-    const outOfStock = products.filter(p => !p.inStock || p.stockQuantity === 0).length
-    const totalValue = products.reduce((sum, p) => sum + p.price * p.stockQuantity, 0)
-    const avgMargin = products.filter(p => p.costEUR).length > 0
-      ? products.filter(p => p.costEUR).reduce((sum, p) => {
+    const inStock = products.filter((p: any) => p.inStock).length
+    const lowStock = products.filter((p: any) => p.inStock && p.stockQuantity <= 2).length
+    const outOfStock = products.filter((p: any) => !p.inStock || p.stockQuantity === 0).length
+    const totalValue = products.reduce((sum: number, p: any) => sum + (p.price || 0) * (p.stockQuantity || 0), 0)
+    const productsWithCost = products.filter((p: any) => p.costEUR)
+    const avgMargin = productsWithCost.length > 0
+      ? productsWithCost.reduce((sum: number, p: any) => {
           const costZAR = (p.costEUR || 0) * settings.exchangeRate
-          const margin = ((p.priceExVAT - costZAR) / p.priceExVAT) * 100
+          const margin = p.priceExVAT > 0 ? ((p.priceExVAT - costZAR) / p.priceExVAT) * 100 : 0
           return sum + margin
-        }, 0) / products.filter(p => p.costEUR).length
+        }, 0) / productsWithCost.length
       : 0
     return { total, inStock, lowStock, outOfStock, totalValue, avgMargin }
   }, [products, settings.exchangeRate])
@@ -51,14 +66,24 @@ export default function AdminDashboard() {
     return { pending, confirmed, todayBookings, revenue, upcomingBookings }
   }, [bookings])
 
-  // Order metrics
+  // Order metrics (handles both Medusa and local order formats)
   const orderMetrics = useMemo(() => {
-    const pending = orders.filter(o => o.status === 'pending').length
-    const processing = orders.filter(o => o.status === 'processing').length
-    const total = orders.length
-    const revenue = orders.filter(o => o.paymentStatus === 'paid').reduce((sum, o) => sum + o.total, 0)
+    if (useMedusaOrders && Array.isArray(medusaOrders)) {
+      const pending = medusaOrders.filter((o: any) => o.fulfillment_status === 'not_fulfilled').length
+      const processing = medusaOrders.filter((o: any) => o.fulfillment_status === 'partially_fulfilled').length
+      const total = medusaOrders.length
+      const revenue = medusaOrders
+        .filter((o: any) => o.payment_status === 'captured')
+        .reduce((sum: number, o: any) => sum + ((o.total || 0) / 100), 0) // Medusa stores in cents
+      return { pending, processing, total, revenue }
+    }
+    const localOrdrs = localOrders
+    const pending = localOrdrs.filter(o => o.status === 'pending').length
+    const processing = localOrdrs.filter(o => o.status === 'processing').length
+    const total = localOrdrs.length
+    const revenue = localOrdrs.filter(o => o.paymentStatus === 'paid').reduce((sum, o) => sum + o.total, 0)
     return { pending, processing, total, revenue }
-  }, [orders])
+  }, [orders, useMedusaOrders, medusaOrders, localOrders])
 
   // Invoice metrics
   const invoiceMetrics = useMemo(() => {
@@ -97,6 +122,35 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout title="Dashboard">
+      {/* Data Source Indicator */}
+      <div className="flex items-center gap-3 mb-4 text-sm">
+        {useMedusaProducts ? (
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full">
+            <Database className="h-3.5 w-3.5" />
+            Products: Medusa API
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">
+            <HardDrive className="h-3.5 w-3.5" />
+            Products: Local Storage
+          </span>
+        )}
+        {useMedusaOrders ? (
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full">
+            <Database className="h-3.5 w-3.5" />
+            Orders: Medusa API
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">
+            <HardDrive className="h-3.5 w-3.5" />
+            Orders: Local Storage
+          </span>
+        )}
+        {(productsLoading || ordersLoading) && (
+          <span className="text-xs text-gray-500 animate-pulse">Loading...</span>
+        )}
+      </div>
+
       {/* Key Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4">
