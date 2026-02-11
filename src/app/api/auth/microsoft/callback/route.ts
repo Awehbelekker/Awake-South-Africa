@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       clientId: process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID!,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
       redirectUri: process.env.NEXT_PUBLIC_MICROSOFT_REDIRECT_URI!,
-      scopes: OAUTH_SCOPE_PRESETS.microsoft.oneDriveAndCalendar,
+      scopes: [...OAUTH_SCOPE_PRESETS.microsoft.oneDriveAndCalendar],
     }
 
     // Exchange code for tokens
