@@ -1,5 +1,5 @@
-# Ignore old monorepo structure
-services/
+# Ignore old monorepo structure (top-level only)
+/services/
 
 # Ignore Docker files
 docker/
