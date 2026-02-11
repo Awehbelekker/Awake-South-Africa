@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
 
     const { data: order, error } = await supabase
       .from('orders')
-      .insert(orderData)
+      .insert(orderData as any)
       .select()
       .single()
 

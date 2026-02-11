@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
 
     await supabase
       .from('orders')
-      .update(updateData)
+      .update(updateData as any)
       .eq('id', order.id)
 
     console.log(`Order ${orderId} updated: ${result.status}`)

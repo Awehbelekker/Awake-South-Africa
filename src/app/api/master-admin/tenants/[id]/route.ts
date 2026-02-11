@@ -97,7 +97,7 @@ export async function PUT(
 
     const { data: tenant, error } = await supabase
       .from('tenants')
-      .update(updateData)
+      .update(updateData as any)
       .eq('id', id)
       .select()
       .single()

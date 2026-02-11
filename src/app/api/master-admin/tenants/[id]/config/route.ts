@@ -81,7 +81,7 @@ export async function PATCH(
 
     const { data: tenant, error } = await supabase
       .from('tenants')
-      .update(updates)
+      .update(updates as any)
       .eq('id', params.id)
       .select()
       .single()
@@ -89,7 +89,7 @@ export async function PATCH(
     if (error) throw error
 
     // Log activity
-    await supabase.from('master_admin_activity_log').insert({
+    await supabase.from('master_admin_activity_log' as any).insert({
       admin_email: auth.email,
       action: 'update_tenant_config',
       tenant_id: params.id,
