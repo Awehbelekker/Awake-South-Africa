@@ -1,85 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { OrderService } from '@/lib/services/order.service';
 
-// Medusa Admin API URL
-const MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000';
-const MEDUSA_ADMIN_SECRET = process.env.MEDUSA_ADMIN_SECRET || '';
+/**
+ * PayFast IPN (Instant Payment Notification) Webhook Handler
+ * 
+ * This endpoint receives payment notifications from PayFast and updates
+ * the order status in Supabase when payment is confirmed.
+ * 
+ * @see https://developers.payfast.co.za/docs#instant_transaction_notification
+ */
 
-// Capture payment in Medusa (marks order as paid)
-async function capturePaymentInMedusa(orderId: string): Promise<boolean> {
-  try {
-    // Get order details to find payment ID
-    const orderResponse = await fetch(`${MEDUSA_BACKEND_URL}/admin/orders/${orderId}`, {
-      headers: {
-        'Authorization': `Bearer ${MEDUSA_ADMIN_SECRET}`,
-        'Content-Type': 'application/json',
-      },
-    });
+// Verify PayFast signature
+function verifyPayFastSignature(
+  data: Record<string, string>,
+  signature: string,
+  passPhrase: string = ''
+): boolean {
+  let pfParamString = '';
+  const sortedKeys = Object.keys(data).sort();
 
-    if (!orderResponse.ok) {
-      console.error('Failed to fetch order from Medusa:', await orderResponse.text());
-      return false;
+  for (const key of sortedKeys) {
+    if (data[key] !== '') {
+      pfParamString += `${key}=${encodeURIComponent(data[key].trim()).replace(/%20/g, '+')}&`;
     }
-
-    const { order } = await orderResponse.json();
-
-    // Check if order has payments to capture
-    if (!order.payments || order.payments.length === 0) {
-      console.log('No payments found for order:', orderId);
-      return false;
-    }
-
-    // Capture the payment
-    const paymentId = order.payments[0].id;
-    const captureResponse = await fetch(`${MEDUSA_BACKEND_URL}/admin/orders/${orderId}/capture`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${MEDUSA_ADMIN_SECRET}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!captureResponse.ok) {
-      console.error('Failed to capture payment in Medusa:', await captureResponse.text());
-      return false;
-    }
-
-    console.log(`Payment captured successfully for order ${orderId}`);
-    return true;
-  } catch (error) {
-    console.error('Error capturing payment in Medusa:', error);
-    return false;
   }
-}
 
-// Add note to order with PayFast transaction details
-async function addPayFastNoteToOrder(orderId: string, payfastData: Record<string, string>): Promise<void> {
-  try {
-    const note = `PayFast Payment Confirmed
-- Transaction ID: ${payfastData.pf_payment_id || 'N/A'}
-- Amount: R${payfastData.amount_gross || '0'}
-- Payment Status: ${payfastData.payment_status}
-- Payment Date: ${new Date().toISOString()}`;
+  pfParamString = pfParamString.slice(0, -1);
 
-    await fetch(`${MEDUSA_BACKEND_URL}/admin/notes`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${MEDUSA_ADMIN_SECRET}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        resource_type: 'order',
-        resource_id: orderId,
-        value: note,
-      }),
-    });
-  } catch (error) {
-    console.error('Failed to add note to order:', error);
+  if (passPhrase) {
+    pfParamString += `&passphrase=${encodeURIComponent(passPhrase.trim()).replace(/%20/g, '+')}`;
   }
+
+  const calculatedSignature = crypto.createHash('md5').update(pfParamString).digest('hex');
+  return signature === calculatedSignature;
 }
 
 export async function POST(request: NextRequest) {
   try {
+    // Parse PayFast POST data
     const body = await request.text();
     const params = new URLSearchParams(body);
     const data: Record<string, string> = {};
@@ -88,14 +47,120 @@ export async function POST(request: NextRequest) {
       data[key] = value;
     });
 
-    // Extract signature
+    console.log('PayFast IPN Received:', {
+      payment_id: data.pf_payment_id,
+      order_number: data.m_payment_id,
+      status: data.payment_status,
+      amount: data.amount_gross,
+    });
+
+    // Extract and remove signature
     const signature = data.signature;
     delete data.signature;
 
     // Verify signature
     const passPhrase = process.env.PAYFAST_PASSPHRASE || '';
-    let pfParamString = '';
-    const sortedKeys = Object.keys(data).sort();
+    const isValidSignature = verifyPayFastSignature(data, signature, passPhrase);
+
+    if (!isValidSignature) {
+      console.error('❌ Invalid PayFast signature');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+    }
+
+    console.log('✅ PayFast signature verified');
+
+    // Extract payment data
+    const paymentStatus = data.payment_status;
+    const orderNumber = data.m_payment_id; // Order number (e.g., "AWK-xxx-xxx")
+    const amountGross = parseFloat(data.amount_gross || '0');
+    const payfastPaymentId = data.pf_payment_id;
+
+    // Only process COMPLETE payments
+    if (paymentStatus !== 'COMPLETE') {
+      console.log(`⏸️  Payment not complete. Status: ${paymentStatus}`);
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Payment not yet complete' 
+      });
+    }
+
+    // Get order by order number
+    const { success, data: order, error } = await OrderService.getOrderByNumber(orderNumber);
+
+    if (!success || !order) {
+      console.error('❌ Order not found:', orderNumber, error);
+      return NextResponse.json(
+        { error: 'Order not found' }, 
+        { status: 404 }
+      );
+    }
+
+    // Check if order is already paid
+    if (order.payment_status === 'paid') {
+      console.log('⚠️  Order already marked as paid:', orderNumber);
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Order already paid' 
+      });
+    }
+
+    // Verify amount matches
+    const orderTotal = parseFloat(order.total);
+    if (Math.abs(orderTotal - amountGross) > 0.01) {
+      console.error('❌ Amount mismatch:', {
+        expected: orderTotal,
+        received: amountGross,
+      });
+      return NextResponse.json(
+        { error: 'Amount mismatch' }, 
+        { status: 400 }
+      );
+    }
+
+    // Mark order as paid
+    const updateResult = await OrderService.markOrderAsPaid(
+      order.id,
+      payfastPaymentId,
+      'payfast'
+    );
+
+    if (!updateResult.success) {
+      console.error('❌ Failed to update order:', updateResult.error);
+      return NextResponse.json(
+        { error: 'Failed to update order' }, 
+        { status: 500 }
+      );
+    }
+
+    console.log(`✅ Order ${orderNumber} marked as paid. PayFast ID: ${payfastPaymentId}`);
+
+    // TODO: Send order confirmation email to customer
+    // TODO: Send notification to admin
+    // TODO: Trigger fulfillment workflow
+
+    // PayFast expects a 200 OK response
+    return NextResponse.json({ 
+      success: true,
+      message: 'Payment processed successfully' 
+    });
+
+  } catch (error) {
+    console.error('❌ PayFast webhook error:', error);
+    return NextResponse.json(
+      { error: 'Webhook processing failed' }, 
+      { status: 500 }
+    );
+  }
+}
+
+// GET handler for testing (not used by PayFast)
+export async function GET() {
+  return NextResponse.json({
+    message: 'PayFast IPN endpoint',
+    status: 'active',
+    timestamp: new Date().toISOString(),
+  });
+}
 
     for (const key of sortedKeys) {
       if (data[key] !== '') {
