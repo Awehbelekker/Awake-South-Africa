@@ -2,7 +2,7 @@
  * Supabase Client Configuration
  * Canonical source for the Supabase client instance
  */
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
@@ -12,7 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase environment variables not configured. Using localStorage fallback.')
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+export const supabase: SupabaseClient<Database> = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,

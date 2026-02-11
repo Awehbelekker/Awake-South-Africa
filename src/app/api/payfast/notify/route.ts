@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { OrderService } from '@/lib/services/order.service';
+import { OrderService } from '../../../lib/services/order.service';
 
 /**
  * PayFast IPN (Instant Payment Notification) Webhook Handler

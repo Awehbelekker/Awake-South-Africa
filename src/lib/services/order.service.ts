@@ -3,7 +3,8 @@
  * Handles all order-related database operations
  */
 
-import { supabase } from '@/lib/supabase'
+import { supabase as _supabase } from '@/lib/supabase'
+const supabase: any = _supabase
 
 export interface CreateOrderData {
   customer_id?: string
@@ -362,20 +363,21 @@ export class OrderService {
         .select('status, payment_status, total, created_at')
 
       if (error) throw error
+      const typedData: Array<{ status: string; payment_status: string; total: number; created_at: string }> = (data || []) as any
 
       const stats = {
-        total: data.length,
-        pending: data.filter(o => o.status === 'pending').length,
-        confirmed: data.filter(o => o.status === 'confirmed').length,
-        processing: data.filter(o => o.status === 'processing').length,
-        shipped: data.filter(o => o.status === 'shipped').length,
-        delivered: data.filter(o => o.status === 'delivered').length,
-        cancelled: data.filter(o => o.status === 'cancelled').length,
-        totalRevenue: data
-          .filter(o => o.payment_status === 'paid')
-          .reduce((sum, o) => sum + Number(o.total), 0),
-        averageOrderValue: data.length > 0 
-          ? data.reduce((sum, o) => sum + Number(o.total), 0) / data.length 
+        total: typedData.length,
+        pending: typedData.filter((o) => o.status === 'pending').length,
+        confirmed: typedData.filter((o) => o.status === 'confirmed').length,
+        processing: typedData.filter((o) => o.status === 'processing').length,
+        shipped: typedData.filter((o) => o.status === 'shipped').length,
+        delivered: typedData.filter((o) => o.status === 'delivered').length,
+        cancelled: typedData.filter((o) => o.status === 'cancelled').length,
+        totalRevenue: typedData
+          .filter((o) => o.payment_status === 'paid')
+          .reduce((sum: number, o) => sum + Number(o.total), 0),
+        averageOrderValue: typedData.length > 0 
+          ? typedData.reduce((sum: number, o) => sum + Number(o.total), 0) / typedData.length 
           : 0,
       }
 

@@ -439,6 +439,153 @@ export interface Database {
           updated_at?: string
         }
       }
+      orders: {
+        Row: {
+          id: string
+          order_number: string
+          customer_id: string | null
+          customer_email: string
+          customer_phone: string | null
+          subtotal: number
+          tax_amount: number
+          shipping_amount: number
+          discount_amount: number
+          total: number
+          currency: string
+          shipping_address: Json
+          billing_address: Json
+          payment_method: string
+          payment_reference: string | null
+          status: string
+          payment_status: string
+          fulfillment_status: string
+          paid_at: string | null
+          shipped_at: string | null
+          tracking_number: string | null
+          tracking_url: string | null
+          admin_notes: string | null
+          customer_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          order_number: string
+          customer_id?: string | null
+          customer_email: string
+          customer_phone?: string | null
+          subtotal: number
+          tax_amount: number
+          shipping_amount: number
+          discount_amount: number
+          total: number
+          currency?: string
+          shipping_address: Json
+          billing_address: Json
+          payment_method: string
+          payment_reference?: string | null
+          status?: string
+          payment_status?: string
+          fulfillment_status?: string
+          paid_at?: string | null
+          shipped_at?: string | null
+          tracking_number?: string | null
+          tracking_url?: string | null
+          admin_notes?: string | null
+          customer_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          order_number?: string
+          customer_id?: string | null
+          customer_email?: string
+          customer_phone?: string | null
+          subtotal?: number
+          tax_amount?: number
+          shipping_amount?: number
+          discount_amount?: number
+          total?: number
+          currency?: string
+          shipping_address?: Json
+          billing_address?: Json
+          payment_method?: string
+          payment_reference?: string | null
+          status?: string
+          payment_status?: string
+          fulfillment_status?: string
+          paid_at?: string | null
+          shipped_at?: string | null
+          tracking_number?: string | null
+          tracking_url?: string | null
+          admin_notes?: string | null
+          customer_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      order_items: {
+        Row: {
+          id: string
+          order_id: string
+          product_id: string
+          quantity: number
+          unit_price: number
+          total_price: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          product_id: string
+          quantity: number
+          unit_price: number
+          total_price: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          unit_price?: number
+          total_price?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      payment_transactions: {
+        Row: {
+          id: string
+          order_id: string
+          gateway: string
+          transaction_id: string
+          amount: number
+          currency: string
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          gateway: string
+          transaction_id: string
+          amount: number
+          currency: string
+          status?: string
+          created_at?: string
+        }
+        Update: {
+          order_id?: string
+          gateway?: string
+          transaction_id?: string
+          amount?: number
+          currency?: string
+          status?: string
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
