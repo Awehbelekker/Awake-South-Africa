@@ -1,7 +1,5 @@
 /**
- * Supabase Client
+ * Supabase module index
  * Re-exports from the canonical supabase configuration
  */
-
 export { supabase, isSupabaseConfigured, handleSupabaseError } from '../supabase'
-export { createClient } from '@supabase/supabase-js'
