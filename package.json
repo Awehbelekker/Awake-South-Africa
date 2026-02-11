@@ -43,6 +43,7 @@
     "tailwindcss": "^3.4.1",
     "tesseract.js": "^5.1.1",
     "web-vitals": "^3.5.2",
+    "@supabase/supabase-js": "^2.78.0",
     "zod": "^4.3.5",
     "zustand": "^4.4.7"
   },
@@ -53,7 +54,6 @@
     "@medusajs/medusa-js": "^6.1.10",
     "@playwright/test": "^1.42.0",
     "@stripe/stripe-js": "^8.7.0",
-    "@supabase/supabase-js": "^2.78.0",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@types/node": "^20.11.0",
