@@ -7,16 +7,11 @@ import StructuredData from "@/components/StructuredData";
 import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo/structured-data";
 
 export const metadata: Metadata = {
-<<<<<<< HEAD
   metadataBase: new URL("https://awakesa.co.za"),
   title: {
     default: "Awake SA | Electric Surfboards South Africa",
     template: "%s | Awake SA",
   },
-=======
-  metadataBase: new URL("https://awake-south-africa.vercel.app"),
-  title: "Awake SA | Electric Surfboards South Africa",
->>>>>>> 28003e16778b36f54eadbdb13133396125b12158
   description: "Official Awake Boards distributor for South Africa. Premium RÄVIK Jetboards and VINGA eFoils.",
   keywords: ["electric surfboard", "eFoil", "jetboard", "Awake", "South Africa", "RÄVIK", "VINGA", "electric watercraft", "water sports"],
   authors: [{ name: "Awake SA" }],
