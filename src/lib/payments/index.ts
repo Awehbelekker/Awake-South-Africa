@@ -62,7 +62,6 @@ export {
   getDefaultTenantGateway,
   processPayment,
   verifyWebhook,
-  getAvailableGateways,
 } from './tenant-payment-service'
 
 // Individual Gateway Classes (for advanced usage)
