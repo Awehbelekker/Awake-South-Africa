@@ -114,9 +114,9 @@ export async function POST(request: NextRequest) {
       metadata: body.metadata || {},
     }
 
-    const { data: product, error } = await supabase
+    const { data: product, error } = await (supabase as any)
       .from('products')
-      .insert(productData as any)
+      .insert(productData)
       .select()
       .single()
 

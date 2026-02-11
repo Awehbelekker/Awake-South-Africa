@@ -79,9 +79,9 @@ export async function PATCH(
     if (ai_config) updates.ai_config = ai_config
     if (automation_config) updates.automation_config = automation_config
 
-    const { data: tenant, error } = await supabase
+    const { data: tenant, error } = await (supabase as any)
       .from('tenants')
-      .update(updates as any)
+      .update(updates)
       .eq('id', params.id)
       .select()
       .single()
@@ -89,7 +89,7 @@ export async function PATCH(
     if (error) throw error
 
     // Log activity
-    await supabase.from('master_admin_activity_log' as any).insert({
+    await (supabase as any).from('master_admin_activity_log').insert({
       admin_email: auth.email,
       action: 'update_tenant_config',
       tenant_id: params.id,

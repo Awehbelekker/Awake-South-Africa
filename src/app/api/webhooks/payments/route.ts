@@ -105,9 +105,9 @@ export async function POST(request: NextRequest) {
       updateData.payment_status = 'pending'
     }
 
-    await supabase
+    await (supabase as any)
       .from('orders')
-      .update(updateData as any)
+      .update(updateData)
       .eq('id', order.id)
 
     console.log(`Order ${orderId} updated: ${result.status}`)
