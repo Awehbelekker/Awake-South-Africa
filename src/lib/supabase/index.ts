@@ -11,7 +11,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase environment variables not configured. Using localStorage fallback.')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase: any = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
