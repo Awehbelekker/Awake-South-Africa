@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
         amount: body.amount,
         currency: body.currency || 'ZAR',
         orderId: body.orderId,
+        orderNumber: body.orderNumber || body.orderId,
         customerEmail: body.customerEmail,
         customerName: body.customerName || '',
         itemName: body.itemName || `Order ${body.orderId}`,
