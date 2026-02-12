@@ -8,9 +8,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { Database } from '@/types/supabase'
 
-const supabase = createClient<Database>(
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
@@ -95,7 +94,7 @@ export async function PUT(
       }
     }
 
-    const { data: tenant, error } = await (supabase as any)
+    const { data: tenant, error } = await supabase
       .from('tenants')
       .update(updateData)
       .eq('id', id)

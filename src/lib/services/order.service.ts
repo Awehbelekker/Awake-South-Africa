@@ -3,8 +3,7 @@
  * Handles all order-related database operations
  */
 
-import { supabase as _supabase } from '@/lib/supabase'
-const supabase: any = _supabase
+import { supabase } from '@/lib/supabase'
 
 export interface CreateOrderData {
   customer_id?: string

@@ -7,7 +7,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
-import { Database, Tenant } from '@/types/supabase'
+import { Tenant } from '@/types/supabase'
 import { 
   CloudStorageProvider as ICloudStorageProvider,
   GoogleDriveCredentials,
@@ -20,7 +20,7 @@ import {
 import { GoogleDriveProvider } from './google-drive'
 import { OneDriveProvider } from './onedrive'
 
-const supabase = createClient<Database>(
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )

@@ -13,10 +13,10 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
-import { Database, PaymentGatewayCode, TenantInsert } from '@/types/supabase'
+import { PaymentGatewayCode, TenantInsert } from '@/types/supabase'
 import { validateCredentials } from '@/lib/payments'
 
-const supabase = createClient<Database>(
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
