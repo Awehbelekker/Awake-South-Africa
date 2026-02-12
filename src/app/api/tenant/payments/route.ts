@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { PaymentGatewayCode } from '@/types/supabase'
-import { processPayment, getAvailableGateways } from '@/lib/payments'
+import { processPayment, getTenantGateways } from '@/lib/payments'
 
 const supabase: any = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
     }
 
-    const gateways = await getAvailableGateways(tenantId)
+    const gateways = await getTenantGateways(tenantId)
 
     return NextResponse.json({ gateways })
   } catch (error: any) {
