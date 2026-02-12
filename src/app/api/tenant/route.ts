@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
         // Features
         has_cloud_storage: tenant.google_drive_enabled || tenant.onedrive_enabled,
       },
-      paymentGateways: gateways?.map(g => ({
+      paymentGateways: gateways?.map((g: any) => ({
         code: g.payment_gateways?.code,
         name: g.payment_gateways?.name,
         isDefault: g.is_default,
