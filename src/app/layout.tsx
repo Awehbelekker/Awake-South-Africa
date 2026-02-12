@@ -58,12 +58,6 @@ export const metadata: Metadata = {
     // google: "your-google-verification-code",
     // yandex: "your-yandex-verification-code",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Awake SA | Electric Surfboards South Africa",
-    description: "Premium RÄVIK Jetboards and VINGA eFoils now in South Africa.",
-    images: ["https://awakeboards.com/cdn/shop/files/BRABUSx3.png"],
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
