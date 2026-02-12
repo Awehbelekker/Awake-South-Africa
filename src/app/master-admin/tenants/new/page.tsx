@@ -223,7 +223,6 @@ export default function NewTenantPage() {
                     <input type={field.type} value={formData.gatewayCredentials[field.key] || ''}
                       onChange={e => updateField('gatewayCredentials', { ...formData.gatewayCredentials, [field.key]: e.target.value })}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-                    {field.help && <p className="text-xs text-gray-500 mt-1">{field.help}</p>}
                   </div>
                 ))}
                 <label className="flex items-center gap-2">
