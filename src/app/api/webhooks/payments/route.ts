@@ -73,12 +73,17 @@ export async function POST(request: NextRequest) {
 
     tenantId = order.tenant_id
 
+    if (!tenantId) {
+      console.error('Order has no tenant:', orderId)
+      return NextResponse.json({ error: 'Invalid order' }, { status: 400 })
+    }
+
     // Verify webhook signature using tenant's gateway credentials
     const signature = request.headers.get('x-signature') || 
                       request.headers.get('x-payfast-signature') ||
                       request.headers.get('stripe-signature') || ''
 
-    const result = await verifyWebhook(tenantId, gatewayCode, {
+    const result = await verifyWebhook(tenantId, gatewayCode!, {
       body,
       signature,
       rawBody,
