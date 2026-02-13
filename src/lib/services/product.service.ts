@@ -310,12 +310,12 @@ export class ProductService {
 
       const stats = {
         total: data.length,
-        inStock: data.filter(p => p.in_stock).length,
-        outOfStock: data.filter(p => !p.in_stock).length,
+        inStock: data.filter((p: any) => p.in_stock).length,
+        outOfStock: data.filter((p: any) => !p.in_stock).length,
         byCategory: {} as Record<string, number>
       }
 
-      data.forEach(product => {
+      data.forEach((product: any) => {
         stats.byCategory[product.category] = (stats.byCategory[product.category] || 0) + 1
       })
 
