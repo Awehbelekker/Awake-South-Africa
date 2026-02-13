@@ -10,9 +10,10 @@
  * - Price alerts when supplier costs exceed market norms
  * - Seasonal demand adjustment
  * - Bulk comparison for entire pricelists
+ * - Approval workflow: NEVER auto-changes prices, requires user review & approval
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
 
 // ============================================================================
 // Types
@@ -49,6 +50,24 @@ export interface PriceAlert {
   severity: 'info' | 'warning' | 'critical'
   message: string
   data?: Record<string, any>
+}
+
+/** Price change request — requires explicit user approval */
+export interface PriceChangeRequest {
+  id?: string
+  tenantId: string
+  productSku: string
+  productName: string
+  currentPrice: number
+  recommendedPrice: number
+  reason: string
+  analysis: PriceAnalysis
+  status: 'pending' | 'approved' | 'rejected' | 'expired'
+  requestedAt: string
+  requestedBy: 'price_agent'  // always the agent
+  reviewedBy?: string         // userId who approved/rejected
+  reviewedAt?: string
+  appliedAt?: string
 }
 
 export interface PriceComparisonOptions {
@@ -648,6 +667,192 @@ function buildBatchResult(results: PriceAnalysis[]): BatchPriceResult {
       revenueDifference: Math.round((optimizedRevenue - totalPotentialRevenue) * 100) / 100,
     },
   }
+}
+
+// ============================================================================
+// Approval Workflow — Prices NEVER change without user consent
+// ============================================================================
+
+/**
+ * Create a price change request for user approval.
+ * The agent RECOMMENDS prices but NEVER applies them automatically.
+ */
+export async function requestPriceChange(
+  tenantId: string,
+  analysis: PriceAnalysis
+): Promise<PriceChangeRequest> {
+  const supabase: any = createClient()
+
+  const request: PriceChangeRequest = {
+    tenantId,
+    productSku: analysis.productSku,
+    productName: analysis.productName,
+    currentPrice: analysis.currentRetailPrice || 0,
+    recommendedPrice: analysis.recommendedPrice,
+    reason: analysis.reasoning,
+    analysis,
+    status: 'pending',
+    requestedAt: new Date().toISOString(),
+    requestedBy: 'price_agent',
+  }
+
+  const { data, error } = await supabase
+    .from('price_change_requests')
+    .insert({
+      tenant_id: request.tenantId,
+      product_sku: request.productSku,
+      product_name: request.productName,
+      current_price: request.currentPrice,
+      recommended_price: request.recommendedPrice,
+      reason: request.reason,
+      analysis_data: request.analysis,
+      status: 'pending',
+      requested_at: request.requestedAt,
+      requested_by: 'price_agent',
+    })
+    .select('id')
+    .single()
+
+  if (data) request.id = data.id
+  return request
+}
+
+/**
+ * Approve a price change — only authorized users with pricing rights can call this.
+ * Actually applies the new price to the product.
+ */
+export async function approvePriceChange(
+  requestId: string,
+  userId: string,
+  tenantId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase: any = createClient()
+
+  // Fetch the pending request
+  const { data: request, error: fetchError } = await supabase
+    .from('price_change_requests')
+    .select('*')
+    .eq('id', requestId)
+    .eq('tenant_id', tenantId)
+    .eq('status', 'pending')
+    .single()
+
+  if (fetchError || !request) {
+    return { success: false, error: 'Price change request not found or already processed' }
+  }
+
+  // Apply the price change to the product
+  const { error: updateError } = await supabase
+    .from('products')
+    .update({ price: request.recommended_price })
+    .eq('sku', request.product_sku)
+    .eq('tenant_id', tenantId)
+
+  if (updateError) {
+    return { success: false, error: `Failed to update product price: ${updateError.message}` }
+  }
+
+  // Mark request as approved
+  await supabase
+    .from('price_change_requests')
+    .update({
+      status: 'approved',
+      reviewed_by: userId,
+      reviewed_at: new Date().toISOString(),
+      applied_at: new Date().toISOString(),
+    })
+    .eq('id', requestId)
+
+  return { success: true }
+}
+
+/**
+ * Reject a price change request
+ */
+export async function rejectPriceChange(
+  requestId: string,
+  userId: string,
+  tenantId: string,
+  reason?: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase: any = createClient()
+
+  const { error } = await supabase
+    .from('price_change_requests')
+    .update({
+      status: 'rejected',
+      reviewed_by: userId,
+      reviewed_at: new Date().toISOString(),
+      reason: reason || undefined,
+    })
+    .eq('id', requestId)
+    .eq('tenant_id', tenantId)
+    .eq('status', 'pending')
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+  return { success: true }
+}
+
+/**
+ * Get pending price change requests for a tenant
+ */
+export async function getPendingPriceChanges(
+  tenantId: string
+): Promise<PriceChangeRequest[]> {
+  const supabase: any = createClient()
+
+  const { data, error } = await supabase
+    .from('price_change_requests')
+    .select('*')
+    .eq('tenant_id', tenantId)
+    .eq('status', 'pending')
+    .order('requested_at', { ascending: false })
+
+  if (error || !data) return []
+
+  return data.map((row: any) => ({
+    id: row.id,
+    tenantId: row.tenant_id,
+    productSku: row.product_sku,
+    productName: row.product_name,
+    currentPrice: row.current_price,
+    recommendedPrice: row.recommended_price,
+    reason: row.reason,
+    analysis: row.analysis_data,
+    status: row.status,
+    requestedAt: row.requested_at,
+    requestedBy: row.requested_by,
+    reviewedBy: row.reviewed_by,
+    reviewedAt: row.reviewed_at,
+    appliedAt: row.applied_at,
+  }))
+}
+
+/**
+ * Bulk approve multiple price changes
+ */
+export async function bulkApprovePriceChanges(
+  requestIds: string[],
+  userId: string,
+  tenantId: string
+): Promise<{ approved: number; failed: number; errors: string[] }> {
+  let approved = 0
+  let failed = 0
+  const errors: string[] = []
+
+  for (const id of requestIds) {
+    const result = await approvePriceChange(id, userId, tenantId)
+    if (result.success) {
+      approved++
+    } else {
+      failed++
+      errors.push(`${id}: ${result.error}`)
+    }
+  }
+
+  return { approved, failed, errors }
 }
 
 function emptySummary(): PriceSummary {

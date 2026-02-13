@@ -1,26 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
 import {
   analyzeProductPrice,
   batchAnalyzePrices,
   savePriceAnalysis,
   getPriceHistory,
+  requestPriceChange,
+  approvePriceChange,
+  rejectPriceChange,
+  getPendingPriceChanges,
+  bulkApprovePriceChanges,
 } from '@/lib/ai/price-comparison-agent'
-
-const supabase: any = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 /**
  * POST /api/ai/price-comparison
  * 
- * Analyze product pricing against market data
+ * Analyze product pricing against market data.
+ * NEVER auto-applies price changes — all changes require user approval.
  * 
  * Body:
  *   { action: "analyze", sku, productName, supplierCost, currentRetailPrice?, options? }
  *   { action: "batch", tenantId, pricelistId?, options? }
  *   { action: "history", tenantId, sku, days? }
+ *   { action: "request-change", tenantId, analysis }
+ *   { action: "approve", requestId, userId, tenantId }
+ *   { action: "reject", requestId, userId, tenantId, reason? }
+ *   { action: "pending", tenantId }
+ *   { action: "bulk-approve", requestIds[], userId, tenantId }
  */
 export async function POST(request: NextRequest) {
   try {
@@ -51,7 +57,8 @@ export async function POST(request: NextRequest) {
           await savePriceAnalysis(body.tenantId, analysis)
         }
 
-        return NextResponse.json({ success: true, analysis })
+        // NOTE: Price is NOT applied. Returns recommendation only.
+        return NextResponse.json({ success: true, analysis, message: 'Price recommendation generated. Use approve action to apply.' })
       }
 
       case 'batch': {
@@ -66,7 +73,7 @@ export async function POST(request: NextRequest) {
 
         const result = await batchAnalyzePrices(tenantId, pricelistId, options)
 
-        return NextResponse.json({ success: true, ...result })
+        return NextResponse.json({ success: true, ...result, message: 'Recommendations generated. No prices were changed.' })
       }
 
       case 'history': {
@@ -80,13 +87,57 @@ export async function POST(request: NextRequest) {
         }
 
         const history = await getPriceHistory(tenantId, sku, days)
-
         return NextResponse.json({ success: true, history })
+      }
+
+      case 'request-change': {
+        const { tenantId, analysis } = body
+        if (!tenantId || !analysis) {
+          return NextResponse.json({ error: 'Missing tenantId or analysis' }, { status: 400 })
+        }
+        const changeRequest = await requestPriceChange(tenantId, analysis)
+        return NextResponse.json({ success: true, changeRequest, message: 'Price change request created. Awaiting approval.' })
+      }
+
+      case 'approve': {
+        const { requestId, userId, tenantId } = body
+        if (!requestId || !userId || !tenantId) {
+          return NextResponse.json({ error: 'Missing requestId, userId, or tenantId' }, { status: 400 })
+        }
+        const result = await approvePriceChange(requestId, userId, tenantId)
+        return NextResponse.json(result)
+      }
+
+      case 'reject': {
+        const { requestId, userId, tenantId, reason } = body
+        if (!requestId || !userId || !tenantId) {
+          return NextResponse.json({ error: 'Missing requestId, userId, or tenantId' }, { status: 400 })
+        }
+        const result = await rejectPriceChange(requestId, userId, tenantId, reason)
+        return NextResponse.json(result)
+      }
+
+      case 'pending': {
+        const { tenantId } = body
+        if (!tenantId) {
+          return NextResponse.json({ error: 'Missing tenantId' }, { status: 400 })
+        }
+        const pending = await getPendingPriceChanges(tenantId)
+        return NextResponse.json({ success: true, pending, count: pending.length })
+      }
+
+      case 'bulk-approve': {
+        const { requestIds, userId, tenantId } = body
+        if (!requestIds || !userId || !tenantId) {
+          return NextResponse.json({ error: 'Missing requestIds, userId, or tenantId' }, { status: 400 })
+        }
+        const result = await bulkApprovePriceChanges(requestIds, userId, tenantId)
+        return NextResponse.json({ success: true, ...result })
       }
 
       default:
         return NextResponse.json(
-          { error: 'Invalid action. Use: analyze, batch, or history' },
+          { error: 'Invalid action. Use: analyze, batch, history, request-change, approve, reject, pending, bulk-approve' },
           { status: 400 }
         )
     }
