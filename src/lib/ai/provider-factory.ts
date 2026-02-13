@@ -5,7 +5,7 @@
  */
 
 import type { AIProvider, AIProviderConfig } from './types'
-import { OpenAIProvider } from './openai-provider'
+// import { OpenAIProvider } from './openai-provider' // Commented out - requires 'openai' package
 import { SelfHostedProvider } from './self-hosted-provider'
 
 let cachedProvider: AIProvider | null = null
@@ -28,7 +28,9 @@ export function getAIProvider(config?: AIProviderConfig): AIProvider {
   
   switch (providerType) {
     case 'openai':
-      cachedProvider = new OpenAIProvider()
+      // cachedProvider = new OpenAIProvider() // Requires 'openai' package
+      console.warn('OpenAI provider requires openai package. Falling back to self-hosted provider.')
+      cachedProvider = new SelfHostedProvider(config?.endpoint)
       break
       
     case 'self-hosted':
@@ -36,8 +38,8 @@ export function getAIProvider(config?: AIProviderConfig): AIProvider {
       break
       
     default:
-      console.warn(`Unknown AI provider: ${providerType}. Falling back to OpenAI.`)
-      cachedProvider = new OpenAIProvider()
+      console.warn(`Unknown AI provider: ${providerType}. Falling back to self-hosted provider.`)
+      cachedProvider = new SelfHostedProvider(config?.endpoint)
   }
   
   if (!cachedProvider.isAvailable) {

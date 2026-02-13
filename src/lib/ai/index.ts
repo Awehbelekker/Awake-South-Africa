@@ -23,7 +23,7 @@ export type {
 } from './types'
 
 // Provider implementations
-export { OpenAIProvider } from './openai-provider'
+// export { OpenAIProvider } from './openai-provider' // Commented out - requires 'openai' package
 export { SelfHostedProvider } from './self-hosted-provider'
 
 // Provider factory
