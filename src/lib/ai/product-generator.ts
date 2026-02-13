@@ -13,7 +13,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client'
-import { AIProviderFactory } from './provider-factory'
+import { getAIProvider } from './provider-factory'
 import type { AIProvider } from './types'
 
 export interface BusinessTone {
@@ -53,7 +53,7 @@ export async function generateProductFromPricelist(
   request: ProductGenerationRequest
 ): Promise<ProductGenerationResult> {
   const supabase = createClient()
-  const aiProvider = AIProviderFactory.getProvider('openai')
+  const aiProvider = getAIProvider()
 
   try {
     // Step 1: Search web for product information
