@@ -180,13 +180,13 @@ export async function verifyWebhook(
 
   try {
     const result = await gateway.verifyWebhook({
-      body: data.body,
+      rawBody: data.rawBody || JSON.stringify(data.body),
+      headers: { 'x-signature': data.signature },
       signature: data.signature,
-      rawBody: data.rawBody || '',
     })
 
     return {
-      verified: result.verified,
+      verified: result.valid,
       status: result.status,
       paymentId: result.paymentId,
       error: result.error,
