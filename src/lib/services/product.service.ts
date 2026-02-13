@@ -4,7 +4,7 @@
  */
 
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
-import { Product } from '@/types/product'
+import type { Product } from '@/types/supabase'
 
 export class ProductService {
   /**
