@@ -75,9 +75,9 @@ Find:
 Return a JSON object with this information.
 `
 
-    const webSearchResult = await aiProvider.analyzeText(webSearchPrompt, {
-      maxTokens: 1000,
-      temperature: 0.3,
+    const webSearchResult = await aiProvider.generateDescription({
+      name: request.supplierSku,
+      category: request.supplierDescription,
     })
 
     // Step 2: Generate product title and description matching business tone
@@ -89,7 +89,7 @@ Target Audience: ${request.businessTone.targetAudience}
 Brand Keywords: ${request.businessTone.keywords.join(', ')}
 
 Product Information:
-${webSearchResult.analysis}
+${webSearchResult}
 
 Supplier Description: ${request.supplierDescription}
 
@@ -112,20 +112,20 @@ Return as JSON:
 }
 `
 
-    const descriptionResult = await aiProvider.analyzeText(descriptionPrompt, {
-      maxTokens: 800,
-      temperature: 0.7,
+    const descriptionResult = await aiProvider.generateDescription({
+      name: request.supplierSku,
+      category: request.supplierDescription,
     })
 
     // Parse AI response
     let productData
     try {
-      productData = JSON.parse(descriptionResult.analysis)
+      productData = JSON.parse(descriptionResult)
     } catch {
       // If JSON parsing fails, extract manually
       productData = {
         title: request.supplierDescription,
-        description: descriptionResult.analysis,
+        description: descriptionResult,
         keywords: [],
         features: [],
       }
