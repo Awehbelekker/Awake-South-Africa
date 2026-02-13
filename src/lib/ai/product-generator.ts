@@ -199,14 +199,10 @@ Title: ${productTitle}
 Return only the search query, optimized for finding high-quality product images.
 `
 
-    const searchQueryResult = await aiProvider.analyzeText(imageSearchPrompt, {
-      maxTokens: 50,
-      temperature: 0.3,
-    })
+    const searchQuery = await aiProvider.generateImageAlt(`${sku} ${productTitle}`)
 
     // TODO: Implement actual image search using Google Custom Search API
     // For now, return placeholder
-    const searchQuery = searchQueryResult.analysis.trim()
     
     // Placeholder - in production, use Google Custom Search API
     return `https://via.placeholder.com/800x800?text=${encodeURIComponent(productTitle)}`
