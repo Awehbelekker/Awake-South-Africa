@@ -66,8 +66,8 @@ export class OneDriveProvider implements CloudStorageProvider {
 
       // For files < 4MB, use simple upload
       const fileBuffer = params.file instanceof Buffer 
-        ? params.file 
-        : Buffer.from(await (params.file as Blob).arrayBuffer())
+        ? new Uint8Array(params.file) 
+        : new Uint8Array(await (params.file as Blob).arrayBuffer())
 
       const response = await fetch(
         `${this.baseUrl}${parentPath}:/${encodeURIComponent(params.fileName)}:/content`,
