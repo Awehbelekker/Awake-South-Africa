@@ -6,7 +6,7 @@
  * They own their data - we just help them manage it.
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
 import { Tenant } from '@/types/supabase'
 import { 
   CloudStorageProvider as ICloudStorageProvider,

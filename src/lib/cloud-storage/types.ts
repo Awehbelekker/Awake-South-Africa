@@ -5,10 +5,10 @@
  * Each tenant can have their own cloud storage - their data, their ownership.
  */
 
-export type CloudStorageProvider = 'google_drive' | 'onedrive' | 'local'
+export type CloudStorageProviderType = 'google_drive' | 'onedrive' | 'local'
 
 export interface CloudStorageConfig {
-  provider: CloudStorageProvider
+  provider: CloudStorageProviderType
   credentials: GoogleDriveCredentials | OneDriveCredentials
   folderId?: string // Root folder for this tenant's files
 }
