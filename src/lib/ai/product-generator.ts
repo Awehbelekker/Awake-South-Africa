@@ -12,7 +12,7 @@
  * - Batch processing
  */
 
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@supabase/supabase-js'
 import { getAIProvider } from './provider-factory'
 import type { AIProvider } from './types'
 
@@ -52,7 +52,10 @@ export interface ProductGenerationResult {
 export async function generateProductFromPricelist(
   request: ProductGenerationRequest
 ): Promise<ProductGenerationResult> {
-  const supabase = createClient()
+  const supabase: any = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   const aiProvider = getAIProvider()
 
   try {
