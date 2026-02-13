@@ -182,7 +182,7 @@ export async function verifyWebhook(
     const result = await gateway.verifyWebhook({
       body: data.body,
       signature: data.signature,
-      rawBody: data.rawBody,
+      rawBody: data.rawBody || '',
     })
 
     return {
