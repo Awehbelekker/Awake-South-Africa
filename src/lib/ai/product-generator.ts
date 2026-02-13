@@ -238,7 +238,10 @@ export async function processPricelistBatch(
   failed: number
   errors: string[]
 }> {
-  const supabase = createClient()
+  const supabase: any = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   const { batchSize = 10, delayMs = 2000 } = options
 
   // Get pricelist items
