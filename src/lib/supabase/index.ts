@@ -1,20 +1,42 @@
 /**
  * Supabase Client Configuration
  * Canonical source for the Supabase client instance
+ * Uses lazy initialization to avoid crashing during Next.js build
+ * when environment variables aren't available.
  */
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+let _supabase: any = null
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase environment variables not configured. Using localStorage fallback.')
+function getSupabase() {
+  if (!_supabase) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.warn('Supabase environment variables not configured. Using localStorage fallback.')
+      // Return a no-op proxy to prevent crashes during build
+      return new Proxy({} as any, {
+        get: () => () => ({ data: null, error: { message: 'Supabase not configured' } }),
+      })
+    }
+
+    _supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    })
+  }
+  return _supabase
 }
 
-export const supabase: any = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
+// Export as a getter so it's lazily initialized
+export const supabase: any = new Proxy({} as any, {
+  get: (_target, prop) => {
+    const client = getSupabase()
+    const value = client[prop]
+    return typeof value === 'function' ? value.bind(client) : value
   },
 })
 
