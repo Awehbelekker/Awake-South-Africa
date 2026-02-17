@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * Master Admin - Tenants API
  * 

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * Microsoft OAuth Callback Route
  * 
