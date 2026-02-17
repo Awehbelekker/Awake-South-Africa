@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Set RLS context
-    await getSupabase()ase().rpc('set_config', { 
+    await getSupabase().rpc('set_config', { 
       setting: 'app.tenant_id', 
       value: tenantId 
     }).catch(() => {})
