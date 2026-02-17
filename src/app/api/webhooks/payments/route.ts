@@ -12,10 +12,12 @@ import { createClient } from '@supabase/supabase-js'
 import { PaymentGatewayCode } from '@/types/supabase'
 import { verifyWebhook } from '@/lib/payments'
 
-const supabase: any = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase(): any {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get order to find tenant
-    const { data: order } = await supabase
+    const { data: order } = await getSupabase()
       .from('orders')
       .select('tenant_id, id, status')
       .eq('order_number', orderId)
@@ -110,7 +112,7 @@ export async function POST(request: NextRequest) {
       updateData.payment_status = 'pending'
     }
 
-    await supabase
+    await getSupabase()
       .from('orders')
       .update(updateData)
       .eq('id', order.id)

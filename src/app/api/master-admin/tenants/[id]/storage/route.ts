@@ -8,10 +8,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase: any = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase(): any {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 async function isAuthorized(request: NextRequest): Promise<boolean> {
   const authHeader = request.headers.get('authorization')
@@ -31,7 +33,7 @@ export async function GET(
   const { id } = await params
 
   try {
-    const { data: tenant, error } = await supabase
+    const { data: tenant, error } = await getSupabase()
       .from('tenants')
       .select(`
         google_drive_client_id,
@@ -119,7 +121,7 @@ export async function PUT(
       }
     }
 
-    const { data: tenant, error } = await supabase
+    const { data: tenant, error } = await getSupabase()
       .from('tenants')
       .update(updateData)
       .eq('id', id)

@@ -10,10 +10,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase: any = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase(): any {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     if (isCustomDomain && customDomain) {
       // Look up by custom domain
-      const { data } = await supabase
+      const { data } = await getSupabase()
         .from('tenants')
         .select('*')
         .eq('domain', customDomain)
@@ -35,7 +37,7 @@ export async function GET(request: NextRequest) {
       tenant = data
     } else if (tenantSlug) {
       // Look up by subdomain/slug
-      const { data } = await supabase
+      const { data } = await getSupabase()
         .from('tenants')
         .select('*')
         .or(`subdomain.eq.${tenantSlug},slug.eq.${tenantSlug}`)
@@ -62,7 +64,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get enabled payment gateways (without credentials)
-    const { data: gateways } = await supabase
+    const { data: gateways } = await getSupabase()
       .from('tenant_payment_gateways')
       .select(`
         is_default,

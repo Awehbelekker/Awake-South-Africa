@@ -9,10 +9,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { PaymentGatewayCode } from '@/types/supabase'
 
-const supabase: any = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase(): any {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 async function isAuthorized(request: NextRequest): Promise<boolean> {
   const authHeader = request.headers.get('authorization')
@@ -32,7 +34,7 @@ export async function GET(
   const { id } = await params
 
   try {
-    const { data: gateways, error } = await supabase
+    const { data: gateways, error } = await getSupabase()
       .from('tenant_payment_gateways')
       .select(`
         id,
@@ -80,7 +82,7 @@ export async function POST(
     }
 
     // Get gateway ID from code
-    const { data: gateway, error: gatewayError } = await supabase
+    const { data: gateway, error: gatewayError } = await getSupabase()
       .from('payment_gateways')
       .select('id')
       .eq('code', body.gatewayCode)
@@ -92,14 +94,14 @@ export async function POST(
 
     // If this is set as default, unset other defaults
     if (body.isDefault) {
-      await supabase
+      await getSupabase()
         .from('tenant_payment_gateways')
         .update({ is_default: false })
         .eq('tenant_id', tenantId)
     }
 
     // Add gateway to tenant
-    const { data: tenantGateway, error } = await supabase
+    const { data: tenantGateway, error } = await getSupabase()
       .from('tenant_payment_gateways')
       .upsert({
         tenant_id: tenantId,

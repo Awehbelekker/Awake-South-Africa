@@ -8,10 +8,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase: any = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase(): any {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 // Simple auth check - in production, use proper JWT/session validation
 async function isAuthorized(request: NextRequest): Promise<boolean> {
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { data: tenants, error } = await supabase
+    const { data: tenants, error } = await getSupabase()
       .from('tenants')
       .select('*')
       .order('created_at', { ascending: false })
@@ -83,7 +85,7 @@ export async function POST(request: NextRequest) {
       google_drive_enabled: !!body.googleDrive?.clientId,
     }
 
-    const { data: tenant, error } = await supabase
+    const { data: tenant, error } = await getSupabase()
       .from('tenants')
       .insert(tenantData)
       .select()
@@ -95,14 +97,14 @@ export async function POST(request: NextRequest) {
     if (body.paymentGateways && body.paymentGateways.length > 0) {
       for (const gateway of body.paymentGateways) {
         // Get gateway ID
-        const { data: gatewayRecord } = await supabase
+        const { data: gatewayRecord } = await getSupabase()
           .from('payment_gateways')
           .select('id')
           .eq('code', gateway.code)
           .single()
 
         if (gatewayRecord) {
-          await supabase.from('tenant_payment_gateways').insert({
+          await getSupabase().from('tenant_payment_gateways').insert({
             tenant_id: tenant.id,
             gateway_id: gatewayRecord.id,
             credentials: gateway.credentials,

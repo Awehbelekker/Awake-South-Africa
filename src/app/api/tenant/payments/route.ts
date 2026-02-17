@@ -9,10 +9,12 @@ import { createClient } from '@supabase/supabase-js'
 import { PaymentGatewayCode } from '@/types/supabase'
 import { processPayment, getTenantGateways } from '@/lib/payments'
 
-const supabase: any = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase(): any {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 async function getTenantId(request: NextRequest): Promise<string | null> {
   const tenantSlug = request.headers.get('x-tenant-slug')
@@ -22,7 +24,7 @@ async function getTenantId(request: NextRequest): Promise<string | null> {
   let tenant = null
 
   if (isCustomDomain && customDomain) {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('tenants')
       .select('id')
       .eq('domain', customDomain)
@@ -30,7 +32,7 @@ async function getTenantId(request: NextRequest): Promise<string | null> {
       .single()
     tenant = data
   } else if (tenantSlug) {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('tenants')
       .select('id')
       .or(`subdomain.eq.${tenantSlug},slug.eq.${tenantSlug}`)
