@@ -79,7 +79,7 @@ export async function analyzeCustomer(
   }
 
   // Calculate total revenue and average order value
-  const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0)
+  const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.total || 0), 0)
   const avgOrderValue = totalRevenue / orders.length
 
   // Days since last order
@@ -90,23 +90,23 @@ export async function analyzeCustomer(
 
   // Average payment days
   const paidOrders = orders.filter(
-    (order) => order.payment_status === 'paid' && order.payments && order.payments.length > 0
+    (order: any) => order.payment_status === 'paid' && order.payments && order.payments.length > 0
   )
   let avgPaymentDays: number | null = null
   if (paidOrders.length > 0) {
-    const paymentDays = paidOrders.map((order) => {
+    const paymentDays = paidOrders.map((order: any) => {
       const orderDate = new Date(order.created_at)
       const paymentDate = new Date(order.payments[0].paid_at)
       return Math.floor((paymentDate.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24))
     })
     avgPaymentDays = Math.round(
-      paymentDays.reduce((sum, days) => sum + days, 0) / paymentDays.length
+      paymentDays.reduce((sum: number, days: number) => sum + days, 0) / paymentDays.length
     )
   }
 
   // Find common products
   const productFrequency: Record<string, { productId: string; sku: string; count: number }> = {}
-  orders.forEach((order) => {
+  orders.forEach((order: any) => {
     if (order.items) {
       order.items.forEach((item: any) => {
         const key = item.sku
@@ -128,7 +128,7 @@ export async function analyzeCustomer(
 
   // Preferred payment method
   const paymentMethods: Record<string, number> = {}
-  orders.forEach((order) => {
+  orders.forEach((order: any) => {
     if (order.payments && order.payments.length > 0) {
       const method = order.payments[0].payment_method
       paymentMethods[method] = (paymentMethods[method] || 0) + 1
