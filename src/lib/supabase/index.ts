@@ -42,7 +42,7 @@ export const supabase: any = new Proxy({} as any, {
 
 // Helper function to check if Supabase is configured
 export const isSupabaseConfigured = () => {
-  return Boolean(supabaseUrl && supabaseAnonKey)
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 }
 
 // Helper to handle Supabase errors
