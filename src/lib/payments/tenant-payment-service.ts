@@ -11,11 +11,13 @@ import { PaymentGatewayCode, TenantPaymentGateway } from '@/types/supabase'
 import { PaymentGateway, GatewayConfig, PaymentParams, PaymentResult } from './types'
 import { createGateway } from './factory'
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Use service role for server-side operations
-)
+// Lazy-init Supabase client to avoid build-time crash
+function getSupabase(): any {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY! // Use service role for server-side operations
+  )
+}
 
 export interface TenantGatewayInfo {
   code: PaymentGatewayCode
@@ -30,7 +32,7 @@ export interface TenantGatewayInfo {
  * Used to display payment options at checkout
  */
 export async function getTenantGateways(tenantId: string): Promise<TenantGatewayInfo[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('tenant_payment_gateways')
     .select(`
       id,
@@ -68,7 +70,7 @@ export async function getTenantGateway(
   tenantId: string,
   gatewayCode: PaymentGatewayCode
 ): Promise<PaymentGateway | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('tenant_payment_gateways')
     .select(`
       credentials,
@@ -102,7 +104,7 @@ export async function getTenantGateway(
  * Get the default payment gateway for a tenant
  */
 export async function getDefaultTenantGateway(tenantId: string): Promise<PaymentGateway | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('tenant_payment_gateways')
     .select(`
       credentials,
