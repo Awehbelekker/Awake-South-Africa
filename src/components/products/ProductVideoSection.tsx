@@ -124,7 +124,7 @@ export function ProductVideoSection({ videoSections }: Props) {
             <div>
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gray-900 mb-6 max-w-5xl mx-auto">
                 <iframe
-                  src={getEmbedUrl(playing)}
+                  src={getEmbedUrl(playing!)}
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -157,7 +157,7 @@ export function ProductVideoSection({ videoSections }: Props) {
               <span>Close</span>
             </button>
             <iframe
-              src={getEmbedUrl(playing)}
+              src={getEmbedUrl(playing!)}
               className="w-full h-full rounded-lg"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
