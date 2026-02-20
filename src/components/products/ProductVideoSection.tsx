@@ -7,13 +7,13 @@ import { Play, X } from 'lucide-react';
 interface VideoSections {
   product_intro?: {
     enabled: boolean;
-    url: string;
+    url?: string;
     title?: string;
     description?: string;
   };
   action_videos?: {
     enabled: boolean;
-    videos: Array<{
+    videos?: Array<{
       url: string;
       title: string;
       thumbnail?: string;
