@@ -43,7 +43,7 @@ export function ProductVideoSection({ videoSections }: Props) {
 
   const hasAnyVideos = 
     (videoSections.product_intro?.enabled && videoSections.product_intro?.url) ||
-    (videoSections.action_videos?.enabled && videoSections.action_videos?.videos?.length > 0);
+    (videoSections.action_videos?.enabled && (videoSections.action_videos?.videos?.length ?? 0) > 0);
 
   if (!hasAnyVideos) return null;
 
@@ -81,7 +81,7 @@ export function ProductVideoSection({ videoSections }: Props) {
       )}
 
       {/* Action Videos Grid */}
-      {videoSections.action_videos?.enabled && videoSections.action_videos?.videos?.length > 0 && (
+      {videoSections.action_videos?.enabled && videoSections.action_videos?.videos && videoSections.action_videos.videos.length > 0 && (
         <div>
           <h3 className="text-2xl font-semibold text-center mb-8">Action Videos</h3>
           
