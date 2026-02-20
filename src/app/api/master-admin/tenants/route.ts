@@ -11,6 +11,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
+interface Tenant {
+  id: string
+  slug: string
+  name: string
+  domain: string | null
+  subdomain: string
+  email: string
+  phone: string | null
+  primary_color: string
+  secondary_color: string
+  accent_color: string
+  logo_url: string | null
+  plan: string
+  is_active: boolean
+  google_drive_enabled: boolean
+  google_drive_last_sync: string | null
+  created_at: string
+  updated_at: string
+}
+
 function getSupabase(): any {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -72,7 +92,7 @@ export async function GET(request: NextRequest) {
 
     // Get product counts per tenant
     const tenantsWithCounts = await Promise.all(
-      (tenants || []).map(async (tenant) => {
+      (tenants || []).map(async (tenant: Tenant) => {
         const { count } = await getSupabase()
           .from('products')
           .select('*', { count: 'exact', head: true })
