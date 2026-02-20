@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
+import { GoogleDriveConnection } from '@/components/admin/GoogleDriveConnection'
 
 export default function AdminSettingsPage() {
   const router = useRouter()
@@ -132,6 +133,12 @@ export default function AdminSettingsPage() {
                   <p className="mt-1 text-sm text-gray-500">VAT: {(form.taxRate * 100).toFixed(0)}%</p>
                 </div>
               </div>
+            </div>
+
+            {/* Google Drive Integration */}
+            <div className="pt-6 border-t">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Integrations</h3>
+              <GoogleDriveConnection />
             </div>
 
             {/* Save Button */}

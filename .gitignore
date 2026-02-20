@@ -1,5 +1,8 @@
 # Awake Boards SA
 .env
+.env.local
+.env*.local
+.vercel
 node_modules/
 .next/
 dist/

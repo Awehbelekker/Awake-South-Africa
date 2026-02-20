@@ -24,6 +24,9 @@ interface TenantSummary {
   subdomain: string | null
   plan: string
   is_active: boolean
+  google_drive_enabled: boolean
+  google_drive_last_sync: string | null
+  product_count: number
   created_at: string
 }
 
@@ -64,40 +67,21 @@ export default function MasterAdminDashboard() {
   useEffect(() => {
     if (!authenticated) return
 
-    // TODO: Fetch tenants from API
-    // For now, show placeholder data
-    setTenants([
-      {
-        id: '1',
-        name: 'Awake SA',
-        slug: 'awake-sa',
-        domain: 'www.awakesa.co.za',
-        subdomain: 'awake',
-        plan: 'enterprise',
-        is_active: true,
-        created_at: '2024-01-01',
-      },
-      {
-        id: '2',
-        name: 'Kelp Boards SA',
-        slug: 'kelp-boards',
-        domain: 'www.kelpboards.co.za',
-        subdomain: 'kelp',
-        plan: 'pro',
-        is_active: true,
-        created_at: '2024-02-01',
-      },
-      {
-        id: '3',
-        name: 'Aweh Be Lekker',
-        slug: 'aweh-be-lekker',
-        domain: null,
-        subdomain: 'aweh',
-        plan: 'basic',
-        is_active: true,
-        created_at: '2024-03-01',
-      },
-    ])
+    const fetchTenants = async () => {
+      try {
+        const response = await fetch('/api/master-admin/tenants')
+        if (response.ok) {
+          const data = await response.json()
+          setTenants(data.tenants || [])
+        }
+      } catch (error) {
+        console.error('Failed to fetch tenants:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTenants()
     setLoading(false)
   }, [authenticated])
 
@@ -197,45 +181,84 @@ export default function MasterAdminDashboard() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Domain</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Products</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Google Drive</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {tenants.map((tenant) => (
-                  <tr key={tenant.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{tenant.name}</div>
-                      <div className="text-sm text-gray-500">{tenant.slug}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{tenant.domain || `${tenant.subdomain}.yoursaas.com`}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        tenant.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' :
-                        tenant.plan === 'pro' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {tenant.plan}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs rounded-full ${tenant.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {tenant.is_active ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <Link href={`/master-admin/tenants/${tenant.id}`} className="text-blue-600 hover:text-blue-800 mr-4">
-                        Edit
-                      </Link>
-                      <a href={`https://${tenant.domain || `${tenant.subdomain}.yoursaas.com`}`} target="_blank" className="text-gray-600 hover:text-gray-800">
-                        Visit
-                      </a>
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                      Loading tenants...
                     </td>
                   </tr>
-                ))}
+                ) : tenants.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                      No tenants yet. Click "Add New Client" to get started.
+                    </td>
+                  </tr>
+                ) : (
+                  tenants.map((tenant) => (
+                    <tr key={tenant.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">{tenant.name}</div>
+                        <div className="text-sm text-gray-500">{tenant.slug}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{tenant.domain || `${tenant.subdomain}.yoursaas.com`}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{tenant.product_count}</div>
+                        <div className="text-xs text-gray-500">products</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {tenant.google_drive_enabled ? (
+                          <div className="flex items-center">
+                            <Cloud className="w-4 h-4 text-green-600 mr-1" />
+                            <span className="text-xs text-green-700">Connected</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <Cloud className="w-4 h-4 text-gray-400 mr-1" />
+                            <span className="text-xs text-gray-500">Not connected</span>
+                          </div>
+                        )}
+                        {tenant.google_drive_last_sync && (
+                          <div className="text-xs text-gray-400 mt-1">
+                            Synced {new Date(tenant.google_drive_last_sync).toLocaleDateString()}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          tenant.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' :
+                          tenant.plan === 'pro' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {tenant.plan}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs rounded-full ${tenant.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {tenant.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <Link href={`/master-admin/tenants/${tenant.id}`} className="text-blue-600 hover:text-blue-800 mr-4">
+                          Edit
+                        </Link>
+                        <a href={`https://${tenant.domain || `${tenant.subdomain}.yoursaas.com`}`} target="_blank" className="text-gray-600 hover:text-gray-800">
+                          Visit
+                        </a>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

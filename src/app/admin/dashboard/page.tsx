@@ -16,7 +16,7 @@ import {
 
 export default function AdminDashboard() {
   const { settings, authMode } = useAdminStore()
-  const { products: localProducts } = useProductsStore()
+  const { products: localProducts, productSource } = useProductsStore()
   const { bookings } = useBookingsStore()
   const { orders: localOrders } = useOrdersStore()
   const { invoices } = useInvoicesStore()
@@ -26,12 +26,13 @@ export default function AdminDashboard() {
   const { data: medusaOrderData, isLoading: ordersLoading } = useAdminOrders()
 
   // Use Medusa data when available, fallback to local
+  // Changed: Always use Medusa if it returns data, regardless of authMode
   const medusaProducts = medusaProductData?.products
-  const useMedusaProducts = authMode === 'medusa' && medusaProducts && medusaProducts.length > 0
+  const useMedusaProducts = medusaProducts && medusaProducts.length > 0
   const products = useMedusaProducts ? medusaProducts : localProducts
 
   const medusaOrders = medusaOrderData?.orders
-  const useMedusaOrders = authMode === 'medusa' && medusaOrders !== undefined
+  const useMedusaOrders = medusaOrders !== undefined
   const orders = useMedusaOrders ? medusaOrders : localOrders
 
   // Product metrics
@@ -127,12 +128,17 @@ export default function AdminDashboard() {
         {useMedusaProducts ? (
           <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full">
             <Database className="h-3.5 w-3.5" />
-            Products: Medusa API
+            Products: Medusa API ({products.length})
+          </span>
+        ) : productSource === 'supabase' ? (
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+            <Database className="h-3.5 w-3.5" />
+            Products: Supabase ({products.length})
           </span>
         ) : (
           <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">
             <HardDrive className="h-3.5 w-3.5" />
-            Products: Local Storage
+            Products: Local Storage ({products.length})
           </span>
         )}
         {useMedusaOrders ? (

@@ -6,6 +6,7 @@ import { useCartStore } from "../../../store/cart";
 import { useWishlistStore } from "../../../store/wishlist";
 import { useProductsStore } from "../../../store/products";
 import { useProduct } from "../../../lib/medusa-hooks";
+import { ProductVideoSection } from "../../../components/products/ProductVideoSection";
 import { Loader2, Play } from "lucide-react";
 
 export default function ProductDetailPage() {
@@ -14,7 +15,6 @@ export default function ProductDetailPage() {
   const { addItem } = useCartStore();
   const { items: wishlistItems, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlistStore();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   const productId = typeof params.id === 'string' ? params.id : '';
@@ -70,24 +70,13 @@ export default function ProductDetailPage() {
   // Build gallery from product images and videos uploaded in admin
   const defaultImage = product.image || '/images/awake-default.jpg';
 
-  // Use uploaded images if available, otherwise use default image
+  // Use uploaded images - NO VIDEOS in the gallery anymore
   const productImages = ('images' in product && product.images && product.images.length > 0)
-    ? product.images.map(img => ({ url: img.url, type: 'image' as const, id: img.id }))
+    ? product.images.filter(img => img.type === 'image').map(img => ({ url: img.url, type: 'image' as const, id: img.id }))
     : [{ url: defaultImage, type: 'image' as const, id: 'default' }];
 
-  // Use uploaded videos if available
-  const productVideos = ('videos' in product && product.videos && product.videos.length > 0)
-    ? product.videos.map(vid => ({
-        url: vid.url,
-        type: 'video' as const,
-        id: vid.id,
-        thumbnail: vid.thumbnail || defaultImage,
-        name: vid.name || 'Product Video'
-      }))
-    : [];
-
-  // Combined gallery: images first, then videos
-  const productGallery = [...productImages, ...productVideos];
+  // Gallery is images only
+  const productGallery = productImages;
 
   // Ride profile stats - customize per product
   // TO CUSTOMIZE: Update these values based on actual product specifications
@@ -129,25 +118,15 @@ export default function ProductDetailPage() {
         <div className="grid md:grid-cols-2 gap-12">
           {/* Left Column - Product Images & Ride Profile */}
           <div>
-            {/* Product Image/Video Gallery */}
+            {/* Product Image Gallery - Images Only */}
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900 mb-4">
-              {productGallery[selectedImage]?.type === 'video' ? (
-                <video
-                  src={productGallery[selectedImage].url}
-                  controls
-                  autoPlay
-                  className="w-full h-full object-cover"
-                  poster={('thumbnail' in productGallery[selectedImage]) ? (productGallery[selectedImage] as any).thumbnail : undefined}
-                />
-              ) : (
-                <Image
-                  src={productGallery[selectedImage]?.url || defaultImage}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              )}
+              <Image
+                src={productGallery[selectedImage]?.url || defaultImage}
+                alt={product.name}
+                fill
+                className="object-cover"
+                priority
+              />
               {'badge' in product && product.badge && (
                 <div className="absolute top-6 left-6 bg-accent-primary text-awake-black px-4 py-2 rounded-full text-sm font-bold">
                   {product.badge}
@@ -166,26 +145,12 @@ export default function ProductDetailPage() {
                       : 'ring-1 ring-white/20 hover:ring-white/40'
                   }`}
                 >
-                  {item.type === 'video' ? (
-                    <>
-                      <Image
-                        src={('thumbnail' in item && item.thumbnail) ? item.thumbnail : defaultImage}
-                        alt={`Video ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                        <Play className="w-8 h-8 text-white" fill="white" />
-                      </div>
-                    </>
-                  ) : (
-                    <Image
-                      src={item.url}
-                      alt={`View ${idx + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  )}
+                  <Image
+                    src={item.url}
+                    alt={`View ${idx + 1}`}
+                    fill
+                    className="object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -296,6 +261,24 @@ export default function ProductDetailPage() {
               </div>
             )}
 
+            {/* What's Included - Package Contents */}
+            {'whatsIncluded' in product && product.whatsIncluded && product.whatsIncluded.length > 0 && (
+              <div className="mb-8 p-6 bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 rounded-2xl border border-accent-primary/20">
+                <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                  <span className="text-2xl">📦</span>
+                  What's Included
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {product.whatsIncluded.map((item, i) => (
+                    <div key={i} className="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+                      <span className="text-accent-primary text-lg">✓</span>
+                      <span className="text-gray-200">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex gap-4 mt-auto pt-8">
               <button
@@ -340,60 +323,10 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Video Section */}
-        <div className="mt-24">
-          <h2 className="text-3xl font-bold mb-8">See It In Action</h2>
-          
-          {playingVideo ? (
-            <div>
-              <div className="relative aspect-video rounded-2xl overflow-hidden bg-gray-900 mb-6">
-                <iframe
-                  src={`https://www.youtube.com/embed/${playingVideo}?autoplay=1`}
-                  title="Product Video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full"
-                />
-              </div>
-              <button
-                onClick={() => setPlayingVideo(null)}
-                className="text-accent-primary hover:text-accent-secondary flex items-center gap-2"
-              >
-                ← Back to videos
-              </button>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-6">
-              {productVideos.map((video) => (
-                <div
-                  key={video.id}
-                  onClick={() => setPlayingVideo(video.url)}
-                  className="group cursor-pointer"
-                >
-                  <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-900 mb-3">
-                    <Image
-                      src={video.thumbnail}
-                      alt={video.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {/* Play Button */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 group-hover:bg-black/30 transition-colors">
-                      <div className="w-16 h-16 rounded-full bg-accent-primary flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <svg className="w-6 h-6 text-awake-black ml-1" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-bold group-hover:text-accent-primary transition-colors">
-                    {video.name}
-                  </h3>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* See It In Action - Video Section */}
+        {'video_sections' in product && product.video_sections && (
+          <ProductVideoSection videoSections={product.video_sections} />
+        )}
 
         {/* Related Products */}
         <div className="mt-24">

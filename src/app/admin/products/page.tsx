@@ -25,8 +25,9 @@ export default function AdminProductsPage() {
   const updateVariantMutation = useAdminUpdateVariant()
 
   // Use Medusa products if available, otherwise fallback to local
+  // Changed: Always use Medusa if it returns products, regardless of authMode
   const medusaProducts = medusaData?.products
-  const useMedusa = authMode === 'medusa' && medusaProducts && medusaProducts.length > 0
+  const useMedusa = medusaProducts && medusaProducts.length > 0 && !medusaError
   const products: EditableProduct[] = useMedusa ? medusaProducts : localProducts
   const dataSource = useMedusa ? 'medusa' : 'local'
 

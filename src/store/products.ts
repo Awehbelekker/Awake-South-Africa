@@ -13,6 +13,24 @@ export interface MediaFile {
   thumbnail?: string
 }
 
+export interface VideoSections {
+  product_intro?: {
+    enabled: boolean
+    url?: string
+    title?: string
+    description?: string
+  }
+  action_videos?: {
+    enabled: boolean
+    videos?: Array<{
+      url: string
+      title: string
+      thumbnail?: string
+      customThumbnail?: string
+    }>
+  }
+}
+
 export interface EditableProduct {
   id: string
   name: string
@@ -24,22 +42,26 @@ export interface EditableProduct {
   description?: string
   image?: string // Primary image (backward compatibility)
   images?: MediaFile[] // Multiple images
-  videos?: MediaFile[] // Product videos
+  videos?: MediaFile[] // Legacy product videos (deprecated - use video_sections)
+  video_sections?: VideoSections // NEW: Structured video sections for "See It In Action"
   badge?: string
   battery?: string
   skillLevel?: string
   specs?: string[]
   features?: string[]
+  whatsIncluded?: string[] // Package contents - what comes in the box
   inStock: boolean
   stockQuantity: number
 }
 
 interface ProductsStore {
   products: EditableProduct[]
+  productSource: 'localStorage' | 'supabase' | 'medusa'
   updateProduct: (id: string, updates: Partial<EditableProduct>) => void
   addProduct: (product: EditableProduct) => void
   deleteProduct: (id: string) => void
   resetProducts: () => void
+  setProducts: (products: EditableProduct[], source?: 'localStorage' | 'supabase' | 'medusa') => void
   getProductById: (id: string) => EditableProduct | undefined
 }
 
@@ -69,6 +91,7 @@ export const useProductsStore = create<ProductsStore>()(
   persist(
     (set, get) => ({
       products: flattenProducts(),
+      productSource: 'localStorage' as const,
       updateProduct: (id, updates) =>
         set((state) => ({
           products: state.products.map((p) =>
@@ -83,7 +106,8 @@ export const useProductsStore = create<ProductsStore>()(
         set((state) => ({
           products: state.products.filter((p) => p.id !== id),
         })),
-      resetProducts: () => set({ products: flattenProducts() }),
+      resetProducts: () => set({ products: flattenProducts(), productSource: 'localStorage' }),
+      setProducts: (products, source = 'localStorage') => set({ products, productSource: source }),
       getProductById: (id) => get().products.find((p) => p.id === id),
     }),
     {

@@ -49,6 +49,22 @@ export async function GET(request: NextRequest) {
     }
 
     if (!tenant) {
+      // For localhost development, use Awake tenant as default
+      if (request.headers.get('host')?.includes('localhost')) {
+        const { data: defaultTenant } = await getSupabase()
+          .from('tenants')
+          .select('*')
+          .eq('slug', 'awake')
+          .single()
+        
+        if (defaultTenant) {
+          tenant = defaultTenant
+          console.log('Development mode: Using Awake tenant as default')
+        }
+      }
+    }
+
+    if (!tenant) {
       // Return default/fallback tenant or error
       return NextResponse.json({ 
         error: 'Tenant not found',

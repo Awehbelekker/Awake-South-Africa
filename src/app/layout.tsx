@@ -3,6 +3,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { SupabaseSync } from "@/components/SupabaseSync";
+import { DebugPanel } from "@/components/DebugPanel";
 import StructuredData from "@/components/StructuredData";
 import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo/structured-data";
 
@@ -72,9 +74,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-awake-black text-white antialiased font-sans">
         <QueryProvider>
+          <SupabaseSync />
           <Header />
           {children}
           <Footer />
+          <DebugPanel />
         </QueryProvider>
       </body>
     </html>

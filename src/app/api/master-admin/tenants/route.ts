@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
 
 function getSupabase(): any {
   return createClient(
@@ -17,13 +18,25 @@ function getSupabase(): any {
   )
 }
 
-// Simple auth check - in production, use proper JWT/session validation
+// Check auth via cookie or API key
 async function isAuthorized(request: NextRequest): Promise<boolean> {
+  // Check cookie-based auth (for web dashboard)
+  const cookieStore = await cookies()
+  const authCookie = cookieStore.get('master_admin_auth')
+  
+  if (authCookie) {
+    return true
+  }
+
+  // Check API key auth (for API clients)
   const authHeader = request.headers.get('authorization')
   const masterKey = process.env.MASTER_ADMIN_API_KEY
   
-  if (!masterKey) return false
-  return authHeader === `Bearer ${masterKey}`
+  if (masterKey && authHeader === `Bearer ${masterKey}`) {
+    return true
+  }
+
+  return false
 }
 
 export async function GET(request: NextRequest) {
@@ -34,12 +47,45 @@ export async function GET(request: NextRequest) {
   try {
     const { data: tenants, error } = await getSupabase()
       .from('tenants')
-      .select('*')
+      .select(`
+        id,
+        slug,
+        name,
+        domain,
+        subdomain,
+        email,
+        phone,
+        primary_color,
+        secondary_color,
+        accent_color,
+        logo_url,
+        plan,
+        is_active,
+        google_drive_enabled,
+        google_drive_last_sync,
+        created_at,
+        updated_at
+      `)
       .order('created_at', { ascending: false })
 
     if (error) throw error
 
-    return NextResponse.json({ tenants })
+    // Get product counts per tenant
+    const tenantsWithCounts = await Promise.all(
+      (tenants || []).map(async (tenant) => {
+        const { count } = await getSupabase()
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq('tenant_id', tenant.id)
+
+        return {
+          ...tenant,
+          product_count: count || 0,
+        }
+      })
+    )
+
+    return NextResponse.json({ tenants: tenantsWithCounts })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }

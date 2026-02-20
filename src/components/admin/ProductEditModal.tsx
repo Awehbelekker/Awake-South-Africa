@@ -6,6 +6,7 @@ import { EditableProduct } from '@/store/products';
 import ArrayFieldEditor from './ArrayFieldEditor';
 import RichTextEditor from './RichTextEditor';
 import MediaManager from './MediaManager';
+import { VideoSectionManager } from './VideoSectionManager';
 import { validateProduct } from '@/lib/validation/productValidation';
 import toast from 'react-hot-toast';
 
@@ -256,6 +257,15 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                   />
                   {errors.features && <p className="text-red-500 text-sm mt-1">{errors.features}</p>}
 
+                  {/* What's Included Array Editor */}
+                  <ArrayFieldEditor
+                    label="What's Included (Package Contents)"
+                    values={formData.whatsIncluded || []}
+                    onChange={(values) => handleChange('whatsIncluded', values)}
+                    placeholder="E.g. 1x Jetboard, 1x Battery, 1x Charger, 1x Remote"
+                  />
+                  {errors.whatsIncluded && <p className="text-red-500 text-sm mt-1">{errors.whatsIncluded}</p>}
+
                   {/* Media Management Section */}
                   <div className="border-t pt-4 mt-4">
                     <h4 className="text-lg font-medium text-gray-900 mb-4">Media Management</h4>
@@ -268,17 +278,14 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                       label="Product Images"
                       maxItems={10}
                     />
+                  </div>
 
-                    {/* Product Videos */}
-                    <div className="mt-6">
-                      <MediaManager
-                        type="video"
-                        items={formData.videos || []}
-                        onChange={(items) => handleChange('videos', items)}
-                        label="Product Videos"
-                        maxItems={5}
-                      />
-                    </div>
+                  {/* Video Sections - Separate from image gallery */}
+                  <div className="border-t pt-4 mt-4">
+                    <VideoSectionManager
+                      value={formData.video_sections || {}}
+                      onChange={(sections) => handleChange('video_sections', sections)}
+                    />
                   </div>
 
                   {/* Legacy Image URL (for backward compatibility) */}
