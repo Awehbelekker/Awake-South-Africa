@@ -72,9 +72,9 @@ export async function POST(request: NextRequest) {
 
     // List images from Drive
     const folderToScan = folder_id || tenant.google_drive_folder_id || 'root'
-    const files = await driveProvider.listFiles(folderToScan)
+    const result = await driveProvider.listFiles(folderToScan)
 
-    if (!files || files.length === 0) {
+    if (!result || !result.files || result.files.length === 0) {
       return NextResponse.json({
         success: true,
         message: 'No images found in Drive folder',
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Filter for image files only
-    const imageFiles = files.filter((file: any) => 
+    const imageFiles = result.files.filter((file: any) => 
       file.mimeType?.startsWith('image/')
     )
 
@@ -228,17 +228,17 @@ export async function GET(request: NextRequest) {
 
     // List files
     const folderToScan = folderId || tenant.google_drive_folder_id || 'root'
-    const files = await driveProvider.listFiles(folderToScan)
+    const result = await driveProvider.listFiles(folderToScan)
 
     // Filter for images only
-    const imageFiles = files.filter((file: any) => 
+    const imageFiles = result.files.filter((file: any) => 
       file.mimeType?.startsWith('image/')
     )
 
     return NextResponse.json({
       success: true,
       folder: folderToScan,
-      totalFiles: files.length,
+      totalFiles: result.files.length,
       imageFiles: imageFiles.length,
       files: imageFiles.map((f: any) => ({
         id: f.id,
