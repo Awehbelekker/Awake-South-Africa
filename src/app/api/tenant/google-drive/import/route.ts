@@ -127,8 +127,8 @@ export async function POST(request: NextRequest) {
           price: 0, // Tenant needs to set price
           currency: 'ZAR',
           category: category || 'uncategorized',
-          images: [file.webViewLink || file.thumbnailLink || ''],
-          thumbnail: file.thumbnailLink || file.webViewLink || '',
+          images: [file.url || file.thumbnailUrl || ''],
+          thumbnail: file.thumbnailUrl || file.url || '',
           in_stock: false, // Needs manual activation
           stock_quantity: 0,
           is_featured: false,
@@ -245,8 +245,8 @@ export async function GET(request: NextRequest) {
         name: f.name,
         mimeType: f.mimeType,
         size: f.size,
-        thumbnailLink: f.thumbnailLink,
-        webViewLink: f.webViewLink,
+        thumbnailUrl: f.thumbnailUrl,
+        url: f.url,
       })),
     })
 
