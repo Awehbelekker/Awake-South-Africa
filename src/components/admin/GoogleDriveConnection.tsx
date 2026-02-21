@@ -22,8 +22,8 @@ export function GoogleDriveConnection() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Check URL params once on mount (OAuth callback)
   useEffect(() => {
-    // Check URL params for OAuth callback status
     const params = new URLSearchParams(window.location.search)
     const googleDriveStatus = params.get('google_drive')
     const oauthError = params.get('error')
@@ -31,18 +31,22 @@ export function GoogleDriveConnection() {
 
     if (googleDriveStatus === 'connected') {
       setError(null)
-      // Reload status
-      loadStatus()
       // Clean URL
-      window.history.replaceState({}, '', '/admin/settings')
+      const cleanPath = window.location.pathname
+      window.history.replaceState({}, '', cleanPath)
     } else if (oauthError) {
       setError(`Connection failed: ${errorMessage || oauthError}`)
-      // Clean URL
-      window.history.replaceState({}, '', '/admin/settings')
-    } else {
-      loadStatus()
+      const cleanPath = window.location.pathname
+      window.history.replaceState({}, '', cleanPath)
     }
   }, [])
+
+  // Re-fetch status whenever tenant becomes available
+  useEffect(() => {
+    if (tenant?.id) {
+      loadStatus()
+    }
+  }, [tenant?.id])
 
   async function loadStatus() {
     if (!tenant?.id) {
