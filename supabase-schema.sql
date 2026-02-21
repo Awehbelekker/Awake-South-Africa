@@ -50,8 +50,11 @@ create table if not exists tenants (
   updated_at                 timestamptz not null default now()
 );
 
-insert into tenants (slug, name, domain, subdomain, email, currency, tax_rate, plan, is_active)
-values ('awake-sa','Awake South Africa','awakesa.co.za','awake-sa','info@awakesa.co.za','ZAR',0.15,'pro',true)
+-- Ensure is_active exists if tenants table was created by an older schema
+alter table if exists tenants add column if not exists is_active boolean not null default true;
+
+insert into tenants (slug, name, domain, subdomain, email, currency, tax_rate, plan)
+values ('awake-sa','Awake South Africa','awakesa.co.za','awake-sa','info@awakesa.co.za','ZAR',0.15,'pro')
 on conflict (slug) do nothing;
 
 -- =====================================================
