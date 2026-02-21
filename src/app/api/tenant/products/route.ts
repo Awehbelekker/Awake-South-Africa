@@ -21,6 +21,10 @@ async function getTenantId(request: NextRequest): Promise<string | null> {
   const tenantSlug = request.headers.get('x-tenant-slug')
   const customDomain = request.headers.get('x-custom-domain')
   const isCustomDomain = request.headers.get('x-is-custom-domain') === 'true'
+  // Allow explicit tenant_id as query param for admin operations
+  const explicitTenantId = new URL(request.url).searchParams.get('tenant_id')
+
+  if (explicitTenantId) return explicitTenantId
 
   let tenant = null
 
@@ -38,6 +42,16 @@ async function getTenantId(request: NextRequest): Promise<string | null> {
       .select('id')
       .or(`subdomain.eq.${tenantSlug},slug.eq.${tenantSlug}`)
       .eq('is_active', true)
+      .single()
+    tenant = data
+  }
+
+  // Fallback to default Awake SA tenant
+  if (!tenant) {
+    const { data } = await getSupabase()
+      .from('tenants')
+      .select('id')
+      .eq('slug', 'awake-sa')
       .single()
     tenant = data
   }
@@ -126,6 +140,58 @@ export async function POST(request: NextRequest) {
     if (error) throw error
 
     return NextResponse.json({ success: true, product }, { status: 201 })
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
+
+// PUT /api/tenant/products - Bulk upsert products from localStorage
+export async function PUT(request: NextRequest) {
+  try {
+    const tenantId = await getTenantId(request)
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
+    }
+
+    const body = await request.json()
+    const { products } = body
+
+    if (!Array.isArray(products) || products.length === 0) {
+      return NextResponse.json({ error: 'No products provided' }, { status: 400 })
+    }
+
+    const rows = products.map((p: any) => ({
+      tenant_id: tenantId,
+      name: p.name,
+      slug: p.id || p.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      description: p.description || '',
+      price: p.price || 0,
+      compare_at_price: null,
+      category: p.categoryTag || p.category || '',
+      images: p.image ? [p.image] : (p.images || []),
+      inventory_quantity: p.stockQuantity || 0,
+      is_active: true,
+      is_featured: false,
+      metadata: {
+        costEUR: p.costEUR,
+        badge: p.badge,
+        battery: p.battery,
+        skillLevel: p.skillLevel,
+        specs: p.specs,
+        features: p.features,
+        inStock: p.inStock,
+        localId: p.id,
+      },
+    }))
+
+    const { data, error } = await getSupabase()
+      .from('products')
+      .upsert(rows, { onConflict: 'tenant_id,slug', ignoreDuplicates: false })
+      .select('id, name')
+
+    if (error) throw error
+
+    return NextResponse.json({ success: true, synced: data?.length || rows.length })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }

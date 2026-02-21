@@ -24,12 +24,82 @@ export default function AdminProductsPage() {
   const updateProductMutation = useAdminUpdateProduct()
   const updateVariantMutation = useAdminUpdateVariant()
 
-  // Use Medusa products if available, otherwise fallback to local
-  // Changed: Always use Medusa if it returns products, regardless of authMode
+  // Use Medusa products if available, otherwise fallback to Supabase, then local
   const medusaProducts = medusaData?.products
   const useMedusa = medusaProducts && medusaProducts.length > 0 && !medusaError
-  const products: EditableProduct[] = useMedusa ? medusaProducts : localProducts
-  const dataSource = useMedusa ? 'medusa' : 'local'
+  const [supabaseProducts, setSupabaseProducts] = useState<EditableProduct[]>([])
+  const [supabaseLoading, setSupabaseLoading] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+
+  // Fetch from Supabase when Medusa unavailable
+  useEffect(() => {
+    if (!useMedusa && !isLoading) {
+      setSupabaseLoading(true)
+      fetch('/api/tenant/products')
+        .then(r => r.json())
+        .then(data => {
+          if (data.products?.length > 0) {
+            // Map Supabase product shape to EditableProduct
+            setSupabaseProducts(data.products.map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              price: p.price,
+              priceExVAT: Math.round(p.price / 1.15),
+              costEUR: p.metadata?.costEUR,
+              category: p.category,
+              categoryTag: p.category,
+              description: p.description,
+              image: p.images?.[0],
+              badge: p.metadata?.badge,
+              battery: p.metadata?.battery,
+              skillLevel: p.metadata?.skillLevel,
+              specs: p.metadata?.specs,
+              features: p.metadata?.features,
+              inStock: p.inventory_quantity > 0,
+              stockQuantity: p.inventory_quantity,
+            })))
+          }
+        })
+        .catch(() => {})
+        .finally(() => setSupabaseLoading(false))
+    }
+  }, [useMedusa, isLoading])
+
+  const useSupabase = !useMedusa && supabaseProducts.length > 0
+  const products: EditableProduct[] = useMedusa ? medusaProducts : useSupabase ? supabaseProducts : localProducts
+  const dataSource = useMedusa ? 'medusa' : useSupabase ? 'supabase' : 'local'
+
+  const syncToSupabase = async () => {
+    setSyncing(true)
+    try {
+      const res = await fetch('/api/tenant/products', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products: localProducts }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success(`Synced ${data.synced} products to Supabase!`)
+        // Reload from Supabase
+        const r2 = await fetch('/api/tenant/products')
+        const d2 = await r2.json()
+        if (d2.products?.length > 0) setSupabaseProducts(d2.products.map((p: any) => ({
+          id: p.id, name: p.name, price: p.price, priceExVAT: Math.round(p.price / 1.15),
+          costEUR: p.metadata?.costEUR, category: p.category, categoryTag: p.category,
+          description: p.description, image: p.images?.[0], badge: p.metadata?.badge,
+          battery: p.metadata?.battery, skillLevel: p.metadata?.skillLevel,
+          specs: p.metadata?.specs, features: p.metadata?.features,
+          inStock: p.inventory_quantity > 0, stockQuantity: p.inventory_quantity,
+        })))
+      } else {
+        toast.error(`Sync failed: ${data.error}`)
+      }
+    } catch (e: any) {
+      toast.error(`Sync failed: ${e.message}`)
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -138,6 +208,11 @@ export default function AdminProductsPage() {
               <Database className="h-3.5 w-3.5" />
               Medusa API ({products.length} products)
             </span>
+          ) : dataSource === 'supabase' ? (
+            <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+              <Database className="h-3.5 w-3.5" />
+              Supabase ({products.length} products)
+            </span>
           ) : (
             <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">
               <HardDrive className="h-3.5 w-3.5" />
@@ -147,17 +222,32 @@ export default function AdminProductsPage() {
           {medusaError && (
             <span className="text-xs text-red-500">Medusa unavailable</span>
           )}
+          {supabaseLoading && (
+            <span className="text-xs text-gray-400">Checking Supabase...</span>
+          )}
         </div>
-        {dataSource === 'medusa' && (
-          <button
-            onClick={() => refetch()}
-            disabled={isLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 bg-white border rounded-md hover:bg-gray-50"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {dataSource === 'local' && (
+            <button
+              onClick={syncToSupabase}
+              disabled={syncing}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md disabled:opacity-50"
+            >
+              <Database className={`h-3.5 w-3.5 ${syncing ? 'animate-pulse' : ''}`} />
+              {syncing ? 'Syncing...' : 'Sync to Supabase'}
+            </button>
+          )}
+          {dataSource === 'medusa' && (
+            <button
+              onClick={() => refetch()}
+              disabled={isLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 bg-white border rounded-md hover:bg-gray-50"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Loading State */}
