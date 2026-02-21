@@ -49,16 +49,16 @@ export async function GET(request: NextRequest) {
     }
 
     if (!tenant) {
-      // Fallback to Awake tenant as default on all environments
+      // Fallback to Awake SA tenant as default on all environments
       const { data: defaultTenant } = await getSupabase()
         .from('tenants')
         .select('*')
-        .eq('slug', 'awake')
+        .eq('slug', 'awake-sa')
         .single()
       
       if (defaultTenant) {
         tenant = defaultTenant
-        console.log('Using Awake tenant as default')
+        console.log('Using Awake SA tenant as default')
       }
     }
 
