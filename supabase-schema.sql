@@ -61,6 +61,7 @@ create table if not exists tenants (
   google_drive_client_secret text,
   google_drive_refresh_token text,
   google_drive_folder_id     text,
+  google_drive_last_sync     timestamptz,
   google_drive_enabled       boolean not null default false,
   onedrive_client_id         text,
   onedrive_client_secret     text,

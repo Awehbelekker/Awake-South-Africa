@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const supabase = getSupabase()
     const { data: tenant, error } = await supabase
       .from('tenants')
-      .select('google_drive_enabled, google_drive_last_sync, google_drive_folder_id')
+      .select('google_drive_enabled, google_drive_folder_id')
       .eq('id', tenantId)
       .single()
 
@@ -45,7 +45,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       connected: tenant.google_drive_enabled || false,
-      lastSync: tenant.google_drive_last_sync,
       folderId: tenant.google_drive_folder_id,
     })
 

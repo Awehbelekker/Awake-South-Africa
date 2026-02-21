@@ -81,8 +81,7 @@ export async function GET(request: NextRequest) {
       .from('tenants')
       .update({
         google_drive_enabled: true,
-        google_refresh_token: tokens.refresh_token,
-        google_drive_last_sync: new Date().toISOString(),
+        google_drive_refresh_token: tokens.refresh_token,
       })
       .eq('id', tenantId)
 
