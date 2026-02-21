@@ -49,18 +49,16 @@ export async function GET(request: NextRequest) {
     }
 
     if (!tenant) {
-      // For localhost development, use Awake tenant as default
-      if (request.headers.get('host')?.includes('localhost')) {
-        const { data: defaultTenant } = await getSupabase()
-          .from('tenants')
-          .select('*')
-          .eq('slug', 'awake')
-          .single()
-        
-        if (defaultTenant) {
-          tenant = defaultTenant
-          console.log('Development mode: Using Awake tenant as default')
-        }
+      // Fallback to Awake tenant as default on all environments
+      const { data: defaultTenant } = await getSupabase()
+        .from('tenants')
+        .select('*')
+        .eq('slug', 'awake')
+        .single()
+      
+      if (defaultTenant) {
+        tenant = defaultTenant
+        console.log('Using Awake tenant as default')
       }
     }
 

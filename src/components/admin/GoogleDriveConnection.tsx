@@ -64,7 +64,10 @@ export function GoogleDriveConnection() {
   }
 
   async function handleConnect() {
-    if (!tenant?.id) return
+    if (!tenant?.id) {
+      setError('Tenant not loaded. Please refresh the page and try again.')
+      return
+    }
 
     // Redirect to OAuth flow
     window.location.href = `/api/oauth/google/authorize?tenant_id=${tenant.id}`
