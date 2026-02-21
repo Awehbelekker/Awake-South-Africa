@@ -3,6 +3,29 @@
 -- Run this in Supabase Dashboard -> SQL Editor -> New Query
 -- =====================================================
 
+-- Drop all existing tables (clean slate) in FK-safe order
+drop table if exists payment_transactions   cascade;
+drop table if exists order_items            cascade;
+drop table if exists orders                 cascade;
+drop table if exists tenant_payment_gateways cascade;
+drop table if exists payment_gateways       cascade;
+drop table if exists media_files            cascade;
+drop table if exists bookings               cascade;
+drop table if exists customers              cascade;
+drop table if exists wishlist_items         cascade;
+drop table if exists cart_items             cascade;
+drop table if exists store_settings         cascade;
+drop table if exists demo_locations         cascade;
+drop table if exists products               cascade;
+drop table if exists admin_users            cascade;
+drop table if exists tenants                cascade;
+
+-- Drop old helper functions
+drop function if exists update_updated_at()            cascade;
+drop function if exists current_tenant_id()            cascade;
+drop function if exists set_tenant_context(uuid)       cascade;
+drop function if exists get_tenant_payment_gateways(uuid) cascade;
+
 create extension if not exists "uuid-ossp";
 create extension if not exists pgcrypto;
 
@@ -49,26 +72,6 @@ create table if not exists tenants (
   created_at                 timestamptz not null default now(),
   updated_at                 timestamptz not null default now()
 );
-
--- Backfill any columns missing from a previously created tenants table
-alter table if exists tenants add column if not exists is_active                  boolean      not null default true;
-alter table if exists tenants add column if not exists custom_domain_verified     boolean      not null default false;
-alter table if exists tenants add column if not exists ssl_provisioned            boolean      not null default false;
-alter table if exists tenants add column if not exists favicon_url                text;
-alter table if exists tenants add column if not exists accent_color               text         not null default '#0066ff';
-alter table if exists tenants add column if not exists cognicore_business_id      text;
-alter table if exists tenants add column if not exists google_drive_client_id     text;
-alter table if exists tenants add column if not exists google_drive_client_secret text;
-alter table if exists tenants add column if not exists google_drive_refresh_token text;
-alter table if exists tenants add column if not exists google_drive_folder_id     text;
-alter table if exists tenants add column if not exists google_drive_enabled       boolean      not null default false;
-alter table if exists tenants add column if not exists onedrive_client_id         text;
-alter table if exists tenants add column if not exists onedrive_client_secret     text;
-alter table if exists tenants add column if not exists onedrive_refresh_token     text;
-alter table if exists tenants add column if not exists onedrive_folder_id         text;
-alter table if exists tenants add column if not exists onedrive_enabled           boolean      not null default false;
-alter table if exists tenants add column if not exists plan                       text         not null default 'basic';
-alter table if exists tenants add column if not exists updated_at                 timestamptz  not null default now();
 
 insert into tenants (slug, name, domain, subdomain, email, currency, tax_rate, plan)
 values ('awake-sa','Awake South Africa','awakesa.co.za','awake-sa','info@awakesa.co.za','ZAR',0.15,'pro')
@@ -123,26 +126,6 @@ create table if not exists products (
   updated_at       timestamptz not null default now(),
   unique (tenant_id, slug)
 );
-
--- Backfill any columns missing from a previously created products table
-alter table if exists products add column if not exists tenant_id        uuid references tenants(id) on delete cascade;
-alter table if exists products add column if not exists slug             text;
-alter table if exists products add column if not exists sku              text;
-alter table if exists products add column if not exists price_ex_vat     numeric(10,2) not null default 0;
-alter table if exists products add column if not exists compare_at_price numeric(10,2);
-alter table if exists products add column if not exists cost_eur         numeric(10,2);
-alter table if exists products add column if not exists category_tag     text;
-alter table if exists products add column if not exists images           jsonb default '[]'::jsonb;
-alter table if exists products add column if not exists videos           jsonb default '[]'::jsonb;
-alter table if exists products add column if not exists video_sections   jsonb default '{}'::jsonb;
-alter table if exists products add column if not exists badge            text;
-alter table if exists products add column if not exists battery          text;
-alter table if exists products add column if not exists skill_level      text;
-alter table if exists products add column if not exists what_is_included jsonb default '[]'::jsonb;
-alter table if exists products add column if not exists is_active        boolean not null default true;
-alter table if exists products add column if not exists is_featured      boolean not null default false;
-alter table if exists products add column if not exists sort_order       integer not null default 0;
-alter table if exists products add column if not exists updated_at       timestamptz not null default now();
 
 create index if not exists products_tenant_id_idx on products(tenant_id);
 create index if not exists products_category_idx  on products(tenant_id, category);
