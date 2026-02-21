@@ -125,6 +125,7 @@ create table if not exists products (
 );
 
 -- Backfill any columns missing from a previously created products table
+alter table if exists products add column if not exists tenant_id        uuid references tenants(id) on delete cascade;
 alter table if exists products add column if not exists slug             text;
 alter table if exists products add column if not exists sku              text;
 alter table if exists products add column if not exists price_ex_vat     numeric(10,2) not null default 0;
