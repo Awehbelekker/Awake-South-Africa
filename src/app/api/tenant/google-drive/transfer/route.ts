@@ -118,29 +118,37 @@ export async function POST(request: NextRequest) {
     const body: TransferRequest = await request.json()
     const { tenant_id, file_ids, create_products = false, category = 'uncategorized' } = body
 
-    if (!tenant_id || !file_ids || file_ids.length === 0) {
+    if (!file_ids || file_ids.length === 0) {
       return NextResponse.json(
-        { error: 'Missing tenant_id or file_ids' },
+        { error: 'Missing file_ids' },
         { status: 400 }
       )
     }
 
-    // Get tenant's Drive credentials
+    // Resolve tenant with fallback to awake-sa
     const supabase = getSupabase()
-    const { data: tenant, error: tenantError } = await supabase
-      .from('tenants')
-      .select('google_drive_enabled, google_refresh_token, name')
-      .eq('id', tenant_id)
-      .single()
+    let tenant = null
+    if (tenant_id && tenant_id !== 'undefined' && tenant_id.length > 10) {
+      const { data } = await supabase.from('tenants')
+        .select('id, google_drive_enabled, google_drive_refresh_token, name')
+        .eq('id', tenant_id).single()
+      tenant = data
+    }
+    if (!tenant) {
+      const { data } = await supabase.from('tenants')
+        .select('id, google_drive_enabled, google_drive_refresh_token, name')
+        .eq('slug', 'awake-sa').single()
+      tenant = data
+    }
 
-    if (tenantError || !tenant) {
+    if (!tenant) {
       return NextResponse.json(
         { error: 'Tenant not found' },
         { status: 404 }
       )
     }
 
-    if (!tenant.google_drive_enabled || !tenant.google_refresh_token) {
+    if (!tenant.google_drive_enabled || !tenant.google_drive_refresh_token) {
       return NextResponse.json(
         { error: 'Google Drive not connected' },
         { status: 400 }
@@ -153,7 +161,7 @@ export async function POST(request: NextRequest) {
     const accessToken = await refreshAccessToken(
       clientId,
       clientSecret,
-      tenant.google_refresh_token
+      tenant.google_drive_refresh_token
     )
 
     // Transfer each file

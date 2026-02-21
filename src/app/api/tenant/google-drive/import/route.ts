@@ -29,29 +29,30 @@ export async function POST(request: NextRequest) {
     const body: ImportRequest = await request.json()
     const { tenant_id, folder_id, category } = body
 
-    if (!tenant_id) {
-      return NextResponse.json(
-        { error: 'Missing tenant_id' },
-        { status: 400 }
-      )
+    // Resolve tenant with fallback to awake-sa
+    const supabase = getSupabase()
+    let tenant = null
+    if (tenant_id && tenant_id !== 'undefined' && tenant_id.length > 10) {
+      const { data } = await supabase.from('tenants')
+        .select('id, google_drive_enabled, google_drive_refresh_token, google_drive_folder_id, slug, name')
+        .eq('id', tenant_id).single()
+      tenant = data
+    }
+    if (!tenant) {
+      const { data } = await supabase.from('tenants')
+        .select('id, google_drive_enabled, google_drive_refresh_token, google_drive_folder_id, slug, name')
+        .eq('slug', 'awake-sa').single()
+      tenant = data
     }
 
-    // Get tenant's Google Drive credentials
-    const supabase = getSupabase()
-    const { data: tenant, error: tenantError } = await supabase
-      .from('tenants')
-      .select('google_drive_enabled, google_refresh_token, google_drive_folder_id, slug, name')
-      .eq('id', tenant_id)
-      .single()
-
-    if (tenantError || !tenant) {
+    if (!tenant) {
       return NextResponse.json(
         { error: 'Tenant not found' },
         { status: 404 }
       )
     }
 
-    if (!tenant.google_drive_enabled || !tenant.google_refresh_token) {
+    if (!tenant.google_drive_enabled || !tenant.google_drive_refresh_token) {
       return NextResponse.json(
         { error: 'Google Drive not connected for this tenant' },
         { status: 400 }
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
       {
         clientId,
         clientSecret,
-        refreshToken: tenant.google_refresh_token,
+        refreshToken: tenant.google_drive_refresh_token,
       },
       folder_id || tenant.google_drive_folder_id
     )
@@ -185,29 +186,31 @@ export async function GET(request: NextRequest) {
     const tenantId = searchParams.get('tenant_id')
     const folderId = searchParams.get('folder_id')
 
-    if (!tenantId) {
-      return NextResponse.json(
-        { error: 'Missing tenant_id parameter' },
-        { status: 400 }
-      )
+    // Resolve tenant with fallback to awake-sa
+    const supabase2 = getSupabase()
+    let tenant2 = null
+    if (tenantId && tenantId !== 'undefined' && tenantId.length > 10) {
+      const { data } = await supabase2.from('tenants')
+        .select('id, google_drive_enabled, google_drive_refresh_token, google_drive_folder_id')
+        .eq('id', tenantId).single()
+      tenant2 = data
     }
+    if (!tenant2) {
+      const { data } = await supabase2.from('tenants')
+        .select('id, google_drive_enabled, google_drive_refresh_token, google_drive_folder_id')
+        .eq('slug', 'awake-sa').single()
+      tenant2 = data
+    }
+    const tenant = tenant2
 
-    // Get tenant's Google Drive credentials
-    const supabase = getSupabase()
-    const { data: tenant, error: tenantError } = await supabase
-      .from('tenants')
-      .select('google_drive_enabled, google_refresh_token, google_drive_folder_id')
-      .eq('id', tenantId)
-      .single()
-
-    if (tenantError || !tenant) {
+    if (!tenant) {
       return NextResponse.json(
         { error: 'Tenant not found' },
         { status: 404 }
       )
     }
 
-    if (!tenant.google_drive_enabled || !tenant.google_refresh_token) {
+    if (!tenant.google_drive_enabled || !tenant.google_drive_refresh_token) {
       return NextResponse.json(
         { error: 'Google Drive not connected' },
         { status: 400 }
@@ -221,7 +224,7 @@ export async function GET(request: NextRequest) {
       {
         clientId,
         clientSecret,
-        refreshToken: tenant.google_refresh_token,
+        refreshToken: tenant.google_drive_refresh_token,
       },
       folderId || tenant.google_drive_folder_id
     )

@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       .from('tenants')
       .update({
         google_drive_enabled: false,
-        google_refresh_token: null,
+        google_drive_refresh_token: null,
         google_drive_folder_id: null,
       })
       .eq('id', tenantId)

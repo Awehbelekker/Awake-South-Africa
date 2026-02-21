@@ -82,35 +82,42 @@ async function getFolderPath(accessToken: string, folderId: string): Promise<Arr
   return [{ id: 'root', name: 'My Drive' }, ...path]
 }
 
+async function resolveTenant(tenantId: string | null) {
+  const supabase = getSupabase()
+  // Try by ID first (must be a valid UUID)
+  if (tenantId && tenantId !== 'undefined' && tenantId.length > 10) {
+    const { data } = await supabase
+      .from('tenants')
+      .select('id, google_drive_enabled, google_drive_refresh_token, google_drive_folder_id, slug, name')
+      .eq('id', tenantId)
+      .single()
+    if (data) return data
+  }
+  // Fallback to default tenant
+  const { data } = await supabase
+    .from('tenants')
+    .select('id, google_drive_enabled, google_drive_refresh_token, google_drive_folder_id, slug, name')
+    .eq('slug', 'awake-sa')
+    .single()
+  return data
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const tenantId = searchParams.get('tenant_id')
     const folderId = searchParams.get('folder_id') || 'root'
 
-    if (!tenantId) {
-      return NextResponse.json(
-        { error: 'Missing tenant_id parameter' },
-        { status: 400 }
-      )
-    }
+    const tenant = await resolveTenant(tenantId)
 
-    // Get tenant's Drive credentials
-    const supabase = getSupabase()
-    const { data: tenant, error: tenantError } = await supabase
-      .from('tenants')
-      .select('google_drive_enabled, google_refresh_token, name')
-      .eq('id', tenantId)
-      .single()
-
-    if (tenantError || !tenant) {
+    if (!tenant) {
       return NextResponse.json(
         { error: 'Tenant not found' },
         { status: 404 }
       )
     }
 
-    if (!tenant.google_drive_enabled || !tenant.google_refresh_token) {
+    if (!tenant.google_drive_enabled || !tenant.google_drive_refresh_token) {
       return NextResponse.json(
         { error: 'Google Drive not connected for this tenant' },
         { status: 400 }
@@ -123,7 +130,7 @@ export async function GET(request: NextRequest) {
     const accessToken = await refreshAccessToken(
       clientId,
       clientSecret,
-      tenant.google_refresh_token
+      tenant.google_drive_refresh_token
     )
 
     // List files in folder
