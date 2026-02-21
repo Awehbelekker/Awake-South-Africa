@@ -8,10 +8,17 @@
 import { useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+// Lazy-init to avoid crashing during Next.js build when env vars aren't set
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  if (!url || !key) {
+    return new Proxy({} as any, {
+      get: () => () => ({ data: null, error: { message: 'Supabase not configured' } }),
+    })
+  }
+  return createClient(url, key)
+}
 
 interface UploadOptions {
   tenantId: string
@@ -50,7 +57,7 @@ export function useSupabaseUpload() {
         : `${tenantId}/${fileName}`
 
       // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
+      const { data, error } = await getSupabase().storage
         .from(bucket)
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -62,7 +69,7 @@ export function useSupabaseUpload() {
       }
 
       // Get public URL
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = getSupabase().storage
         .from(bucket)
         .getPublicUrl(filePath)
 
@@ -106,7 +113,7 @@ export function useSupabaseUpload() {
     bucket: 'product-images' | 'store-assets' = 'product-images'
   ): Promise<{ error: string | null }> {
     try {
-      const { error } = await supabase.storage.from(bucket).remove([path])
+      const { error } = await getSupabase().storage.from(bucket).remove([path])
 
       if (error) throw error
 
