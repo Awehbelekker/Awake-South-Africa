@@ -77,25 +77,27 @@ export async function GET(request: NextRequest) {
 
     // Store refresh token in tenant record
     const supabase = getSupabase()
-    const { error: updateError } = await supabase
+    const { error: updateError, data: updateData } = await supabase
       .from('tenants')
       .update({
         google_drive_enabled: true,
         google_drive_refresh_token: tokens.refresh_token,
       })
       .eq('id', tenantId)
+      .select('id, google_drive_enabled')
 
     if (updateError) {
-      console.error('Failed to store refresh token:', updateError)
-      return NextResponse.json(
-        { error: 'Failed to save OAuth credentials' },
-        { status: 500 }
+      console.error('Failed to store refresh token:', JSON.stringify(updateError))
+      return NextResponse.redirect(
+        `${process.env.NEXT_PUBLIC_APP_URL}/admin/import?error=save_failed&message=${encodeURIComponent(updateError.message)}`
       )
     }
 
-    // Success! Redirect back to admin settings
+    console.log('Google Drive connected for tenant', tenantId, updateData)
+
+    // Success! Redirect back to admin import page
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/admin/settings?google_drive=connected`
+      `${process.env.NEXT_PUBLIC_APP_URL}/admin/import?google_drive=connected`
     )
 
   } catch (error: any) {

@@ -28,15 +28,13 @@ export function GoogleDriveConnection() {
     const googleDriveStatus = params.get('google_drive')
     const oauthError = params.get('error')
     const errorMessage = params.get('message')
+    const cleanPath = window.location.pathname
 
     if (googleDriveStatus === 'connected') {
       setError(null)
-      // Clean URL
-      const cleanPath = window.location.pathname
       window.history.replaceState({}, '', cleanPath)
-    } else if (oauthError) {
+    } else if (oauthError || errorMessage) {
       setError(`Connection failed: ${errorMessage || oauthError}`)
-      const cleanPath = window.location.pathname
       window.history.replaceState({}, '', cleanPath)
     }
   }, [])
@@ -55,13 +53,16 @@ export function GoogleDriveConnection() {
     }
 
     try {
+      setLoading(true)
       const response = await fetch(`/api/tenant/google-drive/status?tenant_id=${tenant.id}`)
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
         setStatus(data)
+      } else {
+        setError(`Status check failed: ${data.error || response.statusText}`)
       }
     } catch (err: any) {
-      console.error('Failed to load Google Drive status:', err)
+      setError(`Failed to load status: ${err.message}`)
     } finally {
       setLoading(false)
     }
