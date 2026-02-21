@@ -50,8 +50,25 @@ create table if not exists tenants (
   updated_at                 timestamptz not null default now()
 );
 
--- Ensure is_active exists if tenants table was created by an older schema
-alter table if exists tenants add column if not exists is_active boolean not null default true;
+-- Backfill any columns missing from a previously created tenants table
+alter table if exists tenants add column if not exists is_active                  boolean      not null default true;
+alter table if exists tenants add column if not exists custom_domain_verified     boolean      not null default false;
+alter table if exists tenants add column if not exists ssl_provisioned            boolean      not null default false;
+alter table if exists tenants add column if not exists favicon_url                text;
+alter table if exists tenants add column if not exists accent_color               text         not null default '#0066ff';
+alter table if exists tenants add column if not exists cognicore_business_id      text;
+alter table if exists tenants add column if not exists google_drive_client_id     text;
+alter table if exists tenants add column if not exists google_drive_client_secret text;
+alter table if exists tenants add column if not exists google_drive_refresh_token text;
+alter table if exists tenants add column if not exists google_drive_folder_id     text;
+alter table if exists tenants add column if not exists google_drive_enabled       boolean      not null default false;
+alter table if exists tenants add column if not exists onedrive_client_id         text;
+alter table if exists tenants add column if not exists onedrive_client_secret     text;
+alter table if exists tenants add column if not exists onedrive_refresh_token     text;
+alter table if exists tenants add column if not exists onedrive_folder_id         text;
+alter table if exists tenants add column if not exists onedrive_enabled           boolean      not null default false;
+alter table if exists tenants add column if not exists plan                       text         not null default 'basic';
+alter table if exists tenants add column if not exists updated_at                 timestamptz  not null default now();
 
 insert into tenants (slug, name, domain, subdomain, email, currency, tax_rate, plan)
 values ('awake-sa','Awake South Africa','awakesa.co.za','awake-sa','info@awakesa.co.za','ZAR',0.15,'pro')
@@ -106,6 +123,25 @@ create table if not exists products (
   updated_at       timestamptz not null default now(),
   unique (tenant_id, slug)
 );
+
+-- Backfill any columns missing from a previously created products table
+alter table if exists products add column if not exists slug             text;
+alter table if exists products add column if not exists sku              text;
+alter table if exists products add column if not exists price_ex_vat     numeric(10,2) not null default 0;
+alter table if exists products add column if not exists compare_at_price numeric(10,2);
+alter table if exists products add column if not exists cost_eur         numeric(10,2);
+alter table if exists products add column if not exists category_tag     text;
+alter table if exists products add column if not exists images           jsonb default '[]'::jsonb;
+alter table if exists products add column if not exists videos           jsonb default '[]'::jsonb;
+alter table if exists products add column if not exists video_sections   jsonb default '{}'::jsonb;
+alter table if exists products add column if not exists badge            text;
+alter table if exists products add column if not exists battery          text;
+alter table if exists products add column if not exists skill_level      text;
+alter table if exists products add column if not exists what_is_included jsonb default '[]'::jsonb;
+alter table if exists products add column if not exists is_active        boolean not null default true;
+alter table if exists products add column if not exists is_featured      boolean not null default false;
+alter table if exists products add column if not exists sort_order       integer not null default 0;
+alter table if exists products add column if not exists updated_at       timestamptz not null default now();
 
 create index if not exists products_tenant_id_idx on products(tenant_id);
 create index if not exists products_category_idx  on products(tenant_id, category);
