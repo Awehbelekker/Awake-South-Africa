@@ -1,15 +1,37 @@
 // Medusa API Client for Awake Boards SA
-// Connects the Next.js storefront to Medusa e-commerce backend
+// Uses direct fetch calls — compatible with Medusa v2
 
-import Medusa from "@medusajs/medusa-js"
-
-// Initialize Medusa client
 const MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 
-export const medusaClient = new Medusa({
-  baseUrl: MEDUSA_BACKEND_URL,
-  maxRetries: 3,
-})
+// Store JWT token in memory (SSR-safe)
+let adminToken: string | null = null
+
+function getHeaders(isAdmin = false): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "",
+  }
+  if (isAdmin && adminToken) {
+    headers["Authorization"] = `Bearer ${adminToken}`
+  }
+  return headers
+}
+
+async function fetchMedusa(path: string, options: RequestInit = {}, isAdmin = false) {
+  const url = `${MEDUSA_BACKEND_URL}${path}`
+  const res = await fetch(url, {
+    ...options,
+    headers: { ...getHeaders(isAdmin), ...(options.headers as Record<string, string> || {}) },
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }))
+    throw new Error(err.message || `Request failed: ${res.status}`)
+  }
+  return res.json()
+}
+
+// Legacy compat shim (keeps any code that references medusaClient compiling)
+export const medusaClient = {} as never
 
 // Type definitions for Medusa responses
 export interface MedusaProduct {
@@ -103,47 +125,56 @@ export function convertMedusaProduct(product: MedusaProduct) {
 
 // Products
 export async function getProducts() {
-  const { products } = await medusaClient.products.list({ limit: 100 })
-  return products.map((p) => convertMedusaProduct(p as unknown as MedusaProduct))
+  const data = await fetchMedusa("/store/products?limit=100")
+  return (data.products || []).map((p: MedusaProduct) => convertMedusaProduct(p))
 }
 
 export async function getProductByHandle(handle: string) {
-  const { products } = await medusaClient.products.list({ handle })
-  return products[0] ? convertMedusaProduct(products[0] as unknown as MedusaProduct) : null
+  const data = await fetchMedusa(`/store/products?handle=${handle}`)
+  return data.products?.[0] ? convertMedusaProduct(data.products[0] as MedusaProduct) : null
 }
 
 export async function getProductById(id: string) {
-  const { product } = await medusaClient.products.retrieve(id)
-  return convertMedusaProduct(product as unknown as MedusaProduct)
+  const data = await fetchMedusa(`/store/products/${id}`)
+  return convertMedusaProduct(data.product as MedusaProduct)
 }
 
 // Cart
 export async function createCart() {
-  const { cart } = await medusaClient.carts.create({ region_id: await getRegionId() })
-  return cart
+  const regionId = await getRegionId()
+  const data = await fetchMedusa("/store/carts", {
+    method: "POST",
+    body: JSON.stringify({ region_id: regionId }),
+  })
+  return data.cart
 }
 
 export async function getCart(cartId: string) {
-  const { cart } = await medusaClient.carts.retrieve(cartId)
-  return cart
+  const data = await fetchMedusa(`/store/carts/${cartId}`)
+  return data.cart
 }
 
 export async function addToCart(cartId: string, variantId: string, quantity: number = 1) {
-  const { cart } = await medusaClient.carts.lineItems.create(cartId, {
-    variant_id: variantId,
-    quantity,
+  const data = await fetchMedusa(`/store/carts/${cartId}/line-items`, {
+    method: "POST",
+    body: JSON.stringify({ variant_id: variantId, quantity }),
   })
-  return cart
+  return data.cart
 }
 
 export async function updateCartItem(cartId: string, lineItemId: string, quantity: number) {
-  const { cart } = await medusaClient.carts.lineItems.update(cartId, lineItemId, { quantity })
-  return cart
+  const data = await fetchMedusa(`/store/carts/${cartId}/line-items/${lineItemId}`, {
+    method: "POST",
+    body: JSON.stringify({ quantity }),
+  })
+  return data.cart
 }
 
 export async function removeFromCart(cartId: string, lineItemId: string) {
-  const { cart } = await medusaClient.carts.lineItems.delete(cartId, lineItemId)
-  return cart
+  const data = await fetchMedusa(`/store/carts/${cartId}/line-items/${lineItemId}`, {
+    method: "DELETE",
+  })
+  return data.cart
 }
 
 // Update cart with customer info for checkout
@@ -170,77 +201,92 @@ export async function updateCartForCheckout(cartId: string, data: {
     country_code: string
   }
 }) {
-  const { cart } = await medusaClient.carts.update(cartId, data)
-  return cart
+  const res = await fetchMedusa(`/store/carts/${cartId}`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+  return res.cart
 }
 
 // Add shipping method to cart
 export async function addShippingMethod(cartId: string, optionId: string) {
-  const { cart } = await medusaClient.carts.addShippingMethod(cartId, { option_id: optionId })
-  return cart
+  const data = await fetchMedusa(`/store/carts/${cartId}/shipping-methods`, {
+    method: "POST",
+    body: JSON.stringify({ option_id: optionId }),
+  })
+  return data.cart
 }
 
 // Get available shipping options
 export async function getShippingOptions(cartId: string) {
-  const { shipping_options } = await medusaClient.shippingOptions.listCartOptions(cartId)
-  return shipping_options
+  const data = await fetchMedusa(`/store/shipping-options/${cartId}`)
+  return data.shipping_options || []
 }
 
 // Set payment session
 export async function setPaymentSession(cartId: string, providerId: string = "manual") {
-  const { cart } = await medusaClient.carts.setPaymentSession(cartId, { provider_id: providerId })
-  return cart
+  const data = await fetchMedusa(`/store/carts/${cartId}/payment-sessions`, {
+    method: "POST",
+    body: JSON.stringify({ provider_id: providerId }),
+  })
+  return data.cart
 }
 
 // Complete cart to create order
 export async function completeCart(cartId: string) {
-  const response = await medusaClient.carts.complete(cartId)
-  return response
+  const data = await fetchMedusa(`/store/carts/${cartId}/complete`, { method: "POST" })
+  return data
 }
 
 // Get order by ID
 export async function getOrder(orderId: string) {
-  const { order } = await medusaClient.orders.retrieve(orderId)
-  return order
+  const data = await fetchMedusa(`/store/orders/${orderId}`)
+  return data.order
 }
 
 // Get South Africa region ID
 async function getRegionId() {
-  const { regions } = await medusaClient.regions.list()
-  const saRegion = regions.find(r => r.name === "South Africa") || regions[0]
+  const data = await fetchMedusa("/store/regions")
+  const saRegion = data.regions?.find((r: { name: string }) => r.name === "South Africa") || data.regions?.[0]
   return saRegion?.id || ""
 }
 
 // Customer Authentication
 export async function loginCustomer(email: string, password: string) {
-  const { customer } = await medusaClient.auth.authenticate({ email, password })
-  return customer
+  const data = await fetchMedusa("/store/auth", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  })
+  return data.customer
 }
 
-export async function registerCustomer(data: {
+export async function registerCustomer(customerData: {
   email: string
   password: string
   first_name: string
   last_name: string
   phone?: string
 }) {
-  const { customer } = await medusaClient.customers.create(data)
-  return customer
+  const data = await fetchMedusa("/store/customers", {
+    method: "POST",
+    body: JSON.stringify(customerData),
+  })
+  return data.customer
 }
 
 export async function getCustomer() {
-  const { customer } = await medusaClient.customers.retrieve()
-  return customer
+  const data = await fetchMedusa("/store/customers/me")
+  return data.customer
 }
 
 export async function logoutCustomer() {
-  await medusaClient.auth.deleteSession()
+  await fetchMedusa("/store/auth", { method: "DELETE" })
 }
 
 // Get customer orders
 export async function getCustomerOrders() {
-  const { orders } = await medusaClient.customers.listOrders()
-  return orders
+  const data = await fetchMedusa("/store/customers/me/orders")
+  return data.orders || []
 }
 
 // ============================================
@@ -249,91 +295,107 @@ export async function getCustomerOrders() {
 
 // Admin Authentication
 export async function adminLogin(email: string, password: string) {
-  const response = await medusaClient.admin.auth.createSession({
-    email,
-    password,
-  })
-  return response.user
+  const data = await fetchMedusa("/admin/auth/token", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  }, false)
+  if (data.token) {
+    adminToken = data.token
+    if (typeof window !== "undefined") {
+      localStorage.setItem("medusa_admin_token", data.token)
+    }
+  }
+  return data.user
 }
 
 export async function adminLogout() {
-  await medusaClient.admin.auth.deleteSession()
+  adminToken = null
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("medusa_admin_token")
+  }
 }
 
 export async function getAdminSession() {
-  const response = await medusaClient.admin.auth.getSession()
-  return response.user
+  if (!adminToken && typeof window !== "undefined") {
+    adminToken = localStorage.getItem("medusa_admin_token")
+  }
+  if (!adminToken) return null
+  const data = await fetchMedusa("/admin/auth/session", {}, true)
+  return data.user
 }
 
 // Admin Products
 export async function adminGetProducts(limit = 100, offset = 0) {
-  const { products, count } = await medusaClient.admin.products.list({
-    limit,
-    offset,
-  })
-  return { products: products.map((p: any) => convertMedusaProduct(p as unknown as MedusaProduct)), count }
+  const data = await fetchMedusa(`/admin/products?limit=${limit}&offset=${offset}`, {}, true)
+  return {
+    products: (data.products || []).map((p: MedusaProduct) => convertMedusaProduct(p)),
+    count: data.count || 0,
+  }
 }
 
 export async function adminGetProduct(id: string) {
-  const { product } = await medusaClient.admin.products.retrieve(id)
-  return convertMedusaProduct(product as unknown as MedusaProduct)
+  const data = await fetchMedusa(`/admin/products/${id}`, {}, true)
+  return convertMedusaProduct(data.product as MedusaProduct)
 }
 
 export async function adminUpdateProduct(
   id: string,
-  data: {
+  updateData: {
     title?: string
     description?: string
     thumbnail?: string
     metadata?: Record<string, unknown>
   }
 ) {
-  const { product } = await medusaClient.admin.products.update(id, data)
-  return convertMedusaProduct(product as unknown as MedusaProduct)
+  const data = await fetchMedusa(`/admin/products/${id}`, {
+    method: "POST",
+    body: JSON.stringify(updateData),
+  }, true)
+  return convertMedusaProduct(data.product as MedusaProduct)
 }
 
 export async function adminUpdateVariant(
   productId: string,
   variantId: string,
-  data: {
+  variantData: {
     prices?: { amount: number; currency_code: string }[]
     inventory_quantity?: number
     metadata?: Record<string, unknown>
   }
 ) {
-  const { product } = await medusaClient.admin.products.updateVariant(productId, variantId, data)
-  return convertMedusaProduct(product as unknown as MedusaProduct)
+  const data = await fetchMedusa(`/admin/products/${productId}/variants/${variantId}`, {
+    method: "POST",
+    body: JSON.stringify(variantData),
+  }, true)
+  return convertMedusaProduct(data.product as MedusaProduct)
 }
 
 // Admin Orders
 export async function adminGetOrders(limit = 100, offset = 0) {
-  const { orders, count } = await medusaClient.admin.orders.list({
-    limit,
-    offset,
-  })
-  return { orders, count }
+  const data = await fetchMedusa(`/admin/orders?limit=${limit}&offset=${offset}`, {}, true)
+  return { orders: data.orders || [], count: data.count || 0 }
 }
 
 export async function adminGetOrder(id: string) {
-  const { order } = await medusaClient.admin.orders.retrieve(id)
-  return order
+  const data = await fetchMedusa(`/admin/orders/${id}`, {}, true)
+  return data.order
 }
 
-export async function adminUpdateOrder(id: string, data: Record<string, unknown>) {
-  const { order } = await medusaClient.admin.orders.update(id, data)
-  return order
+export async function adminUpdateOrder(id: string, updateData: Record<string, unknown>) {
+  const data = await fetchMedusa(`/admin/orders/${id}`, {
+    method: "POST",
+    body: JSON.stringify(updateData),
+  }, true)
+  return data.order
 }
 
 // Admin Customers
 export async function adminGetCustomers(limit = 100, offset = 0) {
-  const { customers, count } = await medusaClient.admin.customers.list({
-    limit,
-    offset,
-  })
-  return { customers, count }
+  const data = await fetchMedusa(`/admin/customers?limit=${limit}&offset=${offset}`, {}, true)
+  return { customers: data.customers || [], count: data.count || 0 }
 }
 
 export async function adminGetCustomer(id: string) {
-  const { customer } = await medusaClient.admin.customers.retrieve(id)
-  return customer
+  const data = await fetchMedusa(`/admin/customers/${id}`, {}, true)
+  return data.customer
 }

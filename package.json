@@ -53,7 +53,6 @@
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
-    "@medusajs/medusa-js": "^6.1.10",
     "@playwright/test": "^1.42.0",
     "@stripe/stripe-js": "^8.7.0",
     "@testing-library/jest-dom": "^6.1.5",
