@@ -169,6 +169,29 @@ export default function AdminProductsPage() {
         toast.error('Failed to update in Medusa. Saving locally.')
         updateLocalProduct(product.id, product)
       }
+    } else if (useSupabase) {
+      // Update in Supabase
+      try {
+        const res = await fetch('/api/tenant/products', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ products: [product] }),
+        })
+        const data = await res.json()
+        if (data.success) {
+          // Update local Supabase state immediately
+          setSupabaseProducts(prev => prev.map(p =>
+            (p.id === product.id || p.id === product.id) ? product : p
+          ))
+          toast.success('Product saved to Supabase!')
+        } else {
+          toast.error(`Save failed: ${data.error}`)
+          updateLocalProduct(product.id, product)
+        }
+      } catch (err: any) {
+        toast.error(`Save failed: ${err.message}`)
+        updateLocalProduct(product.id, product)
+      }
     } else {
       updateLocalProduct(product.id, product)
       toast.success('Product updated locally')
