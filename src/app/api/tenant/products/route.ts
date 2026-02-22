@@ -96,11 +96,15 @@ export async function GET(request: NextRequest) {
 
     const { data: products, error } = await query
 
-    if (error) throw error
+    if (error) {
+      console.error('Products query error:', JSON.stringify(error))
+      throw error
+    }
 
     return NextResponse.json({ products })
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('Products GET error:', error?.message, error?.code, error?.hint)
+    return NextResponse.json({ error: error.message, code: error.code, hint: error.hint }, { status: 500 })
   }
 }
 
