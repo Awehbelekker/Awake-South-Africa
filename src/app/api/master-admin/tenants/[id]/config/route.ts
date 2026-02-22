@@ -75,7 +75,7 @@ export async function PATCH(
     const body = await request.json()
     const { oauth_config, ai_config, automation_config } = body
 
-    const updates: any = { updated_at: new Date().toISOString() }
+    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
     
     if (oauth_config) updates.oauth_config = oauth_config
     if (ai_config) updates.ai_config = ai_config

@@ -90,7 +90,7 @@ export default function PaymentSuccessPage() {
             </h2>
 
             <div className="space-y-4 mb-6">
-              {order.items?.map((item) => (
+              {order.items?.map((item: any) => (
                 <div key={item.id} className="flex items-center gap-4 pb-4 border-b border-white/10 last:border-0">
                   {item.thumbnail && (
                     <img

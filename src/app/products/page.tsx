@@ -56,10 +56,10 @@ function ProductsContent() {
   const accessoryCategories = ['batteries', 'wings', 'parts', 'apparel', 'accessories', 'Batteries', 'Wings', 'Parts', 'Apparel', 'Accessories']
 
   const filteredProducts = selectedCategory === 'all'
-    ? allProducts.filter(p => p.inStock)
+    ? allProducts.filter((p: any) => p.inStock)
     : selectedCategory === 'accessories'
-      ? allProducts.filter(p => p.inStock && accessoryCategories.includes(p.categoryTag || p.category || ''))
-      : allProducts.filter(p => p.inStock && (p.categoryTag === selectedCategory || p.category === selectedCategory));
+      ? allProducts.filter((p: any) => p.inStock && accessoryCategories.includes(p.categoryTag || p.category || ''))
+      : allProducts.filter((p: any) => p.inStock && (p.categoryTag === selectedCategory || p.category === selectedCategory));
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-ZA', {
@@ -133,7 +133,7 @@ function ProductsContent() {
 
       {/* Products Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredProducts.map((product) => (
+        {filteredProducts.map((product: any) => (
           <div
             key={product.id}
             className="bg-awake-gray rounded-xl overflow-hidden group hover:ring-2 hover:ring-accent-primary transition-all"
@@ -207,7 +207,7 @@ function ProductsContent() {
               
               {'specs' in product && product.specs && product.specs.length > 0 && (
                 <ul className="text-sm text-gray-500 mb-4 space-y-1">
-                  {product.specs.slice(0, 3).map((spec, i) => (
+                  {product.specs.slice(0, 3).map((spec: any, i: number) => (
                     <li key={i}>• {spec}</li>
                   ))}
                 </ul>

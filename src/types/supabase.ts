@@ -53,6 +53,9 @@ export interface Database {
           plan: 'basic' | 'pro' | 'enterprise'
           created_at: string
           updated_at: string
+          oauth_config: Json | null
+          ai_config: Json | null
+          automation_config: Json | null
         }
         Insert: {
           id?: string
@@ -93,6 +96,9 @@ export interface Database {
           plan?: 'basic' | 'pro' | 'enterprise'
           created_at?: string
           updated_at?: string
+          oauth_config?: Json | null
+          ai_config?: Json | null
+          automation_config?: Json | null
         }
         Update: {
           slug?: string
@@ -131,6 +137,37 @@ export interface Database {
           is_active?: boolean
           plan?: 'basic' | 'pro' | 'enterprise'
           updated_at?: string
+          oauth_config?: Json | null
+          ai_config?: Json | null
+          automation_config?: Json | null
+        }
+      }
+      master_admin_activity_log: {
+        Row: {
+          id: string
+          admin_email: string | null
+          action: string
+          tenant_id: string | null
+          details: Json | null
+          ip_address: string | null
+          user_agent: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          admin_email?: string | null
+          action: string
+          tenant_id?: string | null
+          details?: Json | null
+          ip_address?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+        Update: {
+          admin_email?: string | null
+          action?: string
+          tenant_id?: string | null
+          details?: Json | null
         }
       }
       admin_users: {
