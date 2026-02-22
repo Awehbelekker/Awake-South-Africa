@@ -41,22 +41,22 @@ export default function AdminProductsPage() {
           if (data.products?.length > 0) {
             // Map Supabase product shape to EditableProduct
             setSupabaseProducts(data.products.map((p: any) => ({
-              id: p.id,
+              id: p.metadata?.localId || p.id,
               name: p.name,
               price: p.price,
-              priceExVAT: Math.round(p.price / 1.15),
-              costEUR: p.metadata?.costEUR,
+              priceExVAT: p.price_ex_vat || Math.round(p.price / 1.15),
+              costEUR: p.cost_eur,
               category: p.category,
-              categoryTag: p.category,
+              categoryTag: p.category_tag || p.category,
               description: p.description,
-              image: p.images?.[0],
-              badge: p.metadata?.badge,
-              battery: p.metadata?.battery,
-              skillLevel: p.metadata?.skillLevel,
-              specs: p.metadata?.specs,
-              features: p.metadata?.features,
-              inStock: p.inventory_quantity > 0,
-              stockQuantity: p.inventory_quantity,
+              image: p.image || p.images?.[0],
+              badge: p.badge,
+              battery: p.battery,
+              skillLevel: p.skill_level,
+              specs: p.specs,
+              features: p.features,
+              inStock: p.in_stock,
+              stockQuantity: p.stock_quantity,
             })))
           }
         })
@@ -84,12 +84,13 @@ export default function AdminProductsPage() {
         const r2 = await fetch('/api/tenant/products')
         const d2 = await r2.json()
         if (d2.products?.length > 0) setSupabaseProducts(d2.products.map((p: any) => ({
-          id: p.id, name: p.name, price: p.price, priceExVAT: Math.round(p.price / 1.15),
-          costEUR: p.metadata?.costEUR, category: p.category, categoryTag: p.category,
-          description: p.description, image: p.images?.[0], badge: p.metadata?.badge,
-          battery: p.metadata?.battery, skillLevel: p.metadata?.skillLevel,
-          specs: p.metadata?.specs, features: p.metadata?.features,
-          inStock: p.inventory_quantity > 0, stockQuantity: p.inventory_quantity,
+          id: p.metadata?.localId || p.id, name: p.name, price: p.price,
+          priceExVAT: p.price_ex_vat || Math.round(p.price / 1.15),
+          costEUR: p.cost_eur, category: p.category, categoryTag: p.category_tag || p.category,
+          description: p.description, image: p.image || p.images?.[0], badge: p.badge,
+          battery: p.battery, skillLevel: p.skill_level,
+          specs: p.specs, features: p.features,
+          inStock: p.in_stock, stockQuantity: p.stock_quantity,
         })))
       } else {
         toast.error(`Sync failed: ${data.error}`)
