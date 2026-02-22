@@ -61,6 +61,12 @@ async function getTenantId(request: NextRequest): Promise<string | null> {
 
 export async function GET(request: NextRequest) {
   try {
+    // Verify env vars are present
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Missing Supabase env vars')
+      return NextResponse.json({ error: 'Server misconfiguration: missing Supabase env vars' }, { status: 500 })
+    }
+
     const tenantId = await getTenantId(request)
     
     if (!tenantId) {
@@ -195,10 +201,14 @@ export async function PUT(request: NextRequest) {
       .upsert(rows, { onConflict: 'tenant_id,slug', ignoreDuplicates: false })
       .select('id, name')
 
-    if (error) throw error
+    if (error) {
+      console.error('Products upsert error:', JSON.stringify(error))
+      return NextResponse.json({ error: error.message, code: error.code, hint: error.hint, details: error.details }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true, synced: data?.length || rows.length })
   } catch (error: any) {
+    console.error('Products PUT error:', error?.message)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
