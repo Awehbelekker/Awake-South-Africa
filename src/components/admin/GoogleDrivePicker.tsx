@@ -1,144 +1,331 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import useDrivePicker from 'react-google-drive-picker';
-import { Cloud } from 'lucide-react';
-import toast from 'react-hot-toast';
+/**
+ * Google Drive Picker Modal
+ * 
+ * Reusable modal for selecting files from Google Drive
+ * Uses unified OAuth system - "connect once, use everywhere"
+ */
 
-// Placeholder values for unconfigured credentials
-const PLACEHOLDER_CLIENT_ID = 'your-client-id.apps.googleusercontent.com';
-const PLACEHOLDER_API_KEY = 'your-api-key';
-const PLACEHOLDER_APP_ID = 'your-app-id';
+import { useState, useEffect } from 'react'
+import { useGoogleDrive } from '@/hooks/useGoogleDrive'
+import { 
+  X,
+  Folder, 
+  Image as ImageIcon, 
+  ChevronRight, 
+  Home,
+  Loader2,
+  AlertCircle,
+  Check
+} from 'lucide-react'
 
-interface GoogleDrivePickerProps {
-  onSelect: (files: Array<{ id: string; name: string; url: string; mimeType: string; thumbnailUrl?: string }>) => void;
-  multiSelect?: boolean;
-  accept?: 'image' | 'video' | 'all';
-  label?: string;
+interface DriveFile {
+  id: string
+  name: string
+  mimeType: string
+  size: number
+  thumbnailLink?: string
+  webViewLink?: string
 }
 
-export default function GoogleDrivePicker({ 
-  onSelect, 
-  multiSelect = false, 
-  accept = 'all',
-  label = 'Select from Google Drive'
+interface DriveFolder {
+  id: string
+  name: string
+}
+
+interface BreadcrumbItem {
+  id: string
+  name: string
+}
+
+interface GoogleDrivePickerProps {
+  isOpen: boolean
+  onClose: () => void
+  onSelect: (files: DriveFile[]) => void
+  multiSelect?: boolean
+  title?: string
+}
+
+export default function GoogleDrivePicker({
+  isOpen,
+  onClose,
+  onSelect,
+  multiSelect = true,
+  title = 'Select from Google Drive'
 }: GoogleDrivePickerProps) {
-  const [openPicker, authResponse] = useDrivePicker();
-  const [debugInfo, setDebugInfo] = useState<string>('');
+  const { isConnected, checking, connect, browseFolder } = useGoogleDrive()
+  const [currentFolder, setCurrentFolder] = useState('root')
+  const [folderPath, setFolderPath] = useState<BreadcrumbItem[]>([])
+  const [folders, setFolders] = useState<DriveFolder[]>([])
+  const [files, setFiles] = useState<DriveFile[]>([])
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID;
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY;
-  const appId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_APP_ID;
-
-  // Check if Google Drive credentials are configured
-  // More lenient check - just verify they exist and are not empty/placeholder
-  const isConfigured = !!(
-    clientId && 
-    apiKey && 
-    appId && 
-    clientId.length > 10 &&
-    apiKey.length > 10 &&
-    appId.length > 5 &&
-    !clientId.includes('your-client-id') &&
-    !apiKey.includes('your-api-key') &&
-    !appId.includes('your-app-id')
-  );
-
-  // Debug logging (only in development)
+  // Load folder when it changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const info = `Config check: ${isConfigured ? 'YES' : 'NO'} | ClientID: ${clientId ? 'SET' : 'MISSING'} | ApiKey: ${apiKey ? 'SET' : 'MISSING'} | AppID: ${appId ? 'SET' : 'MISSING'}`;
-      setDebugInfo(info);
-      console.log('[GoogleDrivePicker]', info);
+    if (isOpen && isConnected && currentFolder) {
+      loadFolder(currentFolder)
     }
-  }, [clientId, apiKey, appId, isConfigured]);
+  }, [isOpen, isConnected, currentFolder])
 
-  const handleOpenPicker = () => {
-    if (!isConfigured) {
-      const missing = [];
-      if (!clientId || clientId.includes('your-client-id')) missing.push('CLIENT_ID');
-      if (!apiKey || apiKey.includes('your-api-key')) missing.push('API_KEY');
-      if (!appId || appId.includes('your-app-id')) missing.push('APP_ID');
-      
-      toast.error(`Google Drive not configured. Missing: ${missing.join(', ')}. Check Vercel environment variables.`);
-      console.error('[GoogleDrivePicker] Configuration error:', { clientId, apiKey, appId });
-      return;
+  // Reset when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentFolder('root')
+      setSelectedFiles(new Set())
+      setError(null)
     }
+  }, [isOpen])
 
-    // Define MIME types based on accept prop
-    let mimeTypes: string[] = [];
-    if (accept === 'image') {
-      mimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
-    } else if (accept === 'video') {
-      mimeTypes = ['video/mp4', 'video/quicktime', 'video/webm', 'video/ogg'];
+  async function loadFolder(folderId: string) {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const result = await browseFolder(folderId)
+      setFolderPath(result.folderPath)
+      setFolders(result.folders)
+      setFiles(result.files)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function toggleFileSelection(fileId: string) {
+    if (!multiSelect) {
+      // Single select - replace selection
+      setSelectedFiles(new Set([fileId]))
     } else {
-      mimeTypes = [
-        'image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp',
-        'video/mp4', 'video/quicktime', 'video/webm', 'video/ogg'
-      ];
+      // Multi select - toggle
+      setSelectedFiles(prev => {
+        const newSet = new Set(prev)
+        if (newSet.has(fileId)) {
+          newSet.delete(fileId)
+        } else {
+          newSet.add(fileId)
+        }
+        return newSet
+      })
     }
+  }
 
-    openPicker({
-      clientId: clientId!,
-      developerKey: apiKey!,
-      viewId: 'DOCS',
-      showUploadView: true,
-      showUploadFolders: true,
-      supportDrives: true,
-      multiselect: multiSelect,
-      setIncludeFolders: true,
-      setSelectFolderEnabled: false,
-      customViews: [
-        {
-          id: 'DOCS_IMAGES_AND_VIDEOS',
-          mimeTypes: mimeTypes,
-          query: '',
-        },
-      ],
-      callbackFunction: (data) => {
-        if (data.action === 'cancel') {
-          console.log('User cancelled the picker');
-          return;
-        }
+  function handleSelect() {
+    const selected = files.filter(f => selectedFiles.has(f.id))
+    onSelect(selected)
+    onClose()
+  }
 
-        if (data.action === 'picked') {
-          const selectedFiles = data.docs.map((doc: any) => ({
-            id: doc.id,
-            name: doc.name,
-            url: doc.url,
-            mimeType: doc.mimeType,
-            thumbnailUrl: doc.iconUrl || doc.thumbnailUrl,
-          }));
-          
-          onSelect(selectedFiles);
-          toast.success(`Selected ${selectedFiles.length} file(s) from Google Drive`);
-        }
-      },
-    });
-  };
+  function handleConnect() {
+    connect()
+  }
+
+  if (!isOpen) return null
 
   return (
-    <div className="inline-block">
-      <button
-        type="button"
-        onClick={handleOpenPicker}
-        disabled={!isConfigured}
-        className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-          isConfigured
-            ? 'bg-blue-600 text-white hover:bg-blue-700'
-            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
-        }`}
-        title={!isConfigured ? 'Google Drive not configured. Check Vercel environment variables.' : label}
-      >
-        <Cloud className="w-4 h-4" />
-        {isConfigured ? label : '🔒 Google Drive (Not Configured)'}
-      </button>
-      {/* Show debug info in development */}
-      {process.env.NODE_ENV === 'development' && debugInfo && (
-        <div className="text-xs text-gray-500 mt-1 max-w-md">
-          {debugInfo}
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition"
+          >
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
         </div>
-      )}
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {checking ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+              <span className="ml-3 text-gray-600">Checking connection...</span>
+            </div>
+          ) : !isConnected ? (
+            <div className="text-center py-12">
+              <div className="mb-4">
+                <ImageIcon className="w-16 h-16 text-gray-400 mx-auto" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Connect Google Drive
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Connect your Google Drive to browse and select images
+              </p>
+              <button
+                onClick={handleConnect}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Connect Google Drive
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Breadcrumb Navigation */}
+              <div className="flex items-center gap-2 mb-4 text-sm">
+                <button
+                  onClick={() => setCurrentFolder('root')}
+                  className="flex items-center gap-1 px-3 py-1.5 hover:bg-gray-100 rounded transition"
+                >
+                  <Home className="w-4 h-4" />
+                  <span className="text-gray-700">My Drive</span>
+                </button>
+
+                {currentFolder === 'root' && (
+                  <button
+                    onClick={() => setCurrentFolder('shared')}
+                    className="flex items-center gap-1 px-3 py-1.5 hover:bg-gray-100 rounded transition ml-2"
+                  >
+                    <Folder className="w-4 h-4" />
+                    <span className="text-gray-700">Shared with me</span>
+                  </button>
+                )}
+
+                {folderPath.slice(1).map((folder) => (
+                  <div key={folder.id} className="flex items-center gap-2">
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <button
+                      onClick={() => setCurrentFolder(folder.id)}
+                      className="px-3 py-1.5 hover:bg-gray-100 rounded transition text-gray-700"
+                    >
+                      {folder.name}
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Error Display */}
+              {error && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-red-800">{error}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Loading */}
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                  <span className="ml-3 text-gray-600">Loading...</span>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Folders */}
+                  {folders.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Folders</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                        {folders.map((folder) => (
+                          <button
+                            key={folder.id}
+                            onClick={() => setCurrentFolder(folder.id)}
+                            className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition text-left"
+                          >
+                            <Folder className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                            <span className="text-sm text-gray-900 truncate">{folder.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Files */}
+                  {files.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">
+                        Images ({files.length})
+                      </h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        {files.map((file) => {
+                          const isSelected = selectedFiles.has(file.id)
+                          return (
+                            <button
+                              key={file.id}
+                              onClick={() => toggleFileSelection(file.id)}
+                              className={`relative group border-2 rounded-lg overflow-hidden transition ${
+                                isSelected
+                                  ? 'border-blue-600 ring-2 ring-blue-600 ring-offset-2'
+                                  : 'border-gray-200 hover:border-gray-300'
+                              }`}
+                            >
+                              {/* Image Preview */}
+                              <div className="aspect-square bg-gray-100 flex items-center justify-center">
+                                {file.thumbnailLink ? (
+                                  <img
+                                    src={file.thumbnailLink}
+                                    alt={file.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <ImageIcon className="w-12 h-12 text-gray-400" />
+                                )}
+                              </div>
+
+                              {/* File Name */}
+                              <div className="p-2 bg-white">
+                                <p className="text-xs text-gray-900 truncate">{file.name}</p>
+                                <p className="text-xs text-gray-500">
+                                  {(file.size / 1024 / 1024).toFixed(2)} MB
+                                </p>
+                              </div>
+
+                              {/* Selection Indicator */}
+                              {isSelected && (
+                                <div className="absolute top-2 right-2 bg-blue-600 rounded-full p-1">
+                                  <Check className="w-4 h-4 text-white" />
+                                </div>
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {folders.length === 0 && files.length === 0 && !loading && (
+                    <div className="text-center py-12">
+                      <Folder className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                      <p className="text-gray-500">This folder is empty</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        {isConnected && (
+          <div className="border-t p-4 flex items-center justify-between">
+            <p className="text-sm text-gray-600">
+              {selectedFiles.size} file{selectedFiles.size !== 1 ? 's' : ''} selected
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSelect}
+                disabled={selectedFiles.size === 0}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                Select {selectedFiles.size > 0 && `(${selectedFiles.size})`}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-  );
+  )
 }

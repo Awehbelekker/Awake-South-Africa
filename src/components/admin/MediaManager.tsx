@@ -4,7 +4,9 @@ import React, { useState } from 'react';
 import { MediaFile } from '@/store/products';
 import GoogleDrivePicker from './GoogleDrivePicker';
 import { MediaLibrary } from './MediaLibrary';
-import { X, Upload, Image as ImageIcon, Video, ExternalLink, MoveUp, MoveDown, FolderOpen } from 'lucide-react';
+import { useGoogleDrive } from '@/hooks/useGoogleDrive';
+import { useTenant } from '@/contexts/TenantContext';
+import { X, Upload, Image as ImageIcon, Video, ExternalLink, MoveUp, MoveDown, FolderOpen, Cloud } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Placeholder image as data URL (1x1 transparent pixel)
@@ -19,9 +21,13 @@ interface MediaManagerProps {
 }
 
 export default function MediaManager({ type, items = [], onChange, label, maxItems = 10 }: MediaManagerProps) {
+  const { tenant } = useTenant();
+  const { transferToSupabase } = useGoogleDrive();
   const [urlInput, setUrlInput] = useState('');
   const [uploading, setUploading] = useState(false);
   const [showLibrary, setShowLibrary] = useState(false);
+  const [showDrivePicker, setShowDrivePicker] = useState(false);
+  const [transferring, setTransferring] = useState(false);
 
   const handleLibrarySelect = (urls: string[]) => {
     const newItems: MediaFile[] = urls.map(url => ({
@@ -71,23 +77,47 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
     toast.success(`${type === 'image' ? 'Image' : 'Video'} added successfully`);
   };
 
-  const handleDriveSelect = (files: Array<{ id: string; name: string; url: string; mimeType: string; thumbnailUrl?: string }>) => {
-    const newItems: MediaFile[] = files.map(file => ({
-      id: `drive-${file.id}`,
-      url: file.url,
-      type,
-      name: file.name,
-      source: 'drive',
-      driveId: file.id,
-      thumbnail: file.thumbnailUrl,
-    }));
-
-    if (items.length + newItems.length > maxItems) {
+  const handleDriveSelect = async (files: Array<{ id: string; name: string; mimeType: string; size: number; thumbnailLink?: string }>) => {
+    if (items.length + files.length > maxItems) {
       toast.error(`Maximum ${maxItems} ${type}s allowed`);
       return;
     }
 
-    onChange([...items, ...newItems]);
+    setTransferring(true);
+    setShowDrivePicker(false);
+
+    try {
+      // Transfer files from Drive to Supabase
+      const result = await transferToSupabase(
+        files.map(f => f.id),
+        { createProducts: false }
+      );
+
+      if (result.errors.length > 0) {
+        console.error('Transfer errors:', result.errors);
+        toast.error(`Failed to transfer ${result.errors.length} file(s)`);
+      }
+
+      if (result.success.length > 0) {
+        // Add successfully transferred files to media items
+        const newItems: MediaFile[] = result.success.map(item => ({
+          id: `drive-${item.fileId}`,
+          url: item.url,
+          type,
+          name: item.fileName,
+          source: 'drive',
+        }));
+
+        onChange([...items, ...newItems]);
+        toast.success(`Added ${result.success.length} ${type}(s) from Google Drive`);
+      }
+    } catch (error: any) {
+      console.error('Drive transfer error:', error);
+      toast.error(error.message || 'Failed to transfer files from Google Drive');
+    } finally {
+      setTransferring(false);
+    }
+  };
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -193,12 +223,15 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
         </label>
 
         {/* Google Drive Picker */}
-        <GoogleDrivePicker
-          onSelect={handleDriveSelect}
-          multiSelect={true}
-          accept={type}
-          label={`Select from Google Drive`}
-        />
+        <button
+          type="button"
+          onClick={() => setShowDrivePicker(true)}
+          disabled={items.length >= maxItems || transferring}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-md cursor-pointer transition-colors"
+        >
+          <Cloud className="w-4 h-4" />
+          {transferring ? 'Transferring...' : 'Select from Google Drive'}
+        </button>
 
         {/* Media Library */}
         <button
@@ -237,7 +270,7 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
       {items.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {items.map((item, index) => (
-            <div key={item.id} className="relative group border border-gray-200 rounded-lg overflow-hidden bg-gray-50 text-gray-900 bg-white">
+            <div key={item.id} className="relative group border border-gray-200 rounded-lg overflow-hidden text-gray-900 bg-white">
               {/* Media Preview */}
               <div className="aspect-video bg-gray-100 flex items-center justify-center">
                 {type === 'image' ? (
@@ -364,6 +397,15 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
           </div>
         </div>
       )}
+
+      {/* Google Drive Picker Modal */}
+      <GoogleDrivePicker
+        isOpen={showDrivePicker}
+        onClose={() => setShowDrivePicker(false)}
+        onSelect={handleDriveSelect}
+        multiSelect={true}
+        title={`Select ${type === 'image' ? 'Images' : 'Videos'} from Google Drive`}
+      />
     </div>
   );
 }
