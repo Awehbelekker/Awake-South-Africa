@@ -6,7 +6,7 @@ import GoogleDrivePicker from './GoogleDrivePicker';
 import { MediaLibrary } from './MediaLibrary';
 import { useGoogleDrive } from '@/hooks/useGoogleDrive';
 import { useTenant } from '@/contexts/TenantContext';
-import { X, Upload, Image as ImageIcon, Video, ExternalLink, MoveUp, MoveDown, FolderOpen, Cloud } from 'lucide-react';
+import { X, Upload, Image as ImageIcon, Video, ExternalLink, MoveUp, MoveDown, FolderOpen, Cloud, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Placeholder image as data URL (1x1 transparent pixel)
@@ -220,6 +220,23 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
             disabled={uploading || items.length >= maxItems}
           />
         </label>
+
+        {/* Camera Capture (Mobile) */}
+        {type === 'image' && (
+          <label className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-md cursor-pointer transition-colors">
+            <Camera className="w-4 h-4" />
+            <span className="hidden sm:inline">Take Photo</span>
+            <span className="sm:hidden">📷 Camera</span>
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileUpload}
+              className="hidden"
+              disabled={uploading || items.length >= maxItems}
+            />
+          </label>
+        )}
 
         {/* Google Drive Picker */}
         <button
