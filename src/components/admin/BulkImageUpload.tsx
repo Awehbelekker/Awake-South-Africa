@@ -103,7 +103,7 @@ export function BulkImageUpload() {
     const errors: Array<{ name: string; error: string }> = []
 
     for (let i = 0; i < files.length; i++) {
-      const uploadFile = files[i]
+      const currentFile = files[i]
 
       try {
         // Update file status
@@ -114,7 +114,7 @@ export function BulkImageUpload() {
         })
 
         // Upload to Supabase
-        const result = await uploadFile(uploadFile.file, {
+        const result = await uploadFile(currentFile.file, {
           tenantId: tenant.id,
           bucket: 'product-images',
           folder: 'products',
@@ -135,7 +135,7 @@ export function BulkImageUpload() {
           return newFiles
         })
 
-        results.push({ url, name: uploadFile.file.name })
+        results.push({ url, name: currentFile.file.name })
 
         // Create product if requested
         if (createProducts) {
@@ -144,7 +144,7 @@ export function BulkImageUpload() {
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
           )
 
-          const slug = uploadFile.file.name
+          const slug = currentFile.file.name
             .replace(/\.[^/.]+$/, '') // Remove extension
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
@@ -152,8 +152,8 @@ export function BulkImageUpload() {
           const productData = {
             tenant_id: tenant.id,
             slug,
-            name: uploadFile.file.name.replace(/\.[^/.]+$/, ''),
-            description: `Uploaded: ${uploadFile.file.name}`,
+            name: currentFile.file.name.replace(/\.[^/.]+$/, ''),
+            description: `Uploaded: ${currentFile.file.name}`,
             price: 0,
             category,
             images: [url],
@@ -175,7 +175,7 @@ export function BulkImageUpload() {
 
           if (productError) {
             errors.push({
-              name: uploadFile.file.name,
+              name: currentFile.file.name,
               error: `Image uploaded but product creation failed: ${productError.message}`,
             })
           } else {
@@ -190,7 +190,7 @@ export function BulkImageUpload() {
           return newFiles
         })
         errors.push({
-          name: uploadFile.file.name,
+          name: currentFile.file.name,
           error: err.message,
         })
       }
