@@ -35,7 +35,7 @@ export function BulkImageUpload() {
   function handleFileSelect(selectedFiles: FileList | null) {
     if (!selectedFiles || selectedFiles.length === 0) return
 
-    const maxSize = 50 * 1024 * 1024 // 50MB
+    const maxSize = 100 * 1024 * 1024 // 100MB
     const newFiles: UploadedFile[] = []
     const tooLarge: string[] = []
 
@@ -53,7 +53,7 @@ export function BulkImageUpload() {
     })
 
     if (tooLarge.length > 0) {
-      setError(`${tooLarge.length} file(s) too large (max 50MB): ${tooLarge.join(', ')}`)
+      setError(`${tooLarge.length} file(s) too large (max 100MB): ${tooLarge.join(', ')}`)
     }
 
     setFiles((prev) => [...prev, ...newFiles])
@@ -247,7 +247,7 @@ export function BulkImageUpload() {
         <p className="text-gray-600 mb-1">
           <span className="text-blue-600 font-medium">Click to upload</span> or drag and drop
         </p>
-        <p className="text-sm text-gray-500">PNG, JPG, GIF, WEBP (max 50MB per file)</p>
+        <p className="text-sm text-gray-500">PNG, JPG, GIF, WEBP (max 100MB per file)</p>
         <input
           ref={fileInputRef}
           type="file"

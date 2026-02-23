@@ -180,13 +180,13 @@ export async function POST(request: NextRequest) {
         // Get file metadata
         const metadata = await getFileMetadata(accessToken, fileId)
 
-        // Check file size (max 50MB)
-        const maxSize = 50 * 1024 * 1024 // 50MB
+        // Check file size (max 100MB)
+        const maxSize = 100 * 1024 * 1024 // 100MB
         if (metadata.size > maxSize) {
           errors.push({
             fileId,
             file: metadata.name,
-            error: `File too large: ${(metadata.size / 1024 / 1024).toFixed(2)}MB (max 50MB)`,
+            error: `File too large: ${(metadata.size / 1024 / 1024).toFixed(2)}MB (max 100MB)`,
           })
           continue
         }
