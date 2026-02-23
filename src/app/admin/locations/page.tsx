@@ -150,6 +150,7 @@ function LocationEditModal({
 }) {
   const { updateLocation, addLocation } = useDemoLocationsStore()
   const [formData, setFormData] = useState(location)
+  const [showDrivePicker, setShowDrivePicker] = useState(false)
   const isNew = !location.name
 
   const handleSave = () => {
@@ -168,11 +169,11 @@ function LocationEditModal({
     onClose()
   }
 
-  const handleDriveSelect = (files: Array<{ id: string; name: string; url: string; mimeType: string; thumbnailUrl?: string }>) => {
+  const handleDriveSelect = (files: Array<{ id: string; name: string; mimeType: string; size: number; thumbnailLink?: string; webViewLink?: string }>) => {
     if (files.length > 0) {
       const file = files[0]
-      // Use the direct link or thumbnail
-      const imageUrl = file.thumbnailUrl || file.url || `https://drive.google.com/uc?id=${file.id}`
+      // Use the thumbnail link or construct a direct link
+      const imageUrl = file.thumbnailLink || file.webViewLink || `https://drive.google.com/uc?id=${file.id}`
       setFormData({ ...formData, image: imageUrl })
       toast.success('Image selected from Google Drive!')
     }
@@ -220,12 +221,13 @@ function LocationEditModal({
               
               {/* Google Drive Picker Button */}
               <div className="mb-3">
-                <GoogleDrivePicker
-                  onSelect={handleDriveSelect}
-                  accept="image"
-                  multiSelect={false}
-                  label="Select from Google Drive"
-                />
+                <button
+                  type="button"
+                  onClick={() => setShowDrivePicker(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                >
+                  📁 Select from Google Drive
+                </button>
               </div>
 
               {/* OR divider */}
@@ -313,6 +315,15 @@ function LocationEditModal({
           </div>
         </div>
       </div>
+
+      {/* Google Drive Picker Modal */}
+      <GoogleDrivePicker
+        isOpen={showDrivePicker}
+        onClose={() => setShowDrivePicker(false)}
+        onSelect={handleDriveSelect}
+        multiSelect={false}
+        title="Select Location Image from Google Drive"
+      />
     </div>
   )
 }
