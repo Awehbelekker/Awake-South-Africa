@@ -13,7 +13,7 @@ import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
 import { GoogleDriveConnection } from '@/components/admin/GoogleDriveConnection'
 import { GoogleDriveBrowser } from '@/components/admin/GoogleDriveBrowser'
-import { ImageUpload } from '@/components/admin/ImageUpload'
+import { BulkImageUpload } from '@/components/admin/BulkImageUpload'
 
 export default function AdminImportPage() {
   const router = useRouter()
@@ -61,19 +61,13 @@ export default function AdminImportPage() {
         {/* Option 2: Direct Upload to Supabase */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            ≡ƒôñ Direct Upload
+            📤 Bulk Upload from Computer
           </h2>
           <p className="text-gray-600 mb-6">
-            Drag and drop images directly from your computer to Supabase Storage.
+            Drag and drop multiple images directly from your computer. 
+            Optionally create product records automatically.
           </p>
-          <ImageUpload
-            onImagesUploaded={(urls) => {
-              console.log('Uploaded URLs:', urls)
-              alert(`${urls.length} image(s) uploaded successfully! URLs saved: ${urls.join(', ')}`)
-            }}
-            maxFiles={10}
-            folder="products"
-          />
+          <BulkImageUpload />
         </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
