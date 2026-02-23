@@ -17,10 +17,9 @@ function getSupabase() {
   )
 }
 
-async function exchangeCodeForTokens(code: string) {
+async function exchangeCodeForTokens(code: string, redirectUri: string) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID
   const clientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET
-  const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/oauth/google/callback`
 
   const response = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
@@ -46,15 +45,20 @@ async function exchangeCodeForTokens(code: string) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    const reqUrl = new URL(request.url)
+    const { searchParams } = reqUrl
     const code = searchParams.get('code')
     const tenantId = searchParams.get('state') // Tenant ID passed via state
     const error = searchParams.get('error')
 
+    // Base URL for redirects — prefer explicit env var, fall back to live origin
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || reqUrl.origin
+    const redirectUri = `${baseUrl}/api/oauth/google/callback`
+
     // Handle OAuth denial
     if (error) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/admin/settings?error=oauth_denied`
+        `${baseUrl}/admin/import?error=oauth_denied`
       )
     }
 
@@ -66,7 +70,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Exchange authorization code for tokens
-    const tokens = await exchangeCodeForTokens(code)
+    const tokens = await exchangeCodeForTokens(code, redirectUri)
     
     if (!tokens.refresh_token) {
       return NextResponse.json(
@@ -89,7 +93,7 @@ export async function GET(request: NextRequest) {
     if (updateError) {
       console.error('Failed to store refresh token:', JSON.stringify(updateError))
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/admin/import?error=save_failed&message=${encodeURIComponent(updateError.message)}`
+        `${baseUrl}/admin/import?error=save_failed&message=${encodeURIComponent(updateError.message)}`
       )
     }
 
@@ -97,13 +101,13 @@ export async function GET(request: NextRequest) {
 
     // Success! Redirect back to admin import page
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/admin/import?google_drive=connected`
+      `${baseUrl}/admin/import?google_drive=connected`
     )
 
   } catch (error: any) {
     console.error('OAuth callback error:', error)
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/admin/settings?error=oauth_failed&message=${encodeURIComponent(error.message)}`
+      `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.awakesa.co.za'}/admin/import?error=oauth_failed&message=${encodeURIComponent(error.message)}`
     )
   }
 }

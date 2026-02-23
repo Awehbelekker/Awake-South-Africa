@@ -46,7 +46,9 @@ export async function GET(request: NextRequest) {
 
     // Google OAuth configuration
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID
-    const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/oauth/google/callback`
+    // Derive origin from the live request so the redirect_uri always matches
+    const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin
+    const redirectUri = `${origin}/api/oauth/google/callback`
     
     if (!clientId) {
       return NextResponse.json(
