@@ -38,8 +38,16 @@ async function refreshAccessToken(clientId: string, clientSecret: string, refres
 }
 
 async function listDriveFiles(accessToken: string, folderId: string = 'root') {
+  // Special handling for "Shared with me" folder
+  let query: string
+  if (folderId === 'shared') {
+    query = 'sharedWithMe=true and trashed=false'
+  } else {
+    query = `'${folderId}' in parents and trashed=false`
+  }
+
   const params = new URLSearchParams({
-    q: `'${folderId}' in parents and trashed=false`,
+    q: query,
     fields: 'files(id,name,mimeType,size,thumbnailLink,webViewLink,iconLink,createdTime,modifiedTime)',
     pageSize: '100',
     orderBy: 'folder,name',
@@ -61,6 +69,7 @@ async function listDriveFiles(accessToken: string, folderId: string = 'root') {
 
 async function getFolderPath(accessToken: string, folderId: string): Promise<Array<{ id: string; name: string }>> {
   if (folderId === 'root') return [{ id: 'root', name: 'My Drive' }]
+  if (folderId === 'shared') return [{ id: 'shared', name: 'Shared with me' }]
 
   const response = await fetch(
     `https://www.googleapis.com/drive/v3/files/${folderId}?fields=id,name,parents`,

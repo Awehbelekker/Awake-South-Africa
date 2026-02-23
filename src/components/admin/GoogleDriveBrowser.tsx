@@ -191,10 +191,20 @@ export function GoogleDriveBrowser() {
       ) : (
         <>
           {/* Folders */}
-          {folders.length > 0 && (
+          {(folders.length > 0 || currentFolder === 'root') && (
             <div className="bg-gray-50 rounded-lg p-3">
               <h3 className="text-sm font-medium text-gray-700 mb-2">Folders</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {/* Show "Shared with me" at root level */}
+                {currentFolder === 'root' && (
+                  <button
+                    onClick={() => setCurrentFolder('shared')}
+                    className="flex items-center space-x-2 p-2 bg-white hover:bg-blue-50 rounded border border-gray-200 transition-colors text-left text-gray-900"
+                  >
+                    <Folder className="w-5 h-5 text-purple-600 flex-shrink-0" />
+                    <span className="text-sm truncate">Shared with me</span>
+                  </button>
+                )}
                 {folders.map((folder) => (
                   <button
                     key={folder.id}
