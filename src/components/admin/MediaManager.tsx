@@ -118,7 +118,6 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
       setTransferring(false);
     }
   };
-  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
