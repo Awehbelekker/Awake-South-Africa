@@ -23,7 +23,7 @@ interface UploadedFile {
 
 export function BulkImageUpload() {
   const { tenant } = useTenant()
-  const { uploadImage } = useSupabaseUpload()
+  const { uploadFile, uploading: hookUploading } = useSupabaseUpload()
   const [files, setFiles] = useState<UploadedFile[]>([])
   const [createProducts, setCreateProducts] = useState(true)
   const [category, setCategory] = useState('uncategorized')
@@ -114,11 +114,17 @@ export function BulkImageUpload() {
         })
 
         // Upload to Supabase
-        const url = await uploadImage(uploadFile.file, `${tenant.id}/products`)
+        const result = await uploadFile(uploadFile.file, {
+          tenantId: tenant.id,
+          bucket: 'product-images',
+          folder: 'products',
+        })
 
-        if (!url) {
-          throw new Error('Upload failed - no URL returned')
+        if (!result.url) {
+          throw new Error(result.error || 'Upload failed - no URL returned')
         }
+
+        const url = result.url
 
         // Update file with URL
         setFiles((prev) => {
