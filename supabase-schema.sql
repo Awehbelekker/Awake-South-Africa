@@ -499,3 +499,42 @@ $$;
 --   orders, order_items, payment_transactions,
 --   customers, bookings, media_files
 -- =====================================================
+-- =====================================================
+-- STORAGE BUCKETS
+-- =====================================================
+
+-- Create product-images bucket if it doesn't exist
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'product-images',
+  'product-images',
+  true,
+  10485760, -- 10MB limit
+  array['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg']
+)
+on conflict (id) do nothing;
+
+-- Storage policies for product-images bucket
+-- Allow public read access to all images
+drop policy if exists "Public read access" on storage.objects;
+create policy "Public read access"
+  on storage.objects for select
+  using (bucket_id = 'product-images');
+
+-- Allow authenticated users to upload images
+drop policy if exists "Authenticated users can upload" on storage.objects;
+create policy "Authenticated users can upload"
+  on storage.objects for insert
+  with check (bucket_id = 'product-images');
+
+-- Allow authenticated users to update their uploads
+drop policy if exists "Authenticated users can update" on storage.objects;
+create policy "Authenticated users can update"
+  on storage.objects for update
+  using (bucket_id = 'product-images');
+
+-- Allow authenticated users to delete their uploads
+drop policy if exists "Authenticated users can delete" on storage.objects;
+create policy "Authenticated users can delete"
+  on storage.objects for delete
+  using (bucket_id = 'product-images');
