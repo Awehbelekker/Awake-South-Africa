@@ -108,7 +108,7 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
       {label && <label className="block text-sm font-medium text-gray-700">{label}</label>}
       
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-1 border border-gray-300 bg-gray-50 p-2 rounded-t-md">
+      <div className="flex flex-wrap gap-1 border border-gray-300 bg-gray-50 p-2 rounded-t-md text-gray-900 bg-white">
         {!showPreview && (
           <>
             {/* Text formatting */}
@@ -342,7 +342,7 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
               autoFocus
             />
             {imageUrl && (
-              <div className="mb-4 border border-gray-200 rounded-md p-2">
+              <div className="mb-4 border border-gray-200 rounded-md p-2 text-gray-900 bg-white">
                 <p className="text-xs text-gray-500 mb-2">Preview:</p>
                 <img src={imageUrl} alt="Preview" className="max-w-full h-auto rounded" />
               </div>

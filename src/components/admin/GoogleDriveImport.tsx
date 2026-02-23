@@ -139,7 +139,7 @@ export function GoogleDriveImport() {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
             >
               <option value="uncategorized">Uncategorized</option>
               <option value="surfboards">Surfboards</option>
@@ -162,13 +162,13 @@ export function GoogleDriveImport() {
       </div>
 
       {files.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 text-gray-900 bg-white">
           <h4 className="font-medium text-gray-900 mb-3">
             Found {files.length} image{files.length !== 1 ? 's' : ''}
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
             {files.map((file) => (
-              <div key={file.id} className="border border-gray-200 rounded-lg p-2">
+              <div key={file.id} className="border border-gray-200 rounded-lg p-2 text-gray-900 bg-white">
                 {file.thumbnailLink && (
                   <img
                     src={file.thumbnailLink}

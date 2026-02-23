@@ -249,7 +249,7 @@ function LocationEditModal({
                   <img
                     src={formData.image}
                     alt="Preview"
-                    className="h-32 w-full object-cover rounded border border-gray-300"
+                    className="h-32 w-full object-cover rounded border border-gray-300 text-gray-900 bg-white"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none'
                     }}

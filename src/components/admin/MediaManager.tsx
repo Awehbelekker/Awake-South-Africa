@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { MediaFile } from '@/store/products';
 import GoogleDrivePicker from './GoogleDrivePicker';
-import { X, Upload, Image as ImageIcon, Video, ExternalLink, MoveUp, MoveDown } from 'lucide-react';
+import { MediaLibrary } from './MediaLibrary';
+import { X, Upload, Image as ImageIcon, Video, ExternalLink, MoveUp, MoveDown, FolderOpen } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Placeholder image as data URL (1x1 transparent pixel)
@@ -20,6 +21,24 @@ interface MediaManagerProps {
 export default function MediaManager({ type, items = [], onChange, label, maxItems = 10 }: MediaManagerProps) {
   const [urlInput, setUrlInput] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
+
+  const handleLibrarySelect = (urls: string[]) => {
+    const newItems: MediaFile[] = urls.map(url => ({
+      id: `library-${Date.now()}-${Math.random()}`,
+      url,
+      type,
+      source: 'url',
+      name: url.split('/').pop() || 'Library image',
+    }));
+    if (items.length + newItems.length > maxItems) {
+      toast.error(`Maximum ${maxItems} ${type}s allowed`);
+      return;
+    }
+    onChange([...items, ...newItems]);
+    setShowLibrary(false);
+    toast.success(`${newItems.length} item(s) added from library`);
+  };
 
   const handleAddFromUrl = () => {
     if (!urlInput.trim()) {
@@ -181,6 +200,17 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
           label={`Select from Google Drive`}
         />
 
+        {/* Media Library */}
+        <button
+          type="button"
+          onClick={() => setShowLibrary(true)}
+          disabled={items.length >= maxItems}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-md cursor-pointer transition-colors"
+        >
+          <FolderOpen className="w-4 h-4" />
+          Media Library
+        </button>
+
         {/* URL Input */}
         <div className="flex-1 min-w-[250px] flex gap-2">
           <input
@@ -189,7 +219,7 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleAddFromUrl()}
             placeholder={`Enter ${type} URL...`}
-            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
             disabled={items.length >= maxItems}
           />
           <button
@@ -207,7 +237,7 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
       {items.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {items.map((item, index) => (
-            <div key={item.id} className="relative group border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+            <div key={item.id} className="relative group border border-gray-200 rounded-lg overflow-hidden bg-gray-50 text-gray-900 bg-white">
               {/* Media Preview */}
               <div className="aspect-video bg-gray-100 flex items-center justify-center">
                 {type === 'image' ? (
@@ -307,6 +337,31 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
           <p className="text-gray-500 text-sm">
             No {type}s added yet. Upload files, select from Google Drive, or add via URL.
           </p>
+        </div>
+      )}
+
+      {/* Media Library Modal */}
+      {showLibrary && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Choose from Media Library</h3>
+              <button
+                type="button"
+                onClick={() => setShowLibrary(false)}
+                className="p-2 text-gray-500 hover:text-gray-900 rounded-md hover:bg-gray-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              <MediaLibrary
+                onSelect={handleLibrarySelect}
+                multiSelect={true}
+                maxSelect={maxItems - items.length}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>

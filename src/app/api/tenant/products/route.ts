@@ -213,3 +213,48 @@ export async function PUT(request: NextRequest) {
   }
 }
 
+// DELETE /api/tenant/products?id=xxx  OR  body: { ids: [...] }
+export async function DELETE(request: NextRequest) {
+  try {
+    const tenantId = await getTenantId(request)
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
+    }
+
+    // Support ?id= query param for single delete
+    const { searchParams } = new URL(request.url)
+    const singleId = searchParams.get('id')
+
+    let ids: string[] = []
+
+    if (singleId) {
+      ids = [singleId]
+    } else {
+      const body = await request.json().catch(() => ({}))
+      ids = body.ids || []
+    }
+
+    if (ids.length === 0) {
+      return NextResponse.json({ error: 'No product ids provided' }, { status: 400 })
+    }
+
+    // Soft-delete: set is_active = false
+    const { data, error } = await getSupabase()
+      .from('products')
+      .update({ is_active: false })
+      .eq('tenant_id', tenantId)
+      .in('id', ids)
+      .select('id')
+
+    if (error) {
+      console.error('Products delete error:', JSON.stringify(error))
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, deleted: data?.length || ids.length })
+  } catch (error: any) {
+    console.error('Products DELETE error:', error?.message)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
+

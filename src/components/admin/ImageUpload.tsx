@@ -155,7 +155,7 @@ export function ImageUpload({
               <img
                 src={preview}
                 alt={`Preview ${index + 1}`}
-                className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                className="w-full h-32 object-cover rounded-lg border border-gray-200 text-gray-900 bg-white"
               />
               <button
                 onClick={() => removePreview(index)}

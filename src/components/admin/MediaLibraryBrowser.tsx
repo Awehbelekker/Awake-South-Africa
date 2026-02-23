@@ -123,7 +123,7 @@ export default function MediaLibraryBrowser({ isOpen, onClose, onSelect, type = 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by product name, file name, or URL..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
             />
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function MediaLibraryBrowser({ isOpen, onClose, onSelect, type = 
               {filteredMedia.map((media) => (
                 <div
                   key={`${media.productId}-${media.id}`}
-                  className="group relative border border-gray-200 rounded-lg overflow-hidden bg-white hover:shadow-lg transition-shadow cursor-pointer"
+                  className="group relative border border-gray-200 rounded-lg overflow-hidden bg-white hover:shadow-lg transition-shadow cursor-pointer text-gray-900 bg-white"
                   onClick={() => handleSelect(media)}
                 >
                   {/* Media Preview */}

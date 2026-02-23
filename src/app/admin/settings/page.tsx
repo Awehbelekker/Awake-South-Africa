@@ -51,7 +51,7 @@ export default function AdminSettingsPage() {
                     type="text"
                     value={form.storeName}
                     onChange={(e) => setForm({ ...form, storeName: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-gray-900 bg-white"
                   />
                 </div>
 
@@ -61,7 +61,7 @@ export default function AdminSettingsPage() {
                     type="email"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-gray-900 bg-white"
                   />
                 </div>
 
@@ -71,7 +71,7 @@ export default function AdminSettingsPage() {
                     type="tel"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-gray-900 bg-white"
                   />
                 </div>
 
@@ -81,7 +81,7 @@ export default function AdminSettingsPage() {
                     type="tel"
                     value={form.whatsapp}
                     onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-gray-900 bg-white"
                   />
                 </div>
               </div>
@@ -100,7 +100,7 @@ export default function AdminSettingsPage() {
                     step="0.01"
                     value={form.exchangeRate}
                     onChange={(e) => setForm({ ...form, exchangeRate: Number(e.target.value) })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-gray-900 bg-white"
                   />
                   <p className="mt-1 text-sm text-gray-500">Current rate: R{form.exchangeRate}/EUR</p>
                 </div>
@@ -114,7 +114,7 @@ export default function AdminSettingsPage() {
                     step="0.01"
                     value={form.margin * 100}
                     onChange={(e) => setForm({ ...form, margin: Number(e.target.value) / 100 })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-gray-900 bg-white"
                   />
                   <p className="mt-1 text-sm text-gray-500">Target margin: {(form.margin * 100).toFixed(0)}%</p>
                 </div>
@@ -128,7 +128,7 @@ export default function AdminSettingsPage() {
                     step="0.01"
                     value={form.taxRate * 100}
                     onChange={(e) => setForm({ ...form, taxRate: Number(e.target.value) / 100 })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-gray-900 bg-white"
                   />
                   <p className="mt-1 text-sm text-gray-500">VAT: {(form.taxRate * 100).toFixed(0)}%</p>
                 </div>

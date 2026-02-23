@@ -8,7 +8,7 @@ import { useProductsStore, EditableProduct } from '@/store/products'
 import { useAdminProducts, useAdminUpdateProduct, useAdminUpdateVariant } from '@/lib/medusa-hooks'
 import ProductEditModal from '@/components/admin/ProductEditModal'
 import toast, { Toaster } from 'react-hot-toast'
-import { RefreshCw, Database, WifiOff } from 'lucide-react'
+import { RefreshCw, Database, WifiOff, Trash2 } from 'lucide-react'
 
 function mapSupabaseProduct(p: any): EditableProduct {
   return {
@@ -39,6 +39,8 @@ export default function AdminProductsPage() {
   const [filter, setFilter] = useState('all')
   const [editingProduct, setEditingProduct] = useState<EditableProduct | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [deleting, setDeleting] = useState(false)
 
   // Fetch products from Medusa Admin API
   const { data: medusaData, isLoading, error: medusaError, refetch } = useAdminProducts()
@@ -188,6 +190,70 @@ export default function AdminProductsPage() {
     setEditingProduct(null)
   }
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredProducts.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(filteredProducts.map(p => p.id)))
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this product? This cannot be undone.')) return
+    setDeleting(true)
+    try {
+      if (dataSource === 'supabase') {
+        const res = await fetch(`/api/tenant/products?id=${id}`, { method: 'DELETE' })
+        const data = await res.json()
+        if (!data.success) throw new Error(data.error)
+        setSupabaseProducts(prev => prev.filter(p => p.id !== id))
+      } else {
+        // Local-only removal
+        setSupabaseProducts(prev => prev.filter(p => p.id !== id))
+      }
+      setSelectedIds(prev => { const n = new Set(prev); n.delete(id); return n })
+      toast.success('Product deleted')
+    } catch (err: any) {
+      toast.error('Delete failed: ' + err.message)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return
+    if (!confirm(`Delete ${selectedIds.size} selected product(s)? This cannot be undone.`)) return
+    setDeleting(true)
+    try {
+      if (dataSource === 'supabase') {
+        const res = await fetch('/api/tenant/products', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: Array.from(selectedIds) }),
+        })
+        const data = await res.json()
+        if (!data.success) throw new Error(data.error)
+        setSupabaseProducts(prev => prev.filter(p => !selectedIds.has(p.id)))
+      } else {
+        setSupabaseProducts(prev => prev.filter(p => !selectedIds.has(p.id)))
+      }
+      toast.success(`${selectedIds.size} product(s) deleted`)
+      setSelectedIds(new Set())
+    } catch (err: any) {
+      toast.error('Bulk delete failed: ' + err.message)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   const calculateMargin = (product: any) => {
     if (!product.costEUR) return 'N/A'
     const costZAR = product.costEUR * settings.exchangeRate
@@ -259,7 +325,7 @@ export default function AdminProductsPage() {
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white"
         >
           {categories.map((cat) => (
             <option key={cat} value={cat}>
@@ -269,11 +335,30 @@ export default function AdminProductsPage() {
         </select>
       </div>
 
+      {/* Bulk Actions Bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2 mb-2 bg-red-50 border border-red-200 rounded-lg">
+          <span className="text-sm text-red-700 font-medium">{selectedIds.size} selected</span>
+          <button
+            onClick={handleBulkDelete}
+            disabled={deleting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-md"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Delete Selected
+          </button>
+          <button onClick={() => setSelectedIds(new Set())} className="text-sm text-gray-500 hover:text-gray-700">Clear</button>
+        </div>
+      )}
+
       {/* Products Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-4 py-3">
+                <input type="checkbox" checked={selectedIds.size === filteredProducts.length && filteredProducts.length > 0} onChange={toggleSelectAll} className="h-4 w-4 text-blue-600 rounded border-gray-300" />
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
@@ -287,7 +372,10 @@ export default function AdminProductsPage() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredProducts.map((product) => (
-              <tr key={product.id}>
+              <tr key={product.id} className={selectedIds.has(product.id) ? 'bg-blue-50' : ''}>
+                <td className="px-4 py-4">
+                  <input type="checkbox" checked={selectedIds.has(product.id)} onChange={() => toggleSelect(product.id)} className="h-4 w-4 text-blue-600 rounded border-gray-300" />
+                </td>
                 <td className="px-6 py-4">
                   <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded" />
                 </td>
@@ -308,7 +396,17 @@ export default function AdminProductsPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <button onClick={() => startEdit(product)} className="text-blue-600 hover:text-blue-900">Edit</button>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => startEdit(product)} className="text-blue-600 hover:text-blue-900 text-sm">Edit</button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      disabled={deleting}
+                      className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                      title="Delete product"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

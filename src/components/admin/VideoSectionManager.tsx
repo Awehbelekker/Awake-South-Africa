@@ -180,7 +180,7 @@ export function VideoSectionManager({ value = {}, onChange }: Props) {
               placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..."
               value={value.product_intro?.url || ''}
               onChange={(e) => updateIntroVideo(e.target.value, value.product_intro?.title, value.product_intro?.description)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
             />
           </div>
           <div>
@@ -190,7 +190,7 @@ export function VideoSectionManager({ value = {}, onChange }: Props) {
               placeholder="e.g., Meet the Awake Ravik 3"
               value={value.product_intro?.title || ''}
               onChange={(e) => updateIntroVideo(value.product_intro?.url || '', e.target.value, value.product_intro?.description)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
             />
           </div>
           <div>
@@ -199,7 +199,7 @@ export function VideoSectionManager({ value = {}, onChange }: Props) {
               placeholder="Brief description of the video..."
               value={value.product_intro?.description || ''}
               onChange={(e) => updateIntroVideo(value.product_intro?.url || '', value.product_intro?.title, e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
               rows={2}
             />
           </div>
@@ -259,7 +259,7 @@ export function VideoSectionManager({ value = {}, onChange }: Props) {
               placeholder="https://www.youtube.com/watch?v=..."
               value={newVideoUrl}
               onChange={(e) => setNewVideoUrl(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
             />
           </div>
           <div>
@@ -269,7 +269,7 @@ export function VideoSectionManager({ value = {}, onChange }: Props) {
               placeholder="e.g., Riding in Big Waves"
               value={newVideoTitle}
               onChange={(e) => setNewVideoTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
             />
           </div>
           <button
