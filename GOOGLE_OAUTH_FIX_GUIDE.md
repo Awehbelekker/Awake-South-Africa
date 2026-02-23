@@ -6,11 +6,14 @@ Getting **Error 400: redirect_uri_mismatch** when trying to connect Google Drive
 ## Root Cause
 The redirect URI sent in the OAuth request doesn't match the URIs configured in Google Cloud Console.
 
+**CODE IS ALREADY FIXED** ✅ - Commit `79b2665` dynamically derives redirect URI from request origin.
+The fix needed is in **Google Cloud Console configuration**.
+
 ---
 
-## Solution: 3-Step Fix
+## Solution: Add Redirect URI to Google Cloud Console
 
-### Step 1: Add Redirect URIs to Google Cloud Console
+### Step 1: Add Redirect URIs to Google Cloud Console (REQUIRED)
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Select your project (or the project with Client ID: `39956410829-ihrhivfrsenidriv66896el6r9u1m8md`)
@@ -23,22 +26,9 @@ The redirect URI sent in the OAuth request doesn't match the URIs configured in 
    ```
 6. Click **Save**
 
-### Step 2: Update Vercel Environment Variables
+**That's it!** The code already derives the redirect URI from the actual request, so no environment variables needed.
 
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Select your project: **awake-south-africa**
-3. Go to **Settings** → **Environment Variables**
-4. Add or update:
-   ```
-   NEXT_PUBLIC_APP_URL = https://awake-south-africa.vercel.app
-   ```
-5. Select environments: **Production**, **Preview**, **Development**
-6. Click **Save**
-7. Go to **Deployments** tab
-8. Click the three dots (...) on the latest deployment
-9. Click **Redeploy**
-
-### Step 3: Test the Connection
+### Step 2: Test the Connection
 
 #### On Production:
 1. Go to https://awake-south-africa.vercel.app/admin/settings
@@ -113,7 +103,7 @@ Would need to create:
 2. NO trailing slashes
 3. Make sure you clicked "Save" in Google Cloud Console
 4. Try clearing browser cache and cookies
-5. Check if NEXT_PUBLIC_APP_URL is set in Vercel (see Step 2)
+5. Wait 5-10 minutes after saving (Google propagation delay)
 
 ### Not Seeing Google Drive Section?
 1. Make sure you're logged into tenant admin
@@ -134,7 +124,7 @@ Would need to create:
 **Environment Variables:**
 - ✅ `NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID` = `39956410829-ihrhivfrsenidriv66896el6r9u1m8md`
 - ✅ `GOOGLE_DRIVE_CLIENT_SECRET` = `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`
-- ⚠️ `NEXT_PUBLIC_APP_URL` = `http://localhost:3000` (needs production URL in Vercel)
+- ✅ No `NEXT_PUBLIC_APP_URL` needed - code derives origin from request automatically
 
 **OAuth Callback Routes:**
 - ✅ `/api/oauth/google/authorize` - Initiates OAuth flow
@@ -173,16 +163,15 @@ fetch('/api/tenant/google-drive/status?tenant_id=YOUR_TENANT_ID')
 ## Summary
 
 **To Fix Immediately:**
-1. Add both redirect URIs to Google Cloud Console
-2. Set `NEXT_PUBLIC_APP_URL` in Vercel to production URL
-3. Redeploy on Vercel
-4. Test on production domain
+1. Add both redirect URIs to Google Cloud Console (local + production)
+2. Click "Save" and wait 5-10 minutes for propagation
+3. Test on production domain
 
 **Current State:**
 - ✅ Google Drive integration code is complete
+- ✅ OAuth redirect URI dynamically derived from request (commit `79b2665`)
 - ✅ Admin UI exists and should be visible
-- ❌ OAuth redirect URIs not configured correctly
-- ❌ Production URL not set in Vercel
+- ❌ OAuth redirect URIs not configured in Google Cloud Console ← **THIS IS THE FIX**
 
 **After Fix:**
 - Google Drive connection will work
