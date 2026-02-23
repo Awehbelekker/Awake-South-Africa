@@ -57,7 +57,7 @@ export default function ArrayFieldEditor({ label, values, onChange, placeholder 
               type="text"
               value={item}
               onChange={(e) => updateItem(index, e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
             />
             <div className="flex gap-1">
               <button
@@ -99,7 +99,7 @@ export default function ArrayFieldEditor({ label, values, onChange, placeholder 
           onChange={(e) => setNewItem(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addItem())}
           placeholder={placeholder || `Add new ${label.toLowerCase()}`}
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
         />
         <button
           type="button"

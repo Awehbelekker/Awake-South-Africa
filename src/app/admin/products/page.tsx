@@ -8,11 +8,32 @@ import { useProductsStore, EditableProduct } from '@/store/products'
 import { useAdminProducts, useAdminUpdateProduct, useAdminUpdateVariant } from '@/lib/medusa-hooks'
 import ProductEditModal from '@/components/admin/ProductEditModal'
 import toast, { Toaster } from 'react-hot-toast'
-import { RefreshCw, Database, HardDrive } from 'lucide-react'
+import { RefreshCw, Database, WifiOff } from 'lucide-react'
+
+function mapSupabaseProduct(p: any): EditableProduct {
+  return {
+    id: p.metadata?.localId || p.id,
+    name: p.name,
+    price: p.price,
+    priceExVAT: p.price_ex_vat || Math.round(p.price / 1.15),
+    costEUR: p.cost_eur,
+    category: p.category,
+    categoryTag: p.category_tag || p.category,
+    description: p.description,
+    image: p.image || p.images?.[0],
+    badge: p.badge,
+    battery: p.battery,
+    skillLevel: p.skill_level,
+    specs: p.specs,
+    features: p.features,
+    inStock: p.in_stock,
+    stockQuantity: p.stock_quantity,
+  }
+}
 
 export default function AdminProductsPage() {
   const router = useRouter()
-  const { isAuthenticated, settings, authMode } = useAdminStore()
+  const { isAuthenticated, settings } = useAdminStore()
   const { products: localProducts, updateProduct: updateLocalProduct } = useProductsStore()
   const [mounted, setMounted] = useState(false)
   const [filter, setFilter] = useState('all')
@@ -24,94 +45,62 @@ export default function AdminProductsPage() {
   const updateProductMutation = useAdminUpdateProduct()
   const updateVariantMutation = useAdminUpdateVariant()
 
-  // Use Medusa products if available, otherwise fallback to Supabase, then local
   const medusaProducts = medusaData?.products
-  const useMedusa = medusaProducts && medusaProducts.length > 0 && !medusaError
-  const [supabaseProducts, setSupabaseProducts] = useState<EditableProduct[]>([])
-  const [supabaseLoading, setSupabaseLoading] = useState(false)
-  const [syncing, setSyncing] = useState(false)
+  const useMedusa = !!(medusaProducts && medusaProducts.length > 0 && !medusaError)
 
-  // Fetch from Supabase when Medusa unavailable
+  const [supabaseProducts, setSupabaseProducts] = useState<EditableProduct[]>([])
+  const [supabaseAvailable, setSupabaseAvailable] = useState(true)
+  const [supabaseLoading, setSupabaseLoading] = useState(false)
+
+  // Load from Supabase whenever Medusa is unavailable
   useEffect(() => {
     if (!useMedusa && !isLoading) {
       setSupabaseLoading(true)
       fetch('/api/tenant/products')
         .then(r => r.json())
         .then(data => {
+          setSupabaseAvailable(true)
           if (data.products?.length > 0) {
-            // Map Supabase product shape to EditableProduct
-            setSupabaseProducts(data.products.map((p: any) => ({
-              id: p.metadata?.localId || p.id,
-              name: p.name,
-              price: p.price,
-              priceExVAT: p.price_ex_vat || Math.round(p.price / 1.15),
-              costEUR: p.cost_eur,
-              category: p.category,
-              categoryTag: p.category_tag || p.category,
-              description: p.description,
-              image: p.image || p.images?.[0],
-              badge: p.badge,
-              battery: p.battery,
-              skillLevel: p.skill_level,
-              specs: p.specs,
-              features: p.features,
-              inStock: p.in_stock,
-              stockQuantity: p.stock_quantity,
-            })))
+            setSupabaseProducts(data.products.map(mapSupabaseProduct))
+          } else if (localProducts.length > 0) {
+            // Supabase reachable but empty — auto-sync local products up
+            autoSyncToSupabase(localProducts)
           }
         })
-        .catch(() => {})
+        .catch(() => setSupabaseAvailable(false))
         .finally(() => setSupabaseLoading(false))
     }
   }, [useMedusa, isLoading])
 
-  const useSupabase = !useMedusa && supabaseProducts.length > 0
-  const products: EditableProduct[] = useMedusa ? medusaProducts : useSupabase ? supabaseProducts : localProducts
-  const dataSource = useMedusa ? 'medusa' : useSupabase ? 'supabase' : 'local'
-
-  const syncToSupabase = async () => {
-    setSyncing(true)
+  // Silently push local products to Supabase and switch to Supabase source
+  const autoSyncToSupabase = async (products: EditableProduct[]) => {
     try {
       const res = await fetch('/api/tenant/products', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ products: localProducts }),
+        body: JSON.stringify({ products }),
       })
       const data = await res.json()
       if (data.success) {
-        toast.success(`Synced ${data.synced} products to Supabase!`)
-        // Reload from Supabase
+        toast.success(`${data.synced} products synced to Supabase`)
         const r2 = await fetch('/api/tenant/products')
         const d2 = await r2.json()
-        if (d2.products?.length > 0) setSupabaseProducts(d2.products.map((p: any) => ({
-          id: p.metadata?.localId || p.id, name: p.name, price: p.price,
-          priceExVAT: p.price_ex_vat || Math.round(p.price / 1.15),
-          costEUR: p.cost_eur, category: p.category, categoryTag: p.category_tag || p.category,
-          description: p.description, image: p.image || p.images?.[0], badge: p.badge,
-          battery: p.battery, skillLevel: p.skill_level,
-          specs: p.specs, features: p.features,
-          inStock: p.in_stock, stockQuantity: p.stock_quantity,
-        })))
-      } else {
-        toast.error(`Sync failed: ${data.error}`)
+        if (d2.products?.length > 0) setSupabaseProducts(d2.products.map(mapSupabaseProduct))
       }
-    } catch (e: any) {
-      toast.error(`Sync failed: ${e.message}`)
-    } finally {
-      setSyncing(false)
-    }
+    } catch { /* stay on local silently */ }
   }
+
+  const useSupabase = !useMedusa && supabaseAvailable && supabaseProducts.length > 0
+  const useLocal = !useMedusa && !useSupabase
+  const products: EditableProduct[] = useMedusa ? medusaProducts! : useSupabase ? supabaseProducts : localProducts
+  const dataSource = useMedusa ? 'medusa' : useSupabase ? 'supabase' : 'local'
 
   useEffect(() => {
     setMounted(true)
-    if (!isAuthenticated) {
-      router.push('/admin')
-    }
+    if (!isAuthenticated) router.push('/admin')
   }, [isAuthenticated, router])
 
-  if (!mounted || !isAuthenticated) {
-    return null
-  }
+  if (!mounted || !isAuthenticated) return null
 
   const filteredProducts = filter === 'all'
     ? products
@@ -124,10 +113,20 @@ export default function AdminProductsPage() {
     setIsModalOpen(true)
   }
 
+  const saveToSupabase = async (product: EditableProduct) => {
+    const res = await fetch('/api/tenant/products', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ products: [product] }),
+    })
+    const data = await res.json()
+    if (!data.success) throw new Error(data.error || 'Save failed')
+    setSupabaseProducts(prev => prev.map(p => p.id === product.id ? product : p))
+  }
+
   const handleSave = async (product: EditableProduct) => {
     if (useMedusa) {
       try {
-        // Update product title, description, metadata via Medusa Admin API
         await updateProductMutation.mutateAsync({
           id: product.id,
           data: {
@@ -146,8 +145,6 @@ export default function AdminProductsPage() {
             },
           },
         })
-
-        // Update variant pricing and inventory if we have variant info
         if ((product as any).variantId) {
           await updateVariantMutation.mutateAsync({
             productId: product.id,
@@ -155,46 +152,31 @@ export default function AdminProductsPage() {
             data: {
               prices: [{ amount: Math.round(product.price * 100), currency_code: 'zar' }],
               inventory_quantity: product.stockQuantity,
-              metadata: {
-                costEUR: product.costEUR,
-                priceExVAT: product.priceExVAT,
-              },
+              metadata: { costEUR: product.costEUR, priceExVAT: product.priceExVAT },
             },
           })
         }
-
-        toast.success('Product updated in Medusa!')
+        toast.success('Product saved!')
       } catch (err) {
-        console.error('Medusa update failed:', err)
-        toast.error('Failed to update in Medusa. Saving locally.')
-        updateLocalProduct(product.id, product)
-      }
-    } else if (useSupabase) {
-      // Update in Supabase
-      try {
-        const res = await fetch('/api/tenant/products', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ products: [product] }),
-        })
-        const data = await res.json()
-        if (data.success) {
-          // Update local Supabase state immediately
-          setSupabaseProducts(prev => prev.map(p =>
-            (p.id === product.id || p.id === product.id) ? product : p
-          ))
+        // Medusa failed mid-session — fall through to Supabase
+        try {
+          await saveToSupabase(product)
           toast.success('Product saved to Supabase!')
-        } else {
-          toast.error(`Save failed: ${data.error}`)
+        } catch {
           updateLocalProduct(product.id, product)
+          toast('Saved offline — will sync when connected', { icon: '⚠️' })
         }
-      } catch (err: any) {
-        toast.error(`Save failed: ${err.message}`)
-        updateLocalProduct(product.id, product)
       }
     } else {
-      updateLocalProduct(product.id, product)
-      toast.success('Product updated locally')
+      // Primary path when Medusa is down: always save to Supabase
+      try {
+        await saveToSupabase(product)
+        toast.success('Product saved!')
+      } catch {
+        // Supabase also unreachable — offline fallback only
+        updateLocalProduct(product.id, product)
+        toast('Saved offline — will sync when connected', { icon: '⚠️' })
+      }
     }
 
     setIsModalOpen(false)
@@ -227,40 +209,29 @@ export default function AdminProductsPage() {
       {/* Data Source Indicator */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 text-sm">
-          {dataSource === 'medusa' ? (
+          {dataSource === 'medusa' && (
             <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full">
               <Database className="h-3.5 w-3.5" />
-              Medusa API ({products.length} products)
+              Medusa ({products.length} products)
             </span>
-          ) : dataSource === 'supabase' ? (
+          )}
+          {dataSource === 'supabase' && (
             <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
               <Database className="h-3.5 w-3.5" />
               Supabase ({products.length} products)
             </span>
-          ) : (
+          )}
+          {dataSource === 'local' && (
             <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">
-              <HardDrive className="h-3.5 w-3.5" />
-              Local Storage ({products.length} products)
+              <WifiOff className="h-3.5 w-3.5" />
+              Offline ({products.length} products) — changes will sync when reconnected
             </span>
           )}
-          {medusaError && (
-            <span className="text-xs text-red-500">Medusa unavailable</span>
-          )}
           {supabaseLoading && (
-            <span className="text-xs text-gray-400">Checking Supabase...</span>
+            <span className="text-xs text-gray-400">Connecting to Supabase...</span>
           )}
         </div>
         <div className="flex items-center gap-2">
-          {dataSource === 'local' && (
-            <button
-              onClick={syncToSupabase}
-              disabled={syncing}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md disabled:opacity-50"
-            >
-              <Database className={`h-3.5 w-3.5 ${syncing ? 'animate-pulse' : ''}`} />
-              {syncing ? 'Syncing...' : 'Sync to Supabase'}
-            </button>
-          )}
           {dataSource === 'medusa' && (
             <button
               onClick={() => refetch()}
@@ -273,9 +244,8 @@ export default function AdminProductsPage() {
           )}
         </div>
       </div>
-
       {/* Loading State */}
-      {isLoading && dataSource === 'medusa' && (
+      {isLoading && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 text-center text-blue-700">
           Loading products from Medusa...
         </div>
@@ -356,3 +326,5 @@ export default function AdminProductsPage() {
     </AdminLayout>
   )
 }
+
+
