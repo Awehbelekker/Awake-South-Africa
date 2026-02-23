@@ -509,7 +509,7 @@ values (
   'product-images',
   'product-images',
   true,
-  10485760, -- 10MB limit
+  52428800, -- 50MB limit (increased from 10MB)
   array['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg']
 )
 on conflict (id) do nothing;

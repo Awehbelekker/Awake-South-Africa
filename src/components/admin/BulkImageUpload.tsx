@@ -35,19 +35,31 @@ export function BulkImageUpload() {
   function handleFileSelect(selectedFiles: FileList | null) {
     if (!selectedFiles || selectedFiles.length === 0) return
 
+    const maxSize = 50 * 1024 * 1024 // 50MB
     const newFiles: UploadedFile[] = []
+    const tooLarge: string[] = []
+
     Array.from(selectedFiles).forEach((file) => {
       if (file.type.startsWith('image/')) {
-        newFiles.push({
-          file,
-          preview: URL.createObjectURL(file),
-        })
+        if (file.size > maxSize) {
+          tooLarge.push(`${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`)
+        } else {
+          newFiles.push({
+            file,
+            preview: URL.createObjectURL(file),
+          })
+        }
       }
     })
 
+    if (tooLarge.length > 0) {
+      setError(`${tooLarge.length} file(s) too large (max 50MB): ${tooLarge.join(', ')}`)
+    }
+
     setFiles((prev) => [...prev, ...newFiles])
-    setError(null)
-    setSuccess(null)
+    if (newFiles.length > 0) {
+      setSuccess(null)
+    }
   }
 
   function handleDrop(e: React.DragEvent) {
@@ -137,10 +149,9 @@ export function BulkImageUpload() {
             name: uploadFile.file.name.replace(/\.[^/.]+$/, ''),
             description: `Uploaded: ${uploadFile.file.name}`,
             price: 0,
-            currency: 'ZAR',
             category,
             images: [url],
-            thumbnail: url,
+            image: url,
             in_stock: false,
             stock_quantity: 0,
             is_featured: false,
@@ -236,7 +247,7 @@ export function BulkImageUpload() {
         <p className="text-gray-600 mb-1">
           <span className="text-blue-600 font-medium">Click to upload</span> or drag and drop
         </p>
-        <p className="text-sm text-gray-500">PNG, JPG, GIF, WEBP (max 10MB per file)</p>
+        <p className="text-sm text-gray-500">PNG, JPG, GIF, WEBP (max 50MB per file)</p>
         <input
           ref={fileInputRef}
           type="file"
