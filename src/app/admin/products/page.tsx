@@ -189,11 +189,14 @@ export default function AdminProductsPage() {
             },
           })
         }
+        // Always update localStorage to persist changes across reloads
+        updateLocalProduct(product.id, product)
         toast.success('Product saved!')
       } catch (err) {
         // Medusa failed mid-session — fall through to Supabase
         try {
           await saveToSupabase(product)
+          updateLocalProduct(product.id, product)
           toast.success('Product saved to Supabase!')
         } catch {
           updateLocalProduct(product.id, product)
@@ -204,6 +207,8 @@ export default function AdminProductsPage() {
       // Primary path when Medusa is down: always save to Supabase
       try {
         await saveToSupabase(product)
+        // Always update localStorage to persist changes across reloads
+        updateLocalProduct(product.id, product)
         toast.success('Product saved!')
       } catch {
         // Supabase also unreachable — offline fallback only
