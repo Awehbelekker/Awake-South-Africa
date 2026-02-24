@@ -7,8 +7,9 @@ import { useAdminStore } from '@/store/admin'
 import { useProductsStore, EditableProduct } from '@/store/products'
 import { useAdminProducts, useAdminUpdateProduct, useAdminUpdateVariant } from '@/lib/medusa-hooks'
 import ProductEditModal from '@/components/admin/ProductEditModal'
+import QuickProductCreate from '@/components/admin/QuickProductCreate'
 import toast, { Toaster } from 'react-hot-toast'
-import { RefreshCw, Database, WifiOff, Trash2 } from 'lucide-react'
+import { RefreshCw, Database, WifiOff, Trash2, Plus } from 'lucide-react'
 
 function mapSupabaseProduct(p: any): EditableProduct {
   return {
@@ -34,13 +35,16 @@ function mapSupabaseProduct(p: any): EditableProduct {
 export default function AdminProductsPage() {
   const router = useRouter()
   const { isAuthenticated, settings } = useAdminStore()
-  const { products: localProducts, updateProduct: updateLocalProduct } = useProductsStore()
+  const { products: localProducts, updateProduct: updateLocalProduct, deleteProduct: deleteLocalProduct } = useProductsStore()
   const [mounted, setMounted] = useState(false)
   const [filter, setFilter] = useState('all')
   const [editingProduct, setEditingProduct] = useState<EditableProduct | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState(false)
+  const [sortField, setSortField] = useState<'name' | 'price' | 'category'>('name')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
   // Fetch products from Medusa Admin API
   const { data: medusaData, isLoading, error: medusaError, refetch } = useAdminProducts()
@@ -108,7 +112,34 @@ export default function AdminProductsPage() {
     ? products
     : products.filter(p => (p.categoryTag || p.category) === filter)
 
-  const categories = ['all', ...Array.from(new Set(products.map(p => p.categoryTag || p.category)))]
+  // Sort products
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    let compareValue = 0;
+    if (sortField === 'name') {
+      compareValue = a.name.localeCompare(b.name);
+    } else if (sortField === 'price') {
+      compareValue = a.price - b.price;
+    } else if (sortField === 'category') {
+      compareValue = (a.categoryTag || a.category).localeCompare(b.categoryTag || b.category);
+    }
+    return sortDirection === 'asc' ? compareValue : -compareValue;
+  });
+
+  const categories = ['all', ...Array.from(new Set(products.map(p => p.categoryTag || p.category)))];
+
+  const handleSort = (field: 'name' | 'price' | 'category') => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ field }: { field: 'name' | 'price' | 'category' }) => {
+    if (sortField !== field) return <span className="text-gray-400">⬍</span>;
+    return sortDirection === 'asc' ? <span>↑</span> : <span>↓</span>;
+  };
 
   const startEdit = (product: EditableProduct) => {
     setEditingProduct(product)
@@ -190,6 +221,21 @@ export default function AdminProductsPage() {
     setEditingProduct(null)
   }
 
+  const handleProductCreated = async () => {
+    setIsCreateModalOpen(false)
+    // Refresh product list
+    if (dataSource === 'supabase') {
+      const res = await fetch('/api/tenant/products')
+      const data = await res.json()
+      if (data.products) {
+        setSupabaseProducts(data.products.map(mapSupabaseProduct))
+      }
+    } else if (dataSource === 'medusa') {
+      refetch()
+    }
+    toast.success('Product created successfully!')
+  }
+
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
       const next = new Set(prev)
@@ -215,10 +261,9 @@ export default function AdminProductsPage() {
         const data = await res.json()
         if (!data.success) throw new Error(data.error)
         setSupabaseProducts(prev => prev.filter(p => p.id !== id))
-      } else {
-        // Local-only removal
-        setSupabaseProducts(prev => prev.filter(p => p.id !== id))
       }
+      // Always update localStorage to persist deletion across reloads
+      deleteLocalProduct(id)
       setSelectedIds(prev => { const n = new Set(prev); n.delete(id); return n })
       toast.success('Product deleted')
     } catch (err: any) {
@@ -242,9 +287,9 @@ export default function AdminProductsPage() {
         const data = await res.json()
         if (!data.success) throw new Error(data.error)
         setSupabaseProducts(prev => prev.filter(p => !selectedIds.has(p.id)))
-      } else {
-        setSupabaseProducts(prev => prev.filter(p => !selectedIds.has(p.id)))
       }
+      // Always update localStorage to persist deletion across reloads
+      selectedIds.forEach(id => deleteLocalProduct(id))
       toast.success(`${selectedIds.size} product(s) deleted`)
       setSelectedIds(new Set())
     } catch (err: any) {
@@ -298,6 +343,13 @@ export default function AdminProductsPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md shadow-sm transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Add Product
+          </button>
           {dataSource === 'medusa' && (
             <button
               onClick={() => refetch()}
@@ -360,36 +412,72 @@ export default function AdminProductsPage() {
                 <input type="checkbox" checked={selectedIds.size === filteredProducts.length && filteredProducts.length > 0} onChange={toggleSelectAll} className="h-4 w-4 text-blue-600 rounded border-gray-300" />
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (inc VAT)</th>
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('name')}
+              >
+                <div className="flex items-center gap-2">
+                  Product <SortIcon field="name" />
+                </div>
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                onClick={() => handleSort('category')}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="flex items-center gap-2">
+                  Category <SortIcon field="category" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('price')}
+              >
+                <div className="flex items-center gap-2">
+                  Price (inc VAT) <SortIcon field="price" />
+                </div>
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost EUR</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Margin</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit</th>
+
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredProducts.map((product) => (
+            {sortedProducts.map((product) => (
               <tr key={product.id} className={selectedIds.has(product.id) ? 'bg-blue-50' : ''}>
                 <td className="px-4 py-4">
                   <input type="checkbox" checked={selectedIds.has(product.id)} onChange={() => toggleSelect(product.id)} className="h-4 w-4 text-blue-600 rounded border-gray-300" />
                 </td>
                 <td className="px-6 py-4">
-                  <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded" />
+                  {product.image ? (
+                    <img 
+                      src={product.image} 
+                      alt={product.name} 
+                      className="w-16 h-16 object-cover rounded border border-gray-200"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/64x64?text=No+Image';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">
+                      No Image
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                  <div className="text-sm text-gray-500">{product.categoryTag || product.category}</div>
+                  {product.badge && (
+                    <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                      {product.badge}
+                    </span>
+                  )}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-gray-600 max-w-xs truncate" dangerouslySetInnerHTML={{ __html: product.description || '' }} />
+                  <div className="text-sm text-gray-600">{product.categoryTag || product.category}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900">R{product.price.toLocaleString()}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{product.costEUR ? `€${product.costEUR.toLocaleString()}` : 'N/A'}</td>
-                <td className="px-6 py-4 text-sm text-gray-900">{calculateMargin(product)}</td>
-                <td className="px-6 py-4 text-sm text-gray-900">{calculateProfit(product)}</td>
+
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 text-xs rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {product.stockQuantity}
@@ -420,6 +508,13 @@ export default function AdminProductsPage() {
         onClose={handleCloseModal}
         product={editingProduct}
         onSave={handleSave}
+      />
+
+      {/* Quick Product Create Modal */}
+      <QuickProductCreate
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleProductCreated}
       />
     </AdminLayout>
   )

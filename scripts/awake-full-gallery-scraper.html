@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awake Full Gallery Scraper</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+      padding: 25px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+
+    .section-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 15px;
+    }
+
+    .import-mode {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .mode-card {
+      flex: 1;
+      padding: 20px;
+      border: 3px solid #e2e8f0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: white;
+    }
+
+    .mode-card:hover {
+      border-color: #1e3a8a;
+      transform: translateY(-2px);
+    }
+
+    .mode-card.active {
+      border-color: #1e3a8a;
+      background: #eff6ff;
+    }
+
+    .mode-title {
+      font-weight: 700;
+      font-size: 1.1em;
+      margin-bottom: 8px;
+      color: #1e3a8a;
+    }
+
+    .mode-desc {
+      font-size: 0.9em;
+      color: #64748b;
+    }
+
+    .button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
+    }
+
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .log-container {
+      background: #1a1a1a;
+      border-radius: 8px;
+      padding: 20px;
+      max-height: 500px;
+      overflow-y: auto;
+      font-family: 'Monaco', monospace;
+      font-size: 0.9em;
+    }
+
+    .log-entry {
+      margin-bottom: 8px;
+      color: #e5e7eb;
+    }
+
+    .log-entry.success { color: #10b981; }
+    .log-entry.error { color: #ef4444; }
+    .log-entry.warning { color: #f59e0b; }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .gallery-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #e2e8f0;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gallery-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px;
+      font-size: 0.75em;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-family: 'Monaco', monospace;
+      font-size: 0.9em;
+      resize: vertical;
+    }
+
+    .instructions {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .instructions h4 {
+      color: #92400e;
+      margin-bottom: 10px;
+    }
+
+    .instructions ol {
+      margin-left: 20px;
+      color: #78350f;
+    }
+
+    .instructions li {
+      margin-bottom: 5px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid #e2e8f0;
+    }
+
+    .stat-value {
+      font-size: 2em;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: #64748b;
+      margin-top: 5px;
+    }
+
+    code {
+      background: #1a1a1a;
+      color: #10b981;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', monospace;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏄 Awake Full Gallery Scraper</h1>
+      <p>Extract ALL images (6-8+ per product) from awakeboards.com</p>
+    </div>
+
+    <div class="content">
+      <!-- Import Mode Selection -->
+      <div class="section">
+        <div class="section-title">1. Choose Import Method</div>
+        <div class="import-mode">
+          <div class="mode-card active" data-mode="auto">
+            <div class="mode-title">🤖 Auto-Scrape (Recommended)</div>
+            <div class="mode-desc">Automatically fetch full galleries from awakeboards.com using CORS proxy</div>
+          </div>
+          <div class="mode-card" data-mode="manual">
+            <div class="mode-title">✍️ Manual Paste</div>
+            <div class="mode-desc">Paste image URLs extracted from browser DevTools</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto Mode -->
+      <div class="section" id="auto-mode-section">
+        <div class="section-title">2. Configure Auto-Scrape</div>
+        <button class="button" id="start-auto-scrape">
+          🚀 Start Auto-Scraping All Products
+        </button>
+        <p style="margin-top: 15px; color: #64748b; font-size: 0.9em;">
+          This will visit each product page on awakeboards.com and extract ALL gallery images, lifestyle shots, and detail photos.
+        </p>
+      </div>
+
+      <!-- Manual Mode -->
+      <div class="section" id="manual-mode-section" style="display: none;">
+        <div class="section-title">2. Extract Images Manually</div>
+        
+        <div class="instructions">
+          <h4>📋 How to Extract Full Galleries:</h4>
+          <ol>
+            <li>Visit <strong>awakeboards.com</strong> product page (e.g., RÄVIK Adventure)</li>
+            <li>Open DevTools: Press <code>F12</code> or <code>Ctrl+Shift+I</code></li>
+            <li>Go to <strong>Console</strong> tab</li>
+            <li>Paste this code:
+              <pre style="background: #1a1a1a; color: #10b981; padding: 10px; border-radius: 4px; margin-top: 10px; overflow-x: auto; font-size: 0.85em;">
+// Extract all product gallery images
+const images = [];
+document.querySelectorAll('.product-single__photos img, .product__media img, [data-media-id] img').forEach(img => {
+  const src = img.src || img.dataset.src || img.dataset.large;
+  if (src && !images.includes(src) && !src.includes('icon') && !src.includes('logo')) {
+    images.push(src);
+  }
+});
+console.log(images.join('\\n'));
+              </pre>
+            </li>
+            <li>Copy the output URLs and paste below</li>
+            <li>Repeat for each product</li>
+          </ol>
+        </div>
+
+        <textarea id="manual-urls" placeholder="Paste image URLs here (one per line)..."></textarea>
+        
+        <button class="button" id="start-manual-import" style="margin-top: 15px;">
+          📥 Import Pasted URLs
+        </button>
+      </div>
+
+      <!-- Progress -->
+      <div class="section" id="progress-section" style="display: none;">
+        <div class="section-title">Import Progress</div>
+        
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-products">0</div>
+            <div class="stat-label">Products</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-images">0</div>
+            <div class="stat-label">Images Found</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-uploaded">0</div>
+            <div class="stat-label">Uploaded</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-errors">0</div>
+            <div class="stat-label">Errors</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+          <h3 style="margin-bottom: 15px;">Activity Log:</h3>
+          <div class="log-container" id="log-container"></div>
+        </div>
+
+        <div id="gallery-preview" style="margin-top: 30px; display: none;">
+          <h3 style="margin-bottom: 15px;">Gallery Preview:</h3>
+          <div class="gallery-grid" id="gallery-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://iepeffuszswxuwyqrzix.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkcGVmZnVzenN3eHV3eXFyeml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3NjIzNzMsImV4cCI6MjA1MTMzODM3M30.Yy6qSrh1xr-gkqSK7d4Fh_c3YvR2L3x4k1Z_0jH5sXg';
+
+    let supabaseClient = null;
+    let selectedMode = 'auto';
+    let stats = { products: 0, images: 0, uploaded: 0, errors: 0 };
+
+    // Awake product URLs to scrape (product handle → full URL)
+    const AWAKE_PRODUCTS = {
+      // Jetboards
+      'ravik-explore': 'https://awakeboards.com/products/awake-ravik-explore',
+      'ravik-adventure': 'https://awakeboards.com/products/awake-ravik-adventure',
+      'ravik-ultimate': 'https://awakeboards.com/products/awake-ravik-ultimate',
+      'ravik-s': 'https://awakeboards.com/products/awake-ravik-s',
+      
+      // eFoils
+      'vinga-adventure': 'https://awakeboards.com/products/awake-vinga-adventure',
+      'vinga-ultimate': 'https://awakeboards.com/products/awake-vinga-ultimate',
+      
+      // Limited Edition
+      'brabus-shadow': 'https://awakeboards.com/products/brabus-x-awake-shadow-explore',
+      
+      // Batteries
+      'flex-battery-lr4': 'https://awakeboards.com/products/flex-battery-lr-4-90-min',
+      'flex-battery-xr4': 'https://awakeboards.com/products/flex-battery-xr-4-65-min',
+      'brabus-battery-xr4': 'https://awakeboards.com/products/brabus-battery-xr-4-45-min',
+      
+      // Controllers
+      'flex-controller': 'https://awakeboards.com/products/flex-hand-controller',
+      
+      // Wings
+      'powder-1400': 'https://awakeboards.com/products/powder-1400-wing-kit',
+      'powder-1800': 'https://awakeboards.com/products/powder-1800-wing-kit',
+      'fluid-1000': 'https://awakeboards.com/products/fluid-1000-wing-kit',
+      'fluid-1300': 'https://awakeboards.com/products/fluid-1300-wing-kit',
+      
+      // Accessories (selected high-value items)
+      'board-bag-kit': 'https://awakeboards.com/products/board-bag-kit-ravik-vinga',
+      'battery-charger': 'https://awakeboards.com/products/battery-charger',
+      'carbon-fins': 'https://awakeboards.com/products/carbon-fins-set-of-3',
+      'life-vest': 'https://awakeboards.com/products/life-vest-ce-certified',
+    };
+
+    async function init() {
+      log('🔄 Initializing Supabase client...', 'info');
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      log('✅ Ready to import!', 'success');
+
+      // Mode switcher
+      document.querySelectorAll('.mode-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          selectedMode = card.dataset.mode;
+          
+          document.getElementById('auto-mode-section').style.display = selectedMode === 'auto' ? 'block' : 'none';
+          document.getElementById('manual-mode-section').style.display = selectedMode === 'manual' ? 'block' : 'none';
+        });
+      });
+
+      // Auto scrape button
+      document.getElementById('start-auto-scrape').addEventListener('click', startAutoScrape);
+      
+      // Manual import button
+      document.getElementById('start-manual-import').addEventListener('click', startManualImport);
+    }
+
+    async function startAutoScrape() {
+      document.getElementById('progress-section').style.display = 'block';
+      document.getElementById('progress-section').scrollIntoView({ behavior: 'smooth' });
+
+      log('🚀 Starting auto-scrape of awakeboards.com...', 'info');
+      log(`📦 Will process ${Object.keys(AWAKE_PRODUCTS).length} products`, 'info');
+
+      const tenantId = '904f8826-d36d-4075-afb7-d178048b6b20'; // Awake SA
+
+      for (const [handle, url] of Object.entries(AWAKE_PRODUCTS)) {
+        try {
+          log(`🔍 Scraping: ${handle}...`, 'info');
+          stats.products++;
+          updateStats();
+
+          // Fetch product page via CORS proxy
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+          const response = await fetch(proxyUrl);
+          const html = await response.text();
+
+          // Parse HTML
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+
+          // Extract all product images (multiple selectors for safety)
+          const imageUrls = new Set();
+          
+          // Method 1: Gallery thumbnails
+          doc.querySelectorAll('.product-single__thumbnails img, .product__media-item img').forEach(img => {
+            const src = img.src || img.dataset.src || img.dataset.zoom;
+            if (src && src.includes('awakeboards.com')) {
+              imageUrls.add(src.split('?')[0]); // Remove query params
+            }
+          });
+
+          // Method 2: Main product images
+          doc.querySelectorAll('[data-media-id] img, .product__photo img').forEach(img => {
+            const src = img.src || img.dataset.src;
+            if (src && src.includes('awakeboards.com')) {
+              imageUrls.add(src.split('?')[0]);
+            }
+          });
+
+          // Method 3: All large images in product section
+          doc.querySelectorAll('.product img').forEach(img => {
+            const src = img.src || img.dataset.src;
+            if (src && src.includes('awakeboards.com') && 
+                !src.includes('icon') && !src.includes('logo') && 
+                (img.width > 200 || img.dataset.large)) {
+              imageUrls.add(src.split('?')[0]);
+            }
+          });
+
+          const images = Array.from(imageUrls);
+          
+          if (images.length === 0) {
+            log(`⚠️ No images found for ${handle}`, 'warning');
+            continue;
+          }
+
+          log(`✅ Found ${images.length} images for ${handle}`, 'success');
+          stats.images += images.length;
+          updateStats();
+
+          // Upload each image
+          for (let i = 0; i < images.length; i++) {
+            try {
+              const imageUrl = images[i];
+              log(`   📥 Downloading image ${i + 1}/${images.length}...`, 'info');
+
+              // Download image
+              const imgResponse = await fetch(imageUrl);
+              const blob = await imgResponse.blob();
+              const fileName = imageUrl.split('/').pop().split('?')[0];
+
+              // Upload to storage
+              const storagePath = `${tenantId}/${Date.now()}-${handle}-${i}-${fileName}`;
+              const { data: uploadData, error: uploadError } = await supabaseClient
+                .storage
+                .from('product-images')
+                .upload(storagePath, blob, {
+                  contentType: blob.type,
+                  upsert: false
+                });
+
+              if (uploadError) throw uploadError;
+
+              // Get public URL
+              const { data: { publicUrl } } = supabaseClient
+                .storage
+                .from('product-images')
+                .getPublicUrl(storagePath);
+
+              log(`   ✅ Uploaded: ${fileName}`, 'success');
+              stats.uploaded++;
+              updateStats();
+
+              // Add to gallery preview
+              addToGallery(publicUrl, `${handle} - ${i + 1}`);
+
+              // Small delay
+              await new Promise(resolve => setTimeout(resolve, 200));
+
+            } catch (error) {
+              log(`   ❌ Failed to upload image: ${error.message}`, 'error');
+              stats.errors++;
+              updateStats();
+            }
+          }
+
+        } catch (error) {
+          log(`❌ Failed to scrape ${handle}: ${error.message}`, 'error');
+          stats.errors++;
+          updateStats();
+        }
+
+        // Delay between products
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      log('🎉 ==========================================', 'success');
+      log('🎉 AUTO-SCRAPE COMPLETE!', 'success');
+      log(`📊 Products: ${stats.products}`, 'success');
+      log(`🖼️ Images Found: ${stats.images}`, 'success');
+      log(`✅ Uploaded: ${stats.uploaded}`, 'success');
+      log(`❌ Errors: ${stats.errors}`, 'error');
+      log('🎉 ==========================================', 'success');
+    }
+
+    async function startManualImport() {
+      const urls = document.getElementById('manual-urls').value.trim();
+      
+      if (!urls) {
+        alert('⚠️ Please paste image URLs first');
+        return;
+      }
+
+      document.getElementById('progress-section').style.display = 'block';
+      document.getElementById('progress-section').scrollIntoView({ behavior: 'smooth' });
+
+      const imageUrls = urls.split('\n').filter(line => line.trim().startsWith('http'));
+      
+      log('📥 Starting manual import...', 'info');
+      log(`🖼️ Found ${imageUrls.length} URLs`, 'info');
+
+      stats.images = imageUrls.length;
+      updateStats();
+
+      const tenantId = '904f8826-d36d-4075-afb7-d178048b6b20'; // Awake SA
+
+      for (let i = 0; i < imageUrls.length; i++) {
+        try {
+          const imageUrl = imageUrls[i].trim();
+          log(`📥 Downloading ${i + 1}/${imageUrls.length}...`, 'info');
+
+          // Download
+          const response = await fetch(imageUrl);
+          const blob = await response.blob();
+          const fileName = imageUrl.split('/').pop().split('?')[0];
+
+          // Upload
+          const storagePath = `${tenantId}/${Date.now()}-manual-${i}-${fileName}`;
+          const { data: uploadData, error: uploadError } = await supabaseClient
+            .storage
+            .from('product-images')
+            .upload(storagePath, blob, {
+              contentType: blob.type,
+              upsert: false
+            });
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = supabaseClient
+            .storage
+            .from('product-images')
+            .getPublicUrl(storagePath);
+
+          log(`✅ Uploaded: ${fileName}`, 'success');
+          stats.uploaded++;
+          updateStats();
+
+          addToGallery(publicUrl, fileName);
+
+          await new Promise(resolve => setTimeout(resolve, 200));
+
+        } catch (error) {
+          log(`❌ Failed: ${error.message}`, 'error');
+          stats.errors++;
+          updateStats();
+        }
+      }
+
+      log('🎉 Manual import complete!', 'success');
+    }
+
+    function log(message, type = 'info') {
+      const container = document.getElementById('log-container');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      container.appendChild(entry);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function updateStats() {
+      document.getElementById('stat-products').textContent = stats.products;
+      document.getElementById('stat-images').textContent = stats.images;
+      document.getElementById('stat-uploaded').textContent = stats.uploaded;
+      document.getElementById('stat-errors').textContent = stats.errors;
+    }
+
+    function addToGallery(url, label) {
+      const preview = document.getElementById('gallery-preview');
+      preview.style.display = 'block';
+      
+      const grid = document.getElementById('gallery-grid');
+      
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      
+      const img = document.createElement('img');
+      img.src = url;
+      
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 'gallery-label';
+      labelDiv.textContent = label;
+      
+      item.appendChild(img);
+      item.appendChild(labelDiv);
+      grid.appendChild(item);
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

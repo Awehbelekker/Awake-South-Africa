@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal Media Migration Tool - Multi-Tenant</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+      padding: 30px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border: 2px solid #e9ecef;
+    }
+
+    .section-title {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 6px;
+      height: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 3px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #495057;
+      font-size: 0.95em;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .source-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .source-tab {
+      padding: 12px 24px;
+      border: 2px solid #dee2e6;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+
+    .source-tab:hover {
+      border-color: #667eea;
+      transform: translateY(-2px);
+    }
+
+    .source-tab.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: #667eea;
+    }
+
+    .source-content {
+      display: none;
+    }
+
+    .source-content.active {
+      display: block;
+    }
+
+    .button {
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .log-container {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px;
+      max-height: 500px;
+      overflow-y: auto;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.9em;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      margin-bottom: 8px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .log-time {
+      color: #6c757d;
+      flex-shrink: 0;
+    }
+
+    .log-message {
+      color: #f8f9fa;
+    }
+
+    .log-message.success { color: #28a745; }
+    .log-message.error { color: #dc3545; }
+    .log-message.warning { color: #ffc107; }
+    .log-message.info { color: #17a2b8; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #dee2e6;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.5em;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      color: #6c757d;
+      font-size: 0.9em;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .preview-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #dee2e6;
+      background: #f8f9fa;
+    }
+
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 5px;
+      font-size: 0.75em;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .help-text {
+      font-size: 0.85em;
+      color: #6c757d;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌐 Universal Media Migration Tool</h1>
+      <p>Import images & videos from ANY source to ANY tenant</p>
+    </div>
+
+    <div class="content">
+      <!-- Tenant Selection -->
+      <div class="section">
+        <div class="section-title">1. Select Tenant</div>
+        <div class="form-group">
+          <label for="tenant-select">Choose which business to import media for:</label>
+          <select id="tenant-select">
+            <option value="">Loading tenants...</option>
+          </select>
+          <div class="help-text">Select the tenant whose media library you want to populate</div>
+        </div>
+      </div>
+
+      <!-- Source Selection -->
+      <div class="section">
+        <div class="section-title">2. Choose Import Source</div>
+        
+        <div class="source-tabs">
+          <div class="source-tab active" data-source="website">🌐 Website Scraper</div>
+          <div class="source-tab" data-source="instagram">📸 Instagram</div>
+          <div class="source-tab" data-source="facebook">👍 Facebook</div>
+          <div class="source-tab" data-source="custom">🔗 Custom URLs</div>
+          <div class="source-tab" data-source="upload">📁 Upload Files</div>
+        </div>
+
+        <!-- Website Scraper -->
+        <div class="source-content active" data-source="website">
+          <div class="form-group">
+            <label for="website-url">Website URL:</label>
+            <input type="url" id="website-url" placeholder="https://example.com">
+            <div class="help-text">Enter the homepage - we'll crawl for product pages and images</div>
+          </div>
+          <div class="form-group">
+            <label for="website-selectors">Image Selectors (optional):</label>
+            <input type="text" id="website-selectors" placeholder=".product-image, .gallery img, [data-gallery]">
+            <div class="help-text">CSS selectors to find images (leave empty for auto-detect)</div>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="crawl-deep">
+            <label for="crawl-deep">Deep crawl (follow product links)</label>
+          </div>
+        </div>
+
+        <!-- Instagram -->
+        <div class="source-content" data-source="instagram">
+          <div class="form-group">
+            <label for="instagram-url">Instagram Profile URL:</label>
+            <input type="url" id="instagram-url" placeholder="https://www.instagram.com/yourprofile/">
+            <div class="help-text">⚠️ Note: Instagram scraping requires browser extension or API access</div>
+          </div>
+          <div class="form-group">
+            <label for="instagram-posts">Number of posts to import:</label>
+            <input type="number" id="instagram-posts" value="50" min="1" max="200">
+          </div>
+        </div>
+
+        <!-- Facebook -->
+        <div class="source-content" data-source="facebook">
+          <div class="form-group">
+            <label for="facebook-url">Facebook Page URL:</label>
+            <input type="url" id="facebook-url" placeholder="https://www.facebook.com/yourpage">
+            <div class="help-text">⚠️ Note: Facebook scraping requires page access token</div>
+          </div>
+        </div>
+
+        <!-- Custom URLs -->
+        <div class="source-content" data-source="custom">
+          <div class="form-group">
+            <label for="custom-urls">Image/Video URLs (one per line):</label>
+            <textarea id="custom-urls" placeholder="https://example.com/image1.jpg
+https://example.com/image2.png
+https://example.com/video.mp4"></textarea>
+            <div class="help-text">Paste direct links to images or videos - we'll download and organize them</div>
+          </div>
+        </div>
+
+        <!-- Upload Files -->
+        <div class="source-content" data-source="upload">
+          <div class="form-group">
+            <label for="file-upload">Select images/videos from your computer:</label>
+            <input type="file" id="file-upload" multiple accept="image/*,video/*">
+            <div class="help-text">Select multiple files - recommended for bulk migration from old systems</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Import Options -->
+      <div class="section">
+        <div class="section-title">3. Import Options</div>
+        
+        <div class="form-group">
+          <label for="import-mode">Import Mode:</label>
+          <select id="import-mode">
+            <option value="media-only">Media Library Only (don't link to products)</option>
+            <option value="auto-link">Auto-link to Products (match by name/keywords)</option>
+            <option value="manual-review">Manual Review (preview before importing)</option>
+          </select>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="skip-existing" checked>
+          <label for="skip-existing">Skip files that already exist</label>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="optimize-images" checked>
+          <label for="optimize-images">Optimize images (compress large files)</label>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="extract-videos">
+          <label for="extract-videos">Extract video thumbnails</label>
+        </div>
+      </div>
+
+      <!-- Start Import -->
+      <div class="section">
+        <button class="button" id="start-import">
+          🚀 Start Media Migration
+        </button>
+      </div>
+
+      <!-- Progress & Logs -->
+      <div class="section" id="progress-section" style="display: none;">
+        <div class="section-title">Import Progress</div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-found">0</div>
+            <div class="stat-label">Media Found</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-uploaded">0</div>
+            <div class="stat-label">Uploaded</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-linked">0</div>
+            <div class="stat-label">Linked to Products</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-skipped">0</div>
+            <div class="stat-label">Skipped</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+          <h3 style="margin-bottom: 15px; color: #495057;">Activity Log:</h3>
+          <div class="log-container" id="log-container"></div>
+        </div>
+
+        <div id="preview-section" style="margin-top: 30px; display: none;">
+          <h3 style="margin-bottom: 15px; color: #495057;">Preview:</h3>
+          <div class="preview-grid" id="preview-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================
+    // CONFIGURATION
+    // =====================================================
+    const SUPABASE_URL = 'https://iepeffuszswxuwyqrzix.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkcGVmZnVzenN3eHV3eXFyeml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3NjIzNzMsImV4cCI6MjA1MTMzODM3M30.Yy6qSrh1xr-gkqSK7d4Fh_c3YvR2L3x4k1Z_0jH5sXg';
+
+    let supabaseClient = null;
+    let selectedTenant = null;
+    let selectedSource = 'website';
+    let stats = {
+      found: 0,
+      uploaded: 0,
+      linked: 0,
+      skipped: 0,
+      errors: 0
+    };
+
+    // =====================================================
+    // INITIALIZATION
+    // =====================================================
+    async function init() {
+      log('🔄 Initializing Supabase client...', 'info');
+      
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+      if (!supabaseClient) {
+        log('❌ Failed to initialize Supabase client', 'error');
+        return;
+      }
+      
+      log('✅ Supabase client initialized', 'success');
+      
+      // Load tenants
+      await loadTenants();
+      
+      // Setup event listeners
+      setupEventListeners();
+    }
+
+    // =====================================================
+    // TENANT MANAGEMENT
+    // =====================================================
+    async function loadTenants() {
+      log('🔍 Loading all tenants...', 'info');
+      
+      const { data: tenants, error } = await supabaseClient
+        .from('tenants')
+        .select('id, name, slug')
+        .order('name');
+      
+      if (error) {
+        log(`❌ Failed to load tenants: ${error.message}`, 'error');
+        return;
+      }
+      
+      const select = document.getElementById('tenant-select');
+      select.innerHTML = '<option value="">-- Select a tenant --</option>';
+      
+      tenants.forEach(tenant => {
+        const option = document.createElement('option');
+        option.value = tenant.id;
+        option.textContent = `${tenant.name} (${tenant.slug})`;
+        option.dataset.name = tenant.name;
+        option.dataset.slug = tenant.slug;
+        select.appendChild(option);
+      });
+      
+      log(`✅ Loaded ${tenants.length} tenants`, 'success');
+    }
+
+    // =====================================================
+    // EVENT LISTENERS
+    // =====================================================
+    function setupEventListeners() {
+      // Tenant selection
+      document.getElementById('tenant-select').addEventListener('change', (e) => {
+        const option = e.target.selectedOptions[0];
+        if (option.value) {
+          selectedTenant = {
+            id: option.value,
+            name: option.dataset.name,
+            slug: option.dataset.slug
+          };
+          log(`✅ Selected tenant: ${selectedTenant.name}`, 'success');
+        } else {
+          selectedTenant = null;
+        }
+      });
+
+      // Source tabs
+      document.querySelectorAll('.source-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const source = tab.dataset.source;
+          
+          // Update tabs
+          document.querySelectorAll('.source-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          // Update content
+          document.querySelectorAll('.source-content').forEach(c => c.classList.remove('active'));
+          document.querySelector(`.source-content[data-source="${source}"]`).classList.add('active');
+          
+          selectedSource = source;
+          log(`📂 Switched to ${tab.textContent.trim()} mode`, 'info');
+        });
+      });
+
+      // Start import button
+      document.getElementById('start-import').addEventListener('click', startImport);
+    }
+
+    // =====================================================
+    // IMPORT ORCHESTRATION
+    // =====================================================
+    async function startImport() {
+      // Validation
+      if (!selectedTenant) {
+        alert('⚠️ Please select a tenant first');
+        return;
+      }
+
+      // Show progress section
+      document.getElementById('progress-section').style.display = 'block';
+      document.getElementById('progress-section').scrollIntoView({ behavior: 'smooth' });
+
+      // Reset stats
+      stats = { found: 0, uploaded: 0, linked: 0, skipped: 0, errors: 0 };
+      updateStats();
+
+      log('🚀 Starting media migration...', 'info');
+      log(`📍 Tenant: ${selectedTenant.name}`, 'info');
+      log(`📂 Source: ${selectedSource}`, 'info');
+
+      try {
+        let mediaUrls = [];
+
+        // Collect media based on source
+        switch (selectedSource) {
+          case 'website':
+            mediaUrls = await scrapeWebsite();
+            break;
+          case 'instagram':
+            mediaUrls = await scrapeInstagram();
+            break;
+          case 'facebook':
+            mediaUrls = await scrapeFacebook();
+            break;
+          case 'custom':
+            mediaUrls = await parseCustomUrls();
+            break;
+          case 'upload':
+            mediaUrls = await handleFileUploads();
+            break;
+        }
+
+        if (mediaUrls.length === 0) {
+          log('⚠️ No media found to import', 'warning');
+          return;
+        }
+
+        stats.found = mediaUrls.length;
+        updateStats();
+
+        log(`✅ Found ${mediaUrls.length} media files`, 'success');
+        log('🔄 Starting upload process...', 'info');
+
+        // Process each media file
+        await processMediaFiles(mediaUrls);
+
+        log('🎉 ==========================================', 'success');
+        log('🎉 MIGRATION COMPLETE!', 'success');
+        log(`📊 Uploaded: ${stats.uploaded}`, 'success');
+        log(`🔗 Linked to Products: ${stats.linked}`, 'success');
+        log(`⚠️ Skipped: ${stats.skipped}`, 'warning');
+        log(`❌ Errors: ${stats.errors}`, 'error');
+        log('🎉 ==========================================', 'success');
+
+      } catch (error) {
+        log(`❌ Migration failed: ${error.message}`, 'error');
+        console.error(error);
+      }
+    }
+
+    // =====================================================
+    // SOURCE HANDLERS
+    // =====================================================
+    async function scrapeWebsite() {
+      const url = document.getElementById('website-url').value.trim();
+      
+      if (!url) {
+        alert('⚠️ Please enter a website URL');
+        throw new Error('No URL provided');
+      }
+
+      log(`🌐 Scraping website: ${url}`, 'info');
+      
+      // Basic website scraper using CORS proxy
+      try {
+        const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+        const html = await response.text();
+        
+        // Parse HTML for images
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        const images = [];
+        const selectors = document.getElementById('website-selectors').value.trim() || 'img';
+        
+        doc.querySelectorAll(selectors).forEach(img => {
+          let src = img.src || img.dataset.src || img.getAttribute('data-lazy-src');
+          if (src) {
+            // Convert relative URLs to absolute
+            if (!src.startsWith('http')) {
+              const baseUrl = new URL(url);
+              src = new URL(src, baseUrl.origin).href;
+            }
+            // Filter out tiny images (likely icons/logos)
+            if (!src.includes('icon') && !src.includes('logo') && !src.includes('favicon')) {
+              images.push({ url: src, type: 'image' });
+            }
+          }
+        });
+        
+        log(`✅ Found ${images.length} images on page`, 'success');
+        return images;
+        
+      } catch (error) {
+        log(`❌ Failed to scrape website: ${error.message}`, 'error');
+        log('💡 Try using Custom URLs mode instead', 'warning');
+        throw error;
+      }
+    }
+
+    async function scrapeInstagram() {
+      log('⚠️ Instagram scraping requires API access', 'warning');
+      log('💡 Please use Custom URLs mode to paste image links', 'info');
+      alert('Instagram scraping is not yet implemented. Please use "Custom URLs" mode to paste direct image links from Instagram posts.');
+      return [];
+    }
+
+    async function scrapeFacebook() {
+      log('⚠️ Facebook scraping requires page access token', 'warning');
+      log('💡 Please use Custom URLs mode to paste image links', 'info');
+      alert('Facebook scraping is not yet implemented. Please use "Custom URLs" mode to paste direct image links from Facebook posts.');
+      return [];
+    }
+
+    async function parseCustomUrls() {
+      const urls = document.getElementById('custom-urls').value.trim();
+      
+      if (!urls) {
+        alert('⚠️ Please enter at least one URL');
+        throw new Error('No URLs provided');
+      }
+
+      const lines = urls.split('\n').filter(line => line.trim());
+      const mediaFiles = [];
+
+      lines.forEach(url => {
+        const trimmed = url.trim();
+        if (trimmed.startsWith('http')) {
+          const ext = trimmed.split('.').pop().toLowerCase().split('?')[0];
+          const type = ['mp4', 'mov', 'avi', 'webm'].includes(ext) ? 'video' : 'image';
+          mediaFiles.push({ url: trimmed, type });
+        }
+      });
+
+      log(`✅ Parsed ${mediaFiles.length} URLs (${mediaFiles.filter(m => m.type === 'image').length} images, ${mediaFiles.filter(m => m.type === 'video').length} videos)`, 'success');
+      return mediaFiles;
+    }
+
+    async function handleFileUploads() {
+      const fileInput = document.getElementById('file-upload');
+      const files = Array.from(fileInput.files);
+
+      if (files.length === 0) {
+        alert('⚠️ Please select at least one file');
+        throw new Error('No files selected');
+      }
+
+      log(`✅ Selected ${files.length} files from computer`, 'success');
+      
+      return files.map(file => ({
+        file,
+        type: file.type.startsWith('video/') ? 'video' : 'image'
+      }));
+    }
+
+    // =====================================================
+    // MEDIA PROCESSING
+    // =====================================================
+    async function processMediaFiles(mediaFiles) {
+      const importMode = document.getElementById('import-mode').value;
+      const skipExisting = document.getElementById('skip-existing').checked;
+
+      // Load existing media to check for duplicates
+      let existingMedia = [];
+      if (skipExisting) {
+        const { data } = await supabaseClient
+          .from('media_library')
+          .select('file_name')
+          .eq('tenant_id', selectedTenant.id);
+        existingMedia = data ? data.map(m => m.file_name) : [];
+      }
+
+      // Load products if auto-linking
+      let products = [];
+      if (importMode === 'auto-link') {
+        const { data } = await supabaseClient
+          .from('products')
+          .select('id, name, slug')
+          .eq('tenant_id', selectedTenant.id);
+        products = data || [];
+        log(`✅ Loaded ${products.length} products for auto-linking`, 'success');
+      }
+
+      for (let i = 0; i < mediaFiles.length; i++) {
+        const media = mediaFiles[i];
+        
+        try {
+          log(`📥 Processing ${i + 1}/${mediaFiles.length}...`, 'info');
+
+          // Download or read file
+          let blob, fileName;
+          
+          if (media.file) {
+            // Local file upload
+            blob = media.file;
+            fileName = media.file.name;
+          } else {
+            // Remote URL download
+            log(`   Downloading from ${media.url}...`, 'info');
+            const response = await fetch(media.url);
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            blob = await response.blob();
+            fileName = media.url.split('/').pop().split('?')[0] || `media-${Date.now()}.${blob.type.split('/')[1]}`;
+          }
+
+          // Check if already exists
+          if (skipExisting && existingMedia.includes(fileName)) {
+            log(`   ⏭️ Skipped ${fileName} (already exists)`, 'warning');
+            stats.skipped++;
+            updateStats();
+            continue;
+          }
+
+          // Upload to Supabase storage
+          const storagePath = `${selectedTenant.id}/${Date.now()}-${fileName}`;
+          
+          const { data: uploadData, error: uploadError } = await supabaseClient
+            .storage
+            .from('product-images')
+            .upload(storagePath, blob, {
+              contentType: blob.type,
+              upsert: false
+            });
+
+          if (uploadError) {
+            throw uploadError;
+          }
+
+          // Get public URL
+          const { data: { publicUrl } } = supabaseClient
+            .storage
+            .from('product-images')
+            .getPublicUrl(storagePath);
+
+          log(`   ✅ Uploaded to storage: ${fileName}`, 'success');
+          stats.uploaded++;
+          updateStats();
+
+          // Add to media library
+          const { error: mediaError } = await supabaseClient
+            .from('media_library')
+            .insert({
+              tenant_id: selectedTenant.id,
+              file_name: fileName,
+              file_path: storagePath,
+              file_url: publicUrl,
+              file_type: media.type,
+              file_size: blob.size,
+              mime_type: blob.type
+            });
+
+          if (mediaError && !mediaError.message.includes('duplicate')) {
+            log(`   ⚠️ Media library insert warning: ${mediaError.message}`, 'warning');
+          }
+
+          // Auto-link to products if enabled
+          if (importMode === 'auto-link' && products.length > 0) {
+            const linkedProduct = findMatchingProduct(fileName, products);
+            if (linkedProduct) {
+              await linkToProduct(linkedProduct.id, publicUrl);
+              log(`   🔗 Linked to product: ${linkedProduct.name}`, 'info');
+              stats.linked++;
+              updateStats();
+            }
+          }
+
+          // Add to preview
+          addToPreview(publicUrl, fileName);
+
+        } catch (error) {
+          log(`   ❌ Failed: ${error.message}`, 'error');
+          stats.errors++;
+          updateStats();
+        }
+
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+
+    // =====================================================
+    // PRODUCT LINKING
+    // =====================================================
+    function findMatchingProduct(fileName, products) {
+      const name = fileName.toLowerCase()
+        .replace(/\d+/g, '') // Remove numbers
+        .replace(/[^a-z]/g, ' ') // Remove special chars
+        .trim();
+
+      for (const product of products) {
+        const productName = product.name.toLowerCase();
+        const productSlug = product.slug.toLowerCase();
+        
+        // Check if filename contains product keywords
+        const keywords = productName.split(/[\s-]+/);
+        const matches = keywords.filter(keyword => 
+          keyword.length > 3 && name.includes(keyword)
+        );
+        
+        if (matches.length >= 2) {
+          return product;
+        }
+      }
+      
+      return null;
+    }
+
+    async function linkToProduct(productId, imageUrl) {
+      // Get current product images
+      const { data: product } = await supabaseClient
+        .from('products')
+        .select('image, images')
+        .eq('id', productId)
+        .single();
+
+      if (!product) return;
+
+      let images = [];
+      try {
+        images = product.images ? JSON.parse(product.images) : [];
+      } catch {
+        images = [];
+      }
+
+      // Add new image if not already present
+      if (!images.includes(imageUrl)) {
+        images.push(imageUrl);
+
+        await supabaseClient
+          .from('products')
+          .update({
+            image: product.image || imageUrl, // Set as main if no main image
+            images: JSON.stringify(images)
+          })
+          .eq('id', productId);
+      }
+    }
+
+    // =====================================================
+    // UI HELPERS
+    // =====================================================
+    function log(message, type = 'info') {
+      const container = document.getElementById('log-container');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      
+      const time = document.createElement('span');
+      time.className = 'log-time';
+      time.textContent = new Date().toLocaleTimeString();
+      
+      const msg = document.createElement('span');
+      msg.className = `log-message ${type}`;
+      msg.textContent = message;
+      
+      entry.appendChild(time);
+      entry.appendChild(msg);
+      container.appendChild(entry);
+      
+      // Auto-scroll
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function updateStats() {
+      document.getElementById('stat-found').textContent = stats.found;
+      document.getElementById('stat-uploaded').textContent = stats.uploaded;
+      document.getElementById('stat-linked').textContent = stats.linked;
+      document.getElementById('stat-skipped').textContent = stats.skipped;
+    }
+
+    function addToPreview(url, label) {
+      const previewSection = document.getElementById('preview-section');
+      previewSection.style.display = 'block';
+      
+      const grid = document.getElementById('preview-grid');
+      
+      const item = document.createElement('div');
+      item.className = 'preview-item';
+      
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = label;
+      
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 'preview-label';
+      labelDiv.textContent = label;
+      
+      item.appendChild(img);
+      item.appendChild(labelDiv);
+      grid.appendChild(item);
+      
+      // Limit preview to 50 items
+      if (grid.children.length > 50) {
+        grid.removeChild(grid.firstChild);
+      }
+    }
+
+    // =====================================================
+    // START
+    // =====================================================
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
