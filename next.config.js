@@ -5,6 +5,11 @@ const path = require('path');
 const nextConfig = {
   // output: 'standalone',
   
+  // Skip ESLint during production builds (not a project dependency)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  
   // Security Headers
   async headers() {
     return [
