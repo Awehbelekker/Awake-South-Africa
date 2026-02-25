@@ -5,8 +5,11 @@
  * 1. Export products using: scripts/export-products-from-browser.html
  * 2. Set up Medusa admin credentials in .env.local
  * 3. Run: npx tsx scripts/migrate-local-to-medusa.ts [backup-file.json]
+ * 
+ * NOTE: This script is deprecated and may not work with current Medusa setup
  */
 
+// @ts-nocheck - Legacy migration script, not actively maintained
 import { medusaClient } from '../src/lib/medusa-client'
 import * as fs from 'fs'
 import * as path from 'path'
