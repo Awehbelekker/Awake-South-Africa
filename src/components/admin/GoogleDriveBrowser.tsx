@@ -234,7 +234,7 @@ export function GoogleDriveBrowser() {
                   <button
                     key={folder.id}
                     onClick={() => setCurrentFolder(folder.id)}
-                    className="flex items-center space-x-2 p-2 bg-white hover:bg-blue-50 rounded border border-gray-200 transition-colors text-left text-gray-900 bg-white"
+                    className="flex items-center space-x-2 p-2 bg-white hover:bg-blue-50 rounded border border-gray-200 transition-colors text-left text-gray-900"
                   >
                     <Folder className="w-5 h-5 text-blue-600 flex-shrink-0" />
                     <span className="text-sm truncate">{folder.name}</span>

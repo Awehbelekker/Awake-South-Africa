@@ -19,15 +19,33 @@ function getHeaders(isAdmin = false): Record<string, string> {
 
 async function fetchMedusa(path: string, options: RequestInit = {}, isAdmin = false) {
   const url = `${MEDUSA_BACKEND_URL}${path}`
-  const res = await fetch(url, {
-    ...options,
-    headers: { ...getHeaders(isAdmin), ...(options.headers as Record<string, string> || {}) },
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: res.statusText }))
-    throw new Error(err.message || `Request failed: ${res.status}`)
+  
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers: { ...getHeaders(isAdmin), ...(options.headers as Record<string, string> || {}) },
+    })
+    
+    if (!res.ok) {
+      // If 401 and admin request, clear token to prevent repeated failures
+      if (res.status === 401 && isAdmin) {
+        console.warn('Medusa admin authentication failed, clearing token')
+        adminToken = null
+      }
+      
+      const err = await res.json().catch(() => ({ message: res.statusText }))
+      throw new Error(err.message || `Request failed: ${res.status}`)
+    }
+    
+    return res.json()
+  } catch (error: any) {
+    // Suppress console spam for auth errors
+    if (error.message?.includes('401') || error.message?.includes('authentication')) {
+      throw error // Still throw, but don't log repeatedly
+    }
+    console.error('Medusa API error:', error.message)
+    throw error
   }
-  return res.json()
 }
 
 // Legacy compat shim (keeps any code that references medusaClient compiling)

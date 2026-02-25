@@ -281,10 +281,17 @@ export function useAdminLogout() {
 }
 
 export function useAdminProducts() {
+  const medusaUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+  const isConfigured = medusaUrl && medusaUrl !== 'http://localhost:9000'
+  
   return useQuery({
     queryKey: queryKeys.adminProducts,
     queryFn: () => adminGetProducts(),
     staleTime: 2 * 60 * 1000, // 2 minutes
+    enabled: isConfigured, // Only run if Medusa is configured
+    retry: false, // Never retry admin queries
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on component mount
   })
 }
 
@@ -334,10 +341,17 @@ export function useAdminUpdateVariant() {
 }
 
 export function useAdminOrders() {
+  const medusaUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+  const isConfigured = medusaUrl && medusaUrl !== 'http://localhost:9000'
+  
   return useQuery({
     queryKey: queryKeys.adminOrders,
     queryFn: () => adminGetOrders(),
     staleTime: 1 * 60 * 1000, // 1 minute
+    enabled: isConfigured, // Only run if Medusa is configured
+    retry: false, // Never retry admin queries
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on component mount
   })
 }
 

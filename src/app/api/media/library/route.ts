@@ -24,6 +24,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const tenantId = searchParams.get('tenant_id')
     const folder = searchParams.get('folder') || 'media-library'
+    const limit = parseInt(searchParams.get('limit') || '100')
+    const offset = parseInt(searchParams.get('offset') || '0')
 
     if (!tenantId) {
       return NextResponse.json(
@@ -34,56 +36,46 @@ export async function GET(request: NextRequest) {
 
     const supabase = getSupabase()
 
-    // List all files in tenant's media library folder
+    // List files in tenant's media library folder with pagination
     const { data: files, error } = await supabase.storage
       .from('product-images')
       .list(`${tenantId}/${folder}`, {
-        limit: 1000,
+        limit: Math.min(limit, 100), // Cap at 100 to prevent 413 errors
+        offset,
         sortBy: { column: 'created_at', order: 'desc' },
       })
 
     if (error) {
-      console.error('Supabase storage list error:', {
-        error,
-        tenantId,
-        folder,
-        bucket: 'product-images',
-        path: `${tenantId}/${folder}`,
-      })
+      console.error('Supabase storage list error:', error.message)
       throw error
     }
 
-    console.log('Media library files found:', {
-      tenantId,
-      folder,
-      fileCount: files?.length || 0,
-      files: files?.map(f => ({ name: f.name, id: f.id })),
-    })
+    // Filter and map files (only actual files, not folders)
+    const actualFiles = files.filter(file => file.id !== null && !file.name.includes('/'))
 
     // Get public URLs for each file
-    const mediaFiles = files
-      .filter(file => file.id !== null && !file.name.includes('/')) // Filter out folder entries, keep only files
-      .map(file => {
-        const filePath = `${tenantId}/${folder}/${file.name}`
-        const { data: urlData } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(filePath)
+    const mediaFiles = actualFiles.map(file => {
+      const filePath = `${tenantId}/${folder}/${file.name}`
+      const { data: urlData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath)
 
-        return {
-          id: file.id || file.name,
-          name: file.name,
-          path: filePath,
-          url: urlData.publicUrl,
-          size: file.metadata?.size || 0,
-          createdAt: file.created_at,
-          updatedAt: file.updated_at,
-        }
-      })
+      return {
+        id: file.id || file.name,
+        name: file.name,
+        path: filePath,
+        url: urlData.publicUrl,
+        size: file.metadata?.size || 0,
+        createdAt: file.created_at,
+        updatedAt: file.updated_at,
+      }
+    })
 
     return NextResponse.json({
       success: true,
       files: mediaFiles,
       total: mediaFiles.length,
+      hasMore: files.length === limit,
     })
 
   } catch (error: any) {

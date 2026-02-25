@@ -160,7 +160,7 @@ export function GoogleDriveConnection() {
           </div>
         </div>
       ) : (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-gray-900 bg-white">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 text-gray-900">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
               <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

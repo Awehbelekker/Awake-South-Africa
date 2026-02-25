@@ -162,7 +162,7 @@ export function GoogleDriveImport() {
       </div>
 
       {files.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-4 text-gray-900 bg-white">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 text-gray-900">
           <h4 className="font-medium text-gray-900 mb-3">
             Found {files.length} image{files.length !== 1 ? 's' : ''}
           </h4>

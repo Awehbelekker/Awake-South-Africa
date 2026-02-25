@@ -51,11 +51,14 @@ export function useHybridProducts() {
       }
 
       // Priority 2: Try Medusa
-      if (authMode === 'medusa' && medusaData?.products && medusaData.products.length > 0) {
-        setProducts(medusaData.products)
-        setDataSource('medusa')
-        setIsLoading(false)
-        return
+      if (authMode === 'medusa' && medusaData && typeof medusaData === 'object' && 'products' in medusaData) {
+        const data = medusaData as { products: EditableProduct[]; count: number }
+        if (Array.isArray(data.products) && data.products.length > 0) {
+          setProducts(data.products)
+          setDataSource('medusa')
+          setIsLoading(false)
+          return
+        }
       }
 
       // Priority 3: Use localStorage
