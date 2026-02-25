@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -6,6 +6,7 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 import { SupabaseSync } from "@/components/SupabaseSync";
 import { DebugPanel } from "@/components/DebugPanel";
 import StructuredData from "@/components/StructuredData";
+import PWAInstaller from "@/components/PWAInstaller";
 import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo/structured-data";
 
 export const metadata: Metadata = {
@@ -60,6 +61,20 @@ export const metadata: Metadata = {
     // google: "your-google-verification-code",
     // yandex: "your-yandex-verification-code",
   },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Awake Admin',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#3b82f6',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -79,6 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <Footer />
           <DebugPanel />
+          <PWAInstaller />
         </QueryProvider>
       </body>
     </html>
