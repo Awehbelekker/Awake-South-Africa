@@ -14,6 +14,8 @@ import { RefreshCw, Database, WifiOff, Trash2, Plus } from 'lucide-react'
 function mapSupabaseProduct(p: any): EditableProduct {
   return {
     id: p.metadata?.localId || p.id,
+    _supabaseId: p.id,          // always keep the real Supabase UUID for direct UPDATE
+    _slug: p.slug,
     name: p.name,
     price: p.price,
     priceExVAT: p.price_ex_vat || Math.round(p.price / 1.15),
@@ -29,7 +31,7 @@ function mapSupabaseProduct(p: any): EditableProduct {
     features: p.features,
     inStock: p.in_stock,
     stockQuantity: p.stock_quantity,
-  }
+  } as any
 }
 
 export default function AdminProductsPage() {
@@ -147,13 +149,27 @@ export default function AdminProductsPage() {
   }
 
   const saveToSupabase = async (product: EditableProduct) => {
-    const res = await fetch('/api/tenant/products', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ products: [product] }),
-    })
-    const data = await res.json()
-    if (!data.success) throw new Error(data.error || 'Save failed')
+    const supabaseId = (product as any)._supabaseId
+
+    if (supabaseId) {
+      // Product came from Supabase — update directly by UUID
+      const res = await fetch('/api/tenant/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...product, id: supabaseId }),
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error || 'Save failed')
+    } else {
+      // Local/new product — upsert by slug
+      const res = await fetch('/api/tenant/products', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products: [product] }),
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error || 'Save failed')
+    }
     setSupabaseProducts(prev => prev.map(p => p.id === product.id ? product : p))
   }
 

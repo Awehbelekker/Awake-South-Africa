@@ -49,7 +49,7 @@ export default function AdminImportPage() {
         {/* Option 1: Browse Google Drive & Transfer to Supabase */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            ≡ƒôü Browse Google Drive
+            Browse Google Drive
           </h2>
           <p className="text-gray-600 mb-6">
             Navigate your Google Drive folders, select images, and transfer them to Supabase Storage.
@@ -71,13 +71,13 @@ export default function AdminImportPage() {
         </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-medium text-blue-900 mb-2">≡ƒÆí How It Works</h3>
+          <h3 className="font-medium text-blue-900 mb-2">How It Works</h3>
           <ul className="text-sm text-blue-800 space-y-2 list-disc list-inside">
-            <li><strong>Google Drive Browser:</strong> Select images from your Drive ΓåÆ Transfer to Supabase ΓåÆ Images saved permanently</li>
-            <li><strong>Direct Upload:</strong> Drag & drop from your computer ΓåÆ Upload to Supabase ΓåÆ Instant availability</li>
+            <li><strong>Google Drive Browser:</strong> Select images from your Drive &rarr; Transfer to Supabase &rarr; Images saved permanently</li>
+            <li><strong>Direct Upload:</strong> Drag &amp; drop from your computer &rarr; Upload to Supabase &rarr; Instant availability</li>
             <li><strong>Both options:</strong> Images stored in Supabase Storage buckets (isolated per tenant)</li>
             <li><strong>Access anywhere:</strong> Login from any device - images stored in cloud, not locally</li>
-            <li><strong>After import:</strong> Edit product details in Products page, set prices, mark "In Stock"</li>
+            <li><strong>After import:</strong> Edit product details in Products page, set prices, mark &ldquo;In Stock&rdquo;</li>
           </ul>
         </div>
       </div>

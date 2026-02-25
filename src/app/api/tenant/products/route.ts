@@ -258,3 +258,56 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
+// PATCH /api/tenant/products - Update single product by Supabase UUID
+export async function PATCH(request: NextRequest) {
+  try {
+    const tenantId = await getTenantId(request)
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
+    }
+
+    const body = await request.json()
+    const { id, ...p } = body
+
+    if (!id) {
+      return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+    }
+
+    const row: Record<string, any> = {}
+    if (p.name !== undefined)          row.name          = p.name
+    if (p.description !== undefined)   row.description   = p.description || ''
+    if (p.price !== undefined)         row.price         = p.price
+    if (p.priceExVAT !== undefined)    row.price_ex_vat  = p.priceExVAT
+    if (p.costEUR !== undefined)       row.cost_eur      = p.costEUR
+    if (p.category !== undefined)      row.category      = p.categoryTag || p.category
+    if (p.categoryTag !== undefined)   row.category_tag  = p.categoryTag
+    if (p.image !== undefined)         row.image         = p.image
+    if (p.images !== undefined)        row.images        = p.images
+    if (p.badge !== undefined)         row.badge         = p.badge
+    if (p.battery !== undefined)       row.battery       = p.battery
+    if (p.skillLevel !== undefined)    row.skill_level   = p.skillLevel
+    if (p.specs !== undefined)         row.specs         = p.specs
+    if (p.features !== undefined)      row.features      = p.features
+    if (p.inStock !== undefined)       row.in_stock      = p.inStock
+    if (p.stockQuantity !== undefined) row.stock_quantity = p.stockQuantity
+
+    const { data, error } = await getSupabase()
+      .from('products')
+      .update(row)
+      .eq('id', id)
+      .eq('tenant_id', tenantId)
+      .select('id')
+      .single()
+
+    if (error) {
+      console.error('Products PATCH error:', JSON.stringify(error))
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, product: data })
+  } catch (error: any) {
+    console.error('Products PATCH error:', error?.message)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
+

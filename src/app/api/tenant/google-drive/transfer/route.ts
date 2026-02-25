@@ -92,6 +92,9 @@ async function uploadToSupabase(
     })
 
   if (error) {
+    if (error.message?.toLowerCase().includes('exceeded') || error.message?.toLowerCase().includes('size')) {
+      throw new Error(`File too large for Supabase storage (max 50MB). Compress the image first.`)
+    }
     throw error
   }
 
@@ -180,13 +183,14 @@ export async function POST(request: NextRequest) {
         // Get file metadata
         const metadata = await getFileMetadata(accessToken, fileId)
 
-        // Check file size (max 100MB)
-        const maxSize = 100 * 1024 * 1024 // 100MB
-        if (metadata.size > maxSize) {
+        // Check file size (max 50MB - Supabase free tier limit)
+        const fileSize = parseInt(metadata.size || '0', 10)
+        const maxSize = 50 * 1024 * 1024 // 50MB
+        if (fileSize > maxSize) {
           errors.push({
             fileId,
             file: metadata.name,
-            error: `File too large: ${(metadata.size / 1024 / 1024).toFixed(2)}MB (max 100MB)`,
+            error: `File too large: ${(fileSize / 1024 / 1024).toFixed(1)}MB — max 50MB. Compress the image first.`,
           })
           continue
         }
@@ -239,7 +243,7 @@ export async function POST(request: NextRequest) {
 
           const { data: product, error: productError } = await supabase
             .from('products')
-            .insert(productData)
+            .upsert(productData, { onConflict: 'tenant_id,slug', ignoreDuplicates: false })
             .select()
             .single()
 
