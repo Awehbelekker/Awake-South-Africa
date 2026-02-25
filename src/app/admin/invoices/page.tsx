@@ -2,11 +2,12 @@
 
 import { useState, useMemo, useRef } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
+import InvoiceCreateModal from '@/components/admin/InvoiceCreateModal'
 import { useInvoicesStore, Invoice, InvoiceStatus } from '@/store/invoices'
 import { useAdminStore } from '@/store/admin'
 import { 
   Search, Filter, Eye, Download, Send, CheckCircle, 
-  XCircle, Clock, FileText, Printer, Mail
+  XCircle, Clock, FileText, Printer, Mail, Plus
 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 
@@ -24,6 +25,7 @@ export default function AdminInvoicesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'all'>('all')
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const printRef = useRef<HTMLDivElement>(null)
 
   const filteredInvoices = useMemo(() => {
@@ -62,9 +64,55 @@ export default function AdminInvoicesPage() {
     toast.success('Invoice marked as paid')
   }
 
-  const handleSendInvoice = (invoice: Invoice) => {
-    updateInvoiceStatus(invoice.id, 'sent')
-    toast.success(`Invoice sent to ${invoice.customerEmail}`)
+  const handleSendInvoice = async (invoice: Invoice) => {
+    try {
+      // Send email with invoice data and settings
+      const response = await fetch('/api/invoices/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          invoiceNumber: invoice.invoiceNumber,
+          customerName: invoice.customerName,
+          customerEmail: invoice.customerEmail,
+          invoiceDate: formatDate(invoice.createdAt),
+          dueDate: formatDate(invoice.dueDate),
+          items: invoice.items,
+          subtotal: invoice.subtotal,
+          taxRate: invoice.taxRate,
+          taxAmount: invoice.taxAmount,
+          total: invoice.total,
+          notes: invoice.notes,
+          storeName: settings.storeName,
+          storeEmail: settings.email,
+          // Invoice settings
+          logo: settings.invoiceLogo,
+          logoPosition: settings.invoiceLogoPosition,
+          theme: settings.invoiceTheme,
+          showVAT: settings.invoiceShowVAT,
+          showTaxNumber: settings.invoiceShowTaxNumber,
+          taxNumber: settings.taxNumber,
+          showBankDetails: settings.invoiceShowBankDetails,
+          bankName: settings.bankName,
+          bankAccountNumber: settings.bankAccountNumber,
+          bankBranchCode: settings.bankBranchCode,
+          footerText: settings.invoiceFooterText,
+          terms: settings.invoiceTerms,
+          showLineNumbers: settings.invoiceShowLineNumbers,
+          currencySymbol: settings.currencySymbol,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        updateInvoiceStatus(invoice.id, 'sent')
+        toast.success(`Invoice sent to ${invoice.customerEmail}`)
+      } else {
+        toast.error(data.error || 'Failed to send invoice')
+      }
+    } catch (error: any) {
+      toast.error(`Failed to send invoice: ${error.message}`)
+    }
   }
 
   const handlePrint = () => {
@@ -104,6 +152,25 @@ export default function AdminInvoicesPage() {
   return (
     <AdminLayout title="Invoices">
       <Toaster position="top-right" />
+      <InvoiceCreateModal 
+        isOpen={showCreateModal} 
+        onClose={() => setShowCreateModal(false)} 
+      />
+      
+      {/* Header Actions */}
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Invoices</h1>
+          <p className="text-gray-500 mt-1">Manage and track all invoices</p>
+        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          <Plus className="h-5 w-5" />
+          Create Invoice
+        </button>
+      </div>
       
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
@@ -268,12 +335,40 @@ export default function AdminInvoicesPage() {
 
             {/* Printable Invoice Content */}
             <div ref={printRef} className="p-8">
-              <div className="invoice-header border-b-2 border-gray-800 pb-4 mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">INVOICE</h1>
+              {/* Logo */}
+              {settings.invoiceLogo && (
+                <div className={`mb-4 ${
+                  settings.invoiceLogoPosition === 'center' ? 'text-center' :
+                  settings.invoiceLogoPosition === 'right' ? 'text-right' : 'text-left'
+                }`}>
+                  <img 
+                    src={settings.invoiceLogo} 
+                    alt="Company Logo" 
+                    className="h-16 inline-block"
+                  />
+                </div>
+              )}
+
+              {/* Theme-based header */}
+              <div className={`border-b-2 pb-4 mb-6 ${
+                settings.invoiceTheme === 'modern' ? 'border-purple-600' :
+                settings.invoiceTheme === 'minimal' ? 'border-gray-400' :
+                settings.invoiceTheme === 'bold' ? 'border-red-600' :
+                'border-blue-800'
+              }`}>
+                <h1 className={`text-3xl font-bold ${
+                  settings.invoiceTheme === 'modern' ? 'text-purple-600' :
+                  settings.invoiceTheme === 'minimal' ? 'text-gray-900' :
+                  settings.invoiceTheme === 'bold' ? 'text-red-600' :
+                  'text-blue-800'
+                }`}>INVOICE</h1>
                 <div className="company-info mt-2 text-gray-600">
                   <p className="font-semibold">{settings.storeName}</p>
                   <p>Email: {settings.email}</p>
                   <p>Phone: {settings.phone}</p>
+                  {settings.invoiceShowTaxNumber && settings.taxNumber && (
+                    <p>VAT Number: {settings.taxNumber}</p>
+                  )}
                 </div>
               </div>
 
@@ -299,7 +394,15 @@ export default function AdminInvoicesPage() {
 
               <table className="w-full mb-8">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
+                  <tr className={`border-b-2 ${
+                    settings.invoiceTheme === 'modern' ? 'border-purple-300' :
+                    settings.invoiceTheme === 'minimal' ? 'border-gray-300' :
+                    settings.invoiceTheme === 'bold' ? 'border-red-300' :
+                    'border-blue-300'
+                  }`}>
+                    {settings.invoiceShowLineNumbers && (
+                      <th className="py-3 text-left text-sm font-semibold text-gray-700 w-12">#</th>
+                    )}
                     <th className="py-3 text-left text-sm font-semibold text-gray-700">Description</th>
                     <th className="py-3 text-center text-sm font-semibold text-gray-700">Qty</th>
                     <th className="py-3 text-right text-sm font-semibold text-gray-700">Unit Price</th>
@@ -309,10 +412,13 @@ export default function AdminInvoicesPage() {
                 <tbody>
                   {selectedInvoice.items.map((item, index) => (
                     <tr key={index} className="border-b border-gray-200">
+                      {settings.invoiceShowLineNumbers && (
+                        <td className="py-3 text-sm text-gray-500">{index + 1}</td>
+                      )}
                       <td className="py-3 text-sm">{item.description}</td>
                       <td className="py-3 text-sm text-center">{item.quantity}</td>
-                      <td className="py-3 text-sm text-right">{formatCurrency(item.unitPrice)}</td>
-                      <td className="py-3 text-sm text-right">{formatCurrency(item.total)}</td>
+                      <td className="py-3 text-sm text-right">{settings.currencySymbol || 'R'}{item.unitPrice.toFixed(2)}</td>
+                      <td className="py-3 text-sm text-right">{settings.currencySymbol || 'R'}{item.total.toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -322,23 +428,60 @@ export default function AdminInvoicesPage() {
                 <div className="w-64">
                   <div className="flex justify-between py-2">
                     <span className="text-gray-600">Subtotal:</span>
-                    <span>{formatCurrency(selectedInvoice.subtotal)}</span>
+                    <span>{settings.currencySymbol || 'R'}{selectedInvoice.subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-gray-600">VAT ({(selectedInvoice.taxRate * 100).toFixed(0)}%):</span>
-                    <span>{formatCurrency(selectedInvoice.taxAmount)}</span>
-                  </div>
-                  <div className="flex justify-between py-3 border-t-2 border-gray-800 font-bold text-lg">
+                  {(settings.invoiceShowVAT ?? true) && (
+                    <div className="flex justify-between py-2">
+                      <span className="text-gray-600">VAT ({(selectedInvoice.taxRate * 100).toFixed(0)}%):</span>
+                      <span>{settings.currencySymbol || 'R'}{selectedInvoice.taxAmount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className={`flex justify-between py-3 border-t-2 font-bold text-lg ${
+                    settings.invoiceTheme === 'modern' ? 'border-purple-600' :
+                    settings.invoiceTheme === 'minimal' ? 'border-gray-400' :
+                    settings.invoiceTheme === 'bold' ? 'border-red-600' :
+                    'border-blue-800'
+                  }`}>
                     <span>Total:</span>
-                    <span>{formatCurrency(selectedInvoice.total)}</span>
+                    <span>{settings.currencySymbol || 'R'}{selectedInvoice.total.toFixed(2)}</span>
                   </div>
+                  {!(settings.invoiceShowVAT ?? true) && (
+                    <p className="text-xs text-gray-500 mt-1 text-right">Prices exclude VAT</p>
+                  )}
                 </div>
               </div>
+
+              {/* Bank Details */}
+              {settings.invoiceShowBankDetails && settings.bankName && (
+                <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Banking Details</h4>
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <p><span className="font-medium">Bank:</span> {settings.bankName}</p>
+                    {settings.bankAccountNumber && <p><span className="font-medium">Account Number:</span> {settings.bankAccountNumber}</p>}
+                    {settings.bankBranchCode && <p><span className="font-medium">Branch Code:</span> {settings.bankBranchCode}</p>}
+                  </div>
+                </div>
+              )}
 
               {selectedInvoice.notes && (
                 <div className="mt-8 p-4 bg-gray-50 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-500 mb-1">Notes:</h4>
                   <p className="text-sm text-gray-600">{selectedInvoice.notes}</p>
+                </div>
+              )}
+
+              {/* Terms & Conditions */}
+              {settings.invoiceTerms && (
+                <div className="mt-8 border-t pt-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Terms & Conditions</h4>
+                  <p className="text-xs text-gray-600 whitespace-pre-wrap">{settings.invoiceTerms}</p>
+                </div>
+              )}
+
+              {/* Footer Text */}
+              {settings.invoiceFooterText && (
+                <div className="mt-4 text-center">
+                  <p className="text-xs text-gray-500">{settings.invoiceFooterText}</p>
                 </div>
               )}
             </div>

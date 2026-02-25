@@ -12,6 +12,22 @@ export interface StoreSettings {
   taxRate: number
   exchangeRate: number
   margin: number
+  // Invoice Settings
+  invoiceLogo?: string
+  invoiceLogoPosition?: 'left' | 'center' | 'right'
+  invoiceTheme?: 'professional' | 'modern' | 'minimal' | 'bold'
+  invoiceShowVAT?: boolean
+  invoiceShowTaxNumber?: boolean
+  taxNumber?: string
+  invoiceShowBankDetails?: boolean
+  bankName?: string
+  bankAccountNumber?: string
+  bankBranchCode?: string
+  invoiceFooterText?: string
+  invoiceTerms?: string
+  invoiceShowLineNumbers?: boolean
+  currencySymbol?: string
+  invoiceDateFormat?: string
 }
 
 interface AdminStore {

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
 import { GoogleDriveConnection } from '@/components/admin/GoogleDriveConnection'
+import InvoiceSettings from '@/components/admin/InvoiceSettings'
 
 export default function AdminSettingsPage() {
   const router = useRouter()
@@ -133,6 +134,11 @@ export default function AdminSettingsPage() {
                   <p className="mt-1 text-sm text-gray-500">VAT: {(form.taxRate * 100).toFixed(0)}%</p>
                 </div>
               </div>
+            </div>
+
+            {/* Invoice Settings */}
+            <div className="pt-6 border-t">
+              <InvoiceSettings />
             </div>
 
             {/* Google Drive Integration */}
