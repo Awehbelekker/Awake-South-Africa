@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Push Official Images - Awake Store</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      font-size: 42px;
+      color: #1f2937;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 30px;
+      font-size: 18px;
+    }
+    .alert {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    .alert-title {
+      font-weight: 600;
+      color: #92400e;
+      margin-bottom: 6px;
+    }
+    .alert-text {
+      color: #78350f;
+      font-size: 14px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      padding: 28px;
+      border-radius: 12px;
+      border: 2px solid #bae6fd;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 48px;
+      font-weight: 700;
+      color: #0c4a6e;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      color: #075985;
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 18px 48px;
+      font-size: 20px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+    }
+    .btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .progress-bar {
+      background: #e5e7eb;
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .log {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      margin-top: 20px;
+    }
+    .log-entry {
+      padding: 6px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+    .log-success { color: #059669; }
+    .log-error { color: #dc2626; }
+    .log-info { color: #0284c7; }
+    .mapping-preview {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .mapping-item {
+      padding: 8px;
+      margin: 4px 0;
+      background: white;
+      border-radius: 4px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .product-name {
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .image-url {
+      color: #6b7280;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🖼️ Push Official Images</h1>
+    <p class="subtitle">Update all Awake products with official Shopify CDN images</p>
+
+    <div class="alert">
+      <div class="alert-title">⚠️ Ready to Update</div>
+      <div class="alert-text">This will update the image field for all 44 products in your Supabase database with official Awake Shopify CDN URLs.</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="totalCount">44</div>
+        <div class="stat-label">Total Products</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="updatedCount">0</div>
+        <div class="stat-label">Updated</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="skippedCount">0</div>
+        <div class="stat-label">Skipped</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="errorCount">0</div>
+        <div class="stat-label">Errors</div>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <button class="btn" id="pushBtn" onclick="pushImages()">
+      🚀 Push All Images Now
+    </button>
+
+    <div class="mapping-preview">
+      <strong style="color: #1f2937; display: block; margin-bottom: 12px;">📋 Image Mappings Preview (44 products):</strong>
+      <div id="mappingList"></div>
+    </div>
+
+    <div class="log" id="logContainer"></div>
+  </div>
+
+  <script>
+    // Supabase credentials
+    const SUPABASE_URL = 'https://iepeffuszswxuwyqrzix.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllcGVmZnVzenN3eHV3eXFyeml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5MDY1ODcsImV4cCI6MjA1NTQ4MjU4N30.LS7iRJaDpnmUfXh_dq0S67hGKA0zP4iOJvPg-5cvhhM'
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    // Official Awake Shopify CDN image mappings (all 44 products)
+    const OFFICIAL_IMAGES = {
+      // Jetboards
+      'Awake RÄVIK Explore XR 4': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ravik3.webp',
+      'Awake RÄVIK Adventure XR 4': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ravik_s.webp',
+      'Awake RÄVIK Ultimate': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/Ultimate_1.png',
+      'Brabus Shadow 800 Explore': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/brabus-explore.webp',
+      
+      // eFoils
+      'Awake VINGA eFoil': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/vinga.webp',
+      'Awake VINGA Ultimate': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ultimate_vinga.webp',
+      
+      // Batteries
+      'LR4 Battery': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/lr4-battery.webp',
+      'LR4 Flex Battery': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/flex-battery.webp',
+      
+      // Boards Only
+      'RÄVIK Explore Board Only': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ravik3.webp',
+      'RÄVIK Adventure Board Only': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ravik_s.webp',
+      'RÄVIK Ultimate Board Only': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/Ultimate_1.png',
+      'Brabus Shadow Board Only': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/brabus-explore.webp',
+      'VINGA eFoil Board Only': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/vinga.webp',
+      'VINGA Ultimate Board Only': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ultimate_vinga.webp',
+      
+      // Wings
+      'Powder Wing': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/powder-wing.webp',
+      'Fluid Wing': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/fluid-wing.webp',
+      
+      // Bags & Protection
+      'Board Bag': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/board-bag.webp',
+      'Battery Backpack': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/battery-backpack.webp',
+      
+      // Safety & Storage
+      'Life Vest': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/life-vest.webp',
+      'Inflatable Floating Dock': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/inflatable-dock.webp',
+      'Wall Mount': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/wall-mount.webp',
+      
+      // Electronics
+      'Hand Controller': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/hand-controller.webp',
+      'Charger': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/charger.webp',
+      'Controller & Charger Set': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/controller-charger.webp',
+      
+      // Parts & Accessories
+      'RÄVIK Fins': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ravik-fins.webp',
+      'Carbon Fiber Fins': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/carbon-fins.webp',
+      'Foot Straps': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/foot-straps.webp',
+      'Beach Mat': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/beach-mat.webp',
+      'Jetboard Tube': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/jetboard-tube.webp',
+      'Competition Key': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/competition-key.webp',
+      'Power Key Leash': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/power-key-leash.webp',
+      
+      // Apparel
+      'Awake T-Shirt': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/tshirt.webp',
+      'Awake Cap': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/cap.webp',
+      'Wetsuit': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/wetsuit.webp',
+      'Ladies Neo Suit': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ladys-neo-suit.webp',
+      'Neo Jacket': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/neo-jacket.webp',
+      
+      // Demo/Used
+      'Demo RÄVIK Explore': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ravik3.webp',
+      'Demo VINGA': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/vinga.webp',
+      'Used RÄVIK 3': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ravik3.webp',
+      'Used RÄVIK S': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/ravik_s.webp',
+      'Used VINGA': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/vinga.webp',
+      'Used LR4 Battery': 'https://cdn.shopify.com/s/files/1/0074/9305/6546/files/lr4-battery.webp'
+    }
+
+    // Display mapping preview
+    function displayMappings() {
+      const list = document.getElementById('mappingList')
+      let html = ''
+      for (const [name, url] of Object.entries(OFFICIAL_IMAGES)) {
+        const filename = url.split('/').pop()
+        html += `
+          <div class="mapping-item">
+            <span class="product-name">${name}</span>
+            <span class="image-url">${filename}</span>
+          </div>
+        `
+      }
+      list.innerHTML = html
+    }
+
+    // Add log entry
+    function log(message, type = 'info') {
+      const container = document.getElementById('logContainer')
+      const entry = document.createElement('div')
+      entry.className = `log-entry log-${type}`
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`
+      container.appendChild(entry)
+      container.scrollTop = container.scrollHeight
+    }
+
+    // Update stats
+    function updateStats(updated, skipped, errors, total) {
+      document.getElementById('updatedCount').textContent = updated
+      document.getElementById('skippedCount').textContent = skipped
+      document.getElementById('errorCount').textContent = errors
+      
+      const progress = ((updated + skipped + errors) / total) * 100
+      document.getElementById('progressBar').style.width = progress + '%'
+    }
+
+    // Push all images to Supabase
+    async function pushImages() {
+      const btn = document.getElementById('pushBtn')
+      btn.disabled = true
+      btn.textContent = '⏳ Updating...'
+      
+      log('🚀 Starting image update...', 'info')
+      
+      let updated = 0
+      let skipped = 0
+      let errors = 0
+      const total = Object.keys(OFFICIAL_IMAGES).length
+
+      try {
+        // Get tenant ID
+        const { data: tenants, error: tenantError } = await supabase
+          .from('tenants')
+          .select('id')
+          .eq('slug', 'awake')
+          .single()
+
+        if (tenantError || !tenants) {
+          log('❌ Error: Could not find Awake tenant', 'error')
+          throw new Error('Tenant not found')
+        }
+
+        const tenantId = tenants.id
+        log(`✅ Found tenant ID: ${tenantId}`, 'success')
+
+        // Get all products
+        const { data: products, error: productsError } = await supabase
+          .from('products')
+          .select('id, name, tenant_id')
+          .eq('tenant_id', tenantId)
+
+        if (productsError) {
+          log(`❌ Error fetching products: ${productsError.message}`, 'error')
+          throw productsError
+        }
+
+        log(`📦 Found ${products.length} products in database`, 'info')
+
+        // Update each product
+        for (const product of products) {
+          const officialImage = OFFICIAL_IMAGES[product.name]
+          
+          if (officialImage) {
+            const { error } = await supabase
+              .from('products')
+              .update({ image: officialImage })
+              .eq('id', product.id)
+              .eq('tenant_id', tenantId)
+
+            if (error) {
+              log(`❌ Failed: ${product.name} - ${error.message}`, 'error')
+              errors++
+            } else {
+              log(`✅ Updated: ${product.name}`, 'success')
+              updated++
+            }
+          } else {
+            log(`⚠️ Skipped: ${product.name} (no mapping found)`, 'info')
+            skipped++
+          }
+
+          updateStats(updated, skipped, errors, total)
+          
+          // Small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 100))
+        }
+
+        log('', 'info')
+        log('🎉 Update complete!', 'success')
+        log(`📊 Updated: ${updated}, Skipped: ${skipped}, Errors: ${errors}`, 'info')
+        
+        btn.textContent = '✅ Complete! Refresh Admin Page'
+        btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+
+      } catch (err) {
+        log(`❌ Fatal error: ${err.message}`, 'error')
+        btn.disabled = false
+        btn.textContent = '🔄 Retry'
+      }
+    }
+
+    // Initialize on page load
+    displayMappings()
+    log('✅ Ready to push images', 'success')
+    log('👆 Click the button above to start', 'info')
+  </script>
+</body>
+</html>

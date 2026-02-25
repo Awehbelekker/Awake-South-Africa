@@ -14,6 +14,7 @@ import { useAdminStore } from '@/store/admin'
 import { GoogleDriveConnection } from '@/components/admin/GoogleDriveConnection'
 import { GoogleDriveBrowser } from '@/components/admin/GoogleDriveBrowser'
 import { BulkImageUpload } from '@/components/admin/BulkImageUpload'
+import ImageScraper from '@/components/admin/ImageScraper'
 
 export default function AdminImportPage() {
   const router = useRouter()
@@ -68,6 +69,18 @@ export default function AdminImportPage() {
             Optionally create product records automatically.
           </p>
           <BulkImageUpload />
+        </div>
+
+        {/* Option 3: Scrape from awakeboards.com */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            🌐 Scrape from awakeboards.com
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Automatically scrape product images from the official Awake website.
+            Downloads images and uploads to Supabase Storage, then links them to your products.
+          </p>
+          <ImageScraper />
         </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

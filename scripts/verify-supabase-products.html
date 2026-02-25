@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Verify Supabase Products - Awake Store</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      font-size: 36px;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 30px;
+      font-size: 18px;
+    }
+    .alert {
+      background: #dbeafe;
+      border-left: 4px solid #3b82f6;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      color: #1e40af;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      padding: 28px;
+      border-radius: 12px;
+      text-align: center;
+      border: 2px solid #86efac;
+    }
+    .stat-number {
+      font-size: 48px;
+      font-weight: bold;
+      color: #16a34a;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      color: #475569;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    button {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      margin-right: 12px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+    }
+    button:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 30px;
+    }
+    .product-card {
+      background: #f9fafb;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #e5e7eb;
+      transition: all 0.3s;
+    }
+    .product-card:hover {
+      border-color: #10b981;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #e5e7eb;
+    }
+    .product-info {
+      padding: 16px;
+    }
+    .product-name {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 8px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+    .product-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .product-category {
+      font-size: 12px;
+      color: #6b7280;
+      background: #e5e7eb;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .product-price {
+      font-size: 16px;
+      font-weight: bold;
+      color: #10b981;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    .badge-popular { background: #dbeafe; color: #1e40af; }
+    .badge-premium { background: #fef3c7; color: #92400e; }
+    .badge-limited { background: #fce7f3; color: #9f1239; }
+    .category-section {
+      margin: 40px 0;
+    }
+    .category-header {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid #10b981;
+    }
+    #log {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✅ Verify Supabase Products</h1>
+    <p class="subtitle">Check all products migrated to your database</p>
+    
+    <div class="alert">
+      <strong>ℹ️ Info:</strong> Your products are now in <strong>Supabase</strong> (cloud database), not localStorage. This is permanent and accessible from anywhere!
+    </div>
+    
+    <div class="stats" id="stats" style="display:none;">
+      <div class="stat-card">
+        <div class="stat-number" id="totalProducts">0</div>
+        <div class="stat-label">Total Products</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="categoryCount">0</div>
+        <div class="stat-label">Categories</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="withImages">0</div>
+        <div class="stat-label">With Images</div>
+      </div>
+    </div>
+    
+    <button onclick="loadProducts()">🔍 Load All Products</button>
+    <button onclick="showByCategory()">📊 Group by Category</button>
+    
+    <div id="productsContainer"></div>
+    <div id="log" style="display:none;"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://iepeffuszswxuwyqrzix.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllcGVmZnVzenN3eHV3eXFyeml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg4MjEyNTMsImV4cCI6MjA1NDM5NzI1M30.Z-yLyvp4GG0VpYaNQk2RdJu6-tl9nLMLZ6HBcj1_v8Y';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    let allProducts = [];
+    
+    async function loadProducts() {
+      const container = document.getElementById('productsContainer');
+      container.innerHTML = '<p style="text-align:center;padding:40px;color:#6b7280;">Loading products...</p>';
+      
+      try {
+        // Get tenant
+        const { data: tenants } = await supabase
+          .from('tenants')
+          .select('id, name')
+          .eq('slug', 'awake');
+        
+        if (!tenants || tenants.length === 0) {
+          container.innerHTML = '<p style="color:#ef4444;padding:20px;">❌ Awake tenant not found!</p>';
+          return;
+        }
+        
+        // Get products
+        const { data: products, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('tenant_id', tenants[0].id)
+          .order('name', { ascending: true });
+        
+        if (error) throw error;
+        
+        allProducts = products;
+        
+        // Update stats
+        document.getElementById('stats').style.display = 'grid';
+        document.getElementById('totalProducts').textContent = products.length;
+        
+        const categories = [...new Set(products.map(p => p.category))];
+        document.getElementById('categoryCount').textContent = categories.length;
+        
+        const withImages = products.filter(p => p.image && p.image.includes('cdn.shopify.com')).length;
+        document.getElementById('withImages').textContent = withImages;
+        
+        // Display products
+        displayProducts(products);
+        
+      } catch (err) {
+        container.innerHTML = `<p style="color:#ef4444;padding:20px;">❌ Error: ${err.message}</p>`;
+      }
+    }
+    
+    function displayProducts(products) {
+      const container = document.getElementById('productsContainer');
+      
+      if (products.length === 0) {
+        container.innerHTML = '<p style="text-align:center;padding:40px;color:#6b7280;">No products found.</p>';
+        return;
+      }
+      
+      const html = `
+        <div class="products-grid">
+          ${products.map(p => `
+            <div class="product-card">
+              <img src="${p.image || 'https://via.placeholder.com/280x200?text=No+Image'}" 
+                   alt="${p.name}" 
+                   class="product-image"
+                   onerror="this.src='https://via.placeholder.com/280x200?text=No+Image'">
+              <div class="product-info">
+                <div class="product-name">
+                  ${p.name}
+                  ${p.badge ? `<span class="badge badge-${p.badge.toLowerCase()}">${p.badge}</span>` : ''}
+                </div>
+                <div class="product-meta">
+                  <span class="product-category">${p.category || 'Uncategorized'}</span>
+                  <span class="product-price">R${(p.price / 100).toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      container.innerHTML = html;
+    }
+    
+    function showByCategory() {
+      if (allProducts.length === 0) {
+        alert('Please load products first!');
+        return;
+      }
+      
+      const container = document.getElementById('productsContainer');
+      
+      // Group by category
+      const byCategory = {};
+      allProducts.forEach(p => {
+        const cat = p.category || 'Uncategorized';
+        if (!byCategory[cat]) byCategory[cat] = [];
+        byCategory[cat].push(p);
+      });
+      
+      // Sort categories by product count
+      const sortedCategories = Object.entries(byCategory)
+        .sort((a, b) => b[1].length - a[1].length);
+      
+      const html = sortedCategories.map(([category, products]) => `
+        <div class="category-section">
+          <div class="category-header">
+            ${category} (${products.length})
+          </div>
+          <div class="products-grid">
+            ${products.map(p => `
+              <div class="product-card">
+                <img src="${p.image || 'https://via.placeholder.com/280x200?text=No+Image'}" 
+                     alt="${p.name}" 
+                     class="product-image"
+                     onerror="this.src='https://via.placeholder.com/280x200?text=No+Image'">
+                <div class="product-info">
+                  <div class="product-name">
+                    ${p.name}
+                    ${p.badge ? `<span class="badge badge-${p.badge.toLowerCase()}">${p.badge}</span>` : ''}
+                  </div>
+                  <div class="product-meta">
+                    <span class="product-category">${p.category || 'Uncategorized'}</span>
+                    <span class="product-price">R${(p.price / 100).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+      
+      container.innerHTML = html;
+    }
+    
+    // Auto-load on page load
+    window.addEventListener('load', loadProducts);
+  </script>
+</body>
+</html>
