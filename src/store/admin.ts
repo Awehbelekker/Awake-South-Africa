@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export interface StoreSettings {
+  tenantId?: string
   storeName: string
   email: string
   phone: string
