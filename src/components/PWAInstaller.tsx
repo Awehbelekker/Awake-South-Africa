@@ -1,15 +1,23 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Download, X } from 'lucide-react';
 
 export default function PWAInstaller() {
+  const pathname = usePathname();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
+  // Only activate on admin pages
+  const isAdminPage = pathname?.startsWith('/admin');
+
   useEffect(() => {
+    // Don't run any PWA logic for regular customers
+    if (!isAdminPage) return;
+
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
@@ -65,7 +73,7 @@ export default function PWAInstaller() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, []);
+  }, [isAdminPage]);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
@@ -88,7 +96,8 @@ export default function PWAInstaller() {
     localStorage.setItem('pwa-install-dismissed', Date.now().toString());
   };
 
-  if (isInstalled || !showInstallPrompt) {
+  // Only show on admin pages — never to regular storefront customers
+  if (!isAdminPage || isInstalled || !showInstallPrompt) {
     return null;
   }
 
@@ -101,8 +110,8 @@ export default function PWAInstaller() {
               <Download className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-bold text-lg">Install App</h3>
-              <p className="text-sm text-blue-100">Get the best experience</p>
+              <h3 className="font-bold text-lg">Install Admin App</h3>
+              <p className="text-sm text-blue-100">Manage your store on the go</p>
             </div>
           </div>
           <button
@@ -118,8 +127,8 @@ export default function PWAInstaller() {
             <p className="font-medium">To install on iOS:</p>
             <ol className="list-decimal list-inside space-y-1 text-blue-100">
               <li>Tap the Share button</li>
-              <li>Scroll down and tap "Add to Home Screen"</li>
-              <li>Tap "Add"</li>
+              <li>Scroll down and tap &quot;Add to Home Screen&quot;</li>
+              <li>Tap &quot;Add&quot;</li>
             </ol>
           </div>
         ) : (

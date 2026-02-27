@@ -278,7 +278,10 @@ export default function AdminProductsPage() {
     setDeleting(true)
     try {
       if (dataSource === 'supabase') {
-        const res = await fetch(`/api/tenant/products?id=${id}`, { method: 'DELETE' })
+        // Use the real Supabase UUID, not the local slug
+        const product = supabaseProducts.find(p => p.id === id)
+        const supabaseId = (product as any)?._supabaseId || id
+        const res = await fetch(`/api/tenant/products?id=${supabaseId}`, { method: 'DELETE' })
         const data = await res.json()
         if (!data.success) throw new Error(data.error)
         setSupabaseProducts(prev => prev.filter(p => p.id !== id))
@@ -300,10 +303,15 @@ export default function AdminProductsPage() {
     setDeleting(true)
     try {
       if (dataSource === 'supabase') {
+        // Map local IDs (slugs) → real Supabase UUIDs before sending
+        const supabaseIds = Array.from(selectedIds).map(id => {
+          const product = supabaseProducts.find(p => p.id === id)
+          return (product as any)?._supabaseId || id
+        })
         const res = await fetch('/api/tenant/products', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ids: Array.from(selectedIds) }),
+          body: JSON.stringify({ ids: supabaseIds }),
         })
         const data = await res.json()
         if (!data.success) throw new Error(data.error)

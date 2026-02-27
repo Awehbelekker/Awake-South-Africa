@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import InvoiceCreateModal from '@/components/admin/InvoiceCreateModal'
 import { useInvoicesStore, Invoice, InvoiceStatus } from '@/store/invoices'
 import { useAdminStore } from '@/store/admin'
 import { 
   Search, Filter, Eye, Download, Send, CheckCircle, 
-  XCircle, Clock, FileText, Printer, Mail, Plus
+  XCircle, Clock, FileText, Printer, Mail, Plus, Trash2, RefreshCw
 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 
@@ -20,16 +20,119 @@ const statusColors: Record<InvoiceStatus, string> = {
 }
 
 export default function AdminInvoicesPage() {
-  const { invoices, updateInvoiceStatus, markAsPaid } = useInvoicesStore()
-  const { settings } = useAdminStore()
+  const { invoices, updateInvoiceStatus, markAsPaid, addInvoice } = useInvoicesStore()
+  const { settings, isAuthenticated } = useAdminStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'all'>('all')
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const printRef = useRef<HTMLDivElement>(null)
 
+  // Supabase persistence layer
+  const [supabaseInvoices, setSupabaseInvoices] = useState<Invoice[]>([])
+  const [supabaseAvailable, setSupabaseAvailable] = useState(true)
+  const [supabaseLoading, setSupabaseLoading] = useState(false)
+  const prevInvoiceCountRef = useRef(invoices.length)
+
+  // Load invoices from Supabase on mount
+  useEffect(() => {
+    if (!isAuthenticated) return
+    setSupabaseLoading(true)
+    fetch('/api/tenant/invoices')
+      .then(r => r.json())
+      .then(data => {
+        if (data.invoices && data.invoices.length > 0) {
+          setSupabaseInvoices(data.invoices)
+          setSupabaseAvailable(true)
+        } else if (data.tableExists === false) {
+          setSupabaseAvailable(false)
+        } else {
+          // Supabase reachable but empty — push local invoices up
+          setSupabaseAvailable(true)
+          if (invoices.length > 0) {
+            syncAllToSupabase(invoices)
+          }
+        }
+      })
+      .catch(() => setSupabaseAvailable(false))
+      .finally(() => setSupabaseLoading(false))
+  }, [isAuthenticated])
+
+  // Auto-sync new invoices added via InvoiceCreateModal
+  useEffect(() => {
+    if (!supabaseAvailable) return
+    if (invoices.length > prevInvoiceCountRef.current) {
+      const newInvoices = invoices.slice(prevInvoiceCountRef.current)
+      newInvoices.forEach(inv => {
+        fetch('/api/tenant/invoices', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(inv),
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+              setSupabaseInvoices(prev => [{ ...inv, _supabaseId: data.invoice?.id } as any, ...prev])
+            }
+          })
+          .catch(err => console.warn('Invoice sync failed:', err))
+      })
+    }
+    prevInvoiceCountRef.current = invoices.length
+  }, [invoices.length, supabaseAvailable])
+
+  const syncAllToSupabase = async (localInvoices: Invoice[]) => {
+    for (const inv of localInvoices) {
+      try {
+        await fetch('/api/tenant/invoices', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(inv),
+        })
+      } catch { /* ignore */ }
+    }
+    const r = await fetch('/api/tenant/invoices')
+    const d = await r.json()
+    if (d.invoices?.length > 0) setSupabaseInvoices(d.invoices)
+  }
+
+  const refreshFromSupabase = async () => {
+    setSupabaseLoading(true)
+    try {
+      const r = await fetch('/api/tenant/invoices')
+      const d = await r.json()
+      if (d.invoices) setSupabaseInvoices(d.invoices)
+      toast.success('Invoices refreshed')
+    } catch {
+      toast.error('Failed to refresh')
+    } finally {
+      setSupabaseLoading(false)
+    }
+  }
+
+  // Use Supabase data when available, fall back to localStorage
+  const useSupabase = supabaseAvailable && supabaseInvoices.length > 0
+  const displayInvoices: Invoice[] = useSupabase ? supabaseInvoices : invoices
+  const dataSource = useSupabase ? 'supabase' : 'local'
+
+  const patchInvoiceInSupabase = async (inv: Invoice, updates: Partial<Invoice>) => {
+    if (!supabaseAvailable) return
+    try {
+      await fetch('/api/tenant/invoices', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...updates, id: inv.id, _supabaseId: (inv as any)._supabaseId }),
+      })
+      setSupabaseInvoices(prev =>
+        prev.map(i => i.id === inv.id ? { ...i, ...updates } : i)
+      )
+    } catch (err) {
+      console.warn('Invoice patch failed:', err)
+    }
+  }
+
   const filteredInvoices = useMemo(() => {
-    return invoices
+    return displayInvoices
       .filter(inv => {
         const matchesSearch = 
           inv.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -39,17 +142,17 @@ export default function AdminInvoicesPage() {
         return matchesSearch && matchesStatus
       })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  }, [invoices, searchQuery, statusFilter])
+  }, [displayInvoices, searchQuery, statusFilter])
 
   const stats = useMemo(() => ({
-    total: invoices.length,
-    draft: invoices.filter(i => i.status === 'draft').length,
-    sent: invoices.filter(i => i.status === 'sent').length,
-    paid: invoices.filter(i => i.status === 'paid').length,
-    overdue: invoices.filter(i => i.status === 'overdue').length,
-    totalOutstanding: invoices.filter(i => i.status === 'sent' || i.status === 'overdue').reduce((sum, i) => sum + i.total, 0),
-    totalPaid: invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + i.total, 0),
-  }), [invoices])
+    total: displayInvoices.length,
+    draft: displayInvoices.filter(i => i.status === 'draft').length,
+    sent: displayInvoices.filter(i => i.status === 'sent').length,
+    paid: displayInvoices.filter(i => i.status === 'paid').length,
+    overdue: displayInvoices.filter(i => i.status === 'overdue').length,
+    totalOutstanding: displayInvoices.filter(i => i.status === 'sent' || i.status === 'overdue').reduce((sum: number, i) => sum + i.total, 0),
+    totalPaid: displayInvoices.filter(i => i.status === 'paid').reduce((sum: number, i) => sum + i.total, 0),
+  }), [displayInvoices])
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', minimumFractionDigits: 2 }).format(amount)
@@ -59,9 +162,32 @@ export default function AdminInvoicesPage() {
     return new Date(dateString).toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' })
   }
 
-  const handleMarkPaid = (invoiceId: string) => {
+  const handleMarkPaid = async (invoiceId: string) => {
+    const invoice = displayInvoices.find(i => i.id === invoiceId)
     markAsPaid(invoiceId)
+    if (invoice) {
+      await patchInvoiceInSupabase(invoice, { status: 'paid', paidDate: new Date().toISOString() })
+    }
     toast.success('Invoice marked as paid')
+  }
+
+  const handleDeleteInvoice = async (invoice: Invoice) => {
+    if (!confirm(`Delete invoice ${invoice.invoiceNumber}?`)) return
+    if (supabaseAvailable && (invoice as any)._supabaseId) {
+      const res = await fetch(`/api/tenant/invoices?id=${(invoice as any)._supabaseId}`, { method: 'DELETE' })
+      const d = await res.json()
+      if (d.success) {
+        setSupabaseInvoices(prev => prev.filter(i => i.id !== invoice.id))
+        if (selectedInvoice?.id === invoice.id) setSelectedInvoice(null)
+        toast.success('Invoice deleted')
+      } else {
+        toast.error('Delete failed')
+      }
+    } else {
+      setSupabaseInvoices(prev => prev.filter(i => i.id !== invoice.id))
+      if (selectedInvoice?.id === invoice.id) setSelectedInvoice(null)
+      toast.success('Invoice removed')
+    }
   }
 
   const handleSendInvoice = async (invoice: Invoice) => {
@@ -106,6 +232,7 @@ export default function AdminInvoicesPage() {
 
       if (response.ok) {
         updateInvoiceStatus(invoice.id, 'sent')
+        await patchInvoiceInSupabase(invoice, { status: 'sent' })
         toast.success(`Invoice sent to ${invoice.customerEmail}`)
       } else {
         toast.error(data.error || 'Failed to send invoice')
@@ -161,15 +288,36 @@ export default function AdminInvoicesPage() {
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Invoices</h1>
-          <p className="text-gray-500 mt-1">Manage and track all invoices</p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-gray-500">Manage and track all invoices</p>
+            {supabaseAvailable ? (
+              <span className="flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
+                ● Supabase
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full text-xs">
+                ● Local only
+              </span>
+            )}
+          </div>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <Plus className="h-5 w-5" />
-          Create Invoice
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={refreshFromSupabase}
+            disabled={supabaseLoading}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+            title="Refresh from Supabase"
+          >
+            <RefreshCw className={`h-4 w-4 ${supabaseLoading ? 'animate-spin' : ''}`} />
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <Plus className="h-5 w-5" />
+            Create Invoice
+          </button>
+        </div>
       </div>
       
       {/* Stats */}
@@ -298,6 +446,13 @@ export default function AdminInvoicesPage() {
                           <CheckCircle className="h-5 w-5" />
                         </button>
                       )}
+                      <button
+                        onClick={() => handleDeleteInvoice(invoice)}
+                        className="p-1 text-gray-400 hover:text-red-600"
+                        title="Delete Invoice"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </td>
                 </tr>

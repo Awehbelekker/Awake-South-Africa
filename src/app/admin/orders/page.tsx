@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import { useOrdersStore, Order, OrderStatus, PaymentStatus } from '@/store/orders'
 import { useInvoicesStore } from '@/store/invoices'
+import { useAdminOrders } from '@/lib/medusa-hooks'
+import { useAdminStore } from '@/store/admin'
 import { 
   Search, Filter, Eye, FileText, Package, Truck, CheckCircle, 
   XCircle, Clock, RefreshCw, ChevronDown
@@ -28,11 +30,124 @@ const paymentColors: Record<PaymentStatus, string> = {
 }
 
 export default function AdminOrdersPage() {
-  const { orders, updateOrderStatus, updatePaymentStatus } = useOrdersStore()
+  const { orders: localOrders, updateOrderStatus, updatePaymentStatus } = useOrdersStore()
   const { addInvoice, createInvoiceFromOrder, invoices } = useInvoicesStore()
+  const { isAuthenticated } = useAdminStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+
+  // Medusa admin orders
+  const { data: medusaData, isLoading: medusaLoading, error: medusaError } = useAdminOrders()
+  const medusaOrders: Order[] = useMemo(() => {
+    if (!medusaData?.orders?.length) return []
+    return (medusaData.orders as any[]).map((o: any) => ({
+      id: o.id,
+      orderNumber: o.display_id ? `ORD-${o.display_id}` : o.id,
+      customerName: `${o.billing_address?.first_name || ''} ${o.billing_address?.last_name || ''}`.trim() || o.email,
+      customerEmail: o.email,
+      customerPhone: o.billing_address?.phone || '',
+      items: (o.items || []).map((item: any) => ({
+        id: item.id,
+        productId: item.variant_id || item.id,
+        name: item.title,
+        price: (item.unit_price || 0) / 100,
+        quantity: item.quantity,
+        image: item.thumbnail,
+      })),
+      subtotal: (o.subtotal || 0) / 100,
+      tax: (o.tax_total || 0) / 100,
+      total: (o.total || 0) / 100,
+      status: (o.status as OrderStatus) || 'pending',
+      paymentStatus: o.payment_status === 'captured' ? 'paid' : (o.payment_status as PaymentStatus) || 'pending',
+      paymentMethod: o.payments?.[0]?.provider_id || '',
+      shippingAddress: o.shipping_address ? {
+        street: o.shipping_address.address_1 || '',
+        city: o.shipping_address.city || '',
+        province: o.shipping_address.province || '',
+        postalCode: o.shipping_address.postal_code || '',
+        country: o.shipping_address.country_code?.toUpperCase() || 'ZA',
+      } : undefined,
+      notes: o.customer_note || '',
+      createdAt: o.created_at,
+      updatedAt: o.updated_at,
+    }))
+  }, [medusaData])
+
+  // Supabase orders
+  const [supabaseOrders, setSupabaseOrders] = useState<Order[]>([])
+  const [supabaseLoading, setSupabaseLoading] = useState(false)
+  const [supabaseAvailable, setSupabaseAvailable] = useState(false)
+
+  useEffect(() => {
+    if (!isAuthenticated) return
+    setSupabaseLoading(true)
+    fetch('/api/tenant/orders')
+      .then(r => r.json())
+      .then(data => {
+        if (data.orders?.length > 0) {
+          const mapped: Order[] = data.orders.map((o: any) => ({
+            id: o.id,
+            orderNumber: o.order_number || o.id,
+            customerName: o.customer_name || o.customer_email,
+            customerEmail: o.customer_email,
+            customerPhone: o.customer_phone || '',
+            items: o.items || [],
+            subtotal: o.subtotal || 0,
+            tax: o.tax_amount || 0,
+            total: o.total || 0,
+            status: o.status as OrderStatus,
+            paymentStatus: o.payment_status as PaymentStatus,
+            paymentMethod: o.payment_method || '',
+            notes: o.customer_notes || '',
+            createdAt: o.created_at,
+            updatedAt: o.updated_at,
+          }))
+          setSupabaseOrders(mapped)
+          setSupabaseAvailable(true)
+        }
+      })
+      .catch(() => setSupabaseAvailable(false))
+      .finally(() => setSupabaseLoading(false))
+  }, [isAuthenticated])
+
+  const refreshOrders = async () => {
+    setSupabaseLoading(true)
+    try {
+      const r = await fetch('/api/tenant/orders')
+      const d = await r.json()
+      if (d.orders?.length > 0) {
+        setSupabaseOrders(d.orders.map((o: any) => ({
+          id: o.id,
+          orderNumber: o.order_number || o.id,
+          customerName: o.customer_name || o.customer_email,
+          customerEmail: o.customer_email,
+          customerPhone: o.customer_phone || '',
+          items: o.items || [],
+          subtotal: o.subtotal || 0,
+          tax: o.tax_amount || 0,
+          total: o.total || 0,
+          status: o.status as OrderStatus,
+          paymentStatus: o.payment_status as PaymentStatus,
+          paymentMethod: o.payment_method || '',
+          notes: o.customer_notes || '',
+          createdAt: o.created_at,
+          updatedAt: o.updated_at,
+        })))
+      }
+      toast.success('Orders refreshed')
+    } catch {
+      toast.error('Failed to refresh orders')
+    } finally {
+      setSupabaseLoading(false)
+    }
+  }
+
+  // Priority: Medusa > Supabase > localStorage
+  const useMedusa = medusaOrders.length > 0 && !medusaError
+  const useSupabase = !useMedusa && supabaseOrders.length > 0
+  const orders: Order[] = useMedusa ? medusaOrders : useSupabase ? supabaseOrders : localOrders
+  const dataSource = useMedusa ? 'medusa' : useSupabase ? 'supabase' : 'local'
 
   const filteredOrders = useMemo(() => {
     return orders
@@ -84,6 +199,38 @@ export default function AdminOrdersPage() {
   return (
     <AdminLayout title="Orders">
       <Toaster position="top-right" />
+
+      {/* Header with data source indicator */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2 text-sm">
+          {dataSource === 'medusa' && (
+            <span className="flex items-center gap-1.5 px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
+              ● Medusa
+            </span>
+          )}
+          {dataSource === 'supabase' && (
+            <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full">
+              ● Supabase
+            </span>
+          )}
+          {dataSource === 'local' && (
+            <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">
+              ● Local
+            </span>
+          )}
+          {(medusaLoading || supabaseLoading) && (
+            <span className="text-gray-500">Loading...</span>
+          )}
+        </div>
+        <button
+          onClick={refreshOrders}
+          disabled={supabaseLoading}
+          className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm disabled:opacity-50"
+        >
+          <RefreshCw className={`h-4 w-4 ${supabaseLoading ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+      </div>
       
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
