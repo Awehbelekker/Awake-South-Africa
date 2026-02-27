@@ -118,6 +118,27 @@ export async function GET(request: NextRequest) {
       updatedAt: row.updated_at,
     }))
 
+    // ── Auto-flag overdue invoices ──────────────────────────────────────────
+    // Any invoice with status='sent' whose due_date has passed becomes 'overdue'
+    const now = new Date().toISOString()
+    const overdueIds = (data || [])
+      .filter((row: any) => row.status === 'sent' && row.due_date && row.due_date < now)
+      .map((row: any) => row.id)
+
+    if (overdueIds.length > 0) {
+      await getSupabase()
+        .from('invoices')
+        .update({ status: 'overdue', updated_at: now })
+        .in('id', overdueIds)
+
+      // Patch the mapped list in memory so response is consistent
+      invoices.forEach((inv: any) => {
+        if (inv._supabaseId && overdueIds.includes(inv._supabaseId)) {
+          inv.status = 'overdue'
+        }
+      })
+    }
+
     return NextResponse.json({ invoices, total: invoices.length })
   } catch (error: any) {
     console.error('Invoices GET error:', error?.message)

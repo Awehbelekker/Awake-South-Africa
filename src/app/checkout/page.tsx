@@ -96,6 +96,37 @@ export default function CheckoutPage() {
       const itemNames = items.map(item => `${item.quantity}x ${item.name}`).join(', ')
       const itemDescription = `Awake SA Order: ${itemNames}`
 
+      // ── Pre-create order in Supabase so webhook can find it ──────────────
+      // Best-effort: if this fails the PayFast webhook creates it on callback
+      try {
+        await fetch('/api/tenant/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderNumber:   orderId,
+            customerEmail: email,
+            customerName:  name,
+            customerPhone: phone || null,
+            items: items.map(item => ({
+              description: item.name,
+              quantity:    item.quantity,
+              unitPrice:   item.price,
+              total:       item.price * item.quantity,
+            })),
+            subtotal:       total(),
+            taxAmount:      Math.round(total() * 15 / 115 * 100) / 100,
+            shippingAmount: 0,
+            discountAmount: 0,
+            total:          total(),
+            currency:       'ZAR',
+            paymentGateway: 'payfast',
+            status:         'pending',
+          }),
+        })
+      } catch (preCreateError) {
+        console.warn('Pre-order creation failed (non-fatal):', preCreateError)
+      }
+
       // Create PayFast payment (with Medusa order ID if available)
       const payment = createPayFastPayment(
         total(),

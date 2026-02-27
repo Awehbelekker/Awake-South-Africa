@@ -42,6 +42,16 @@ async function getTenantId(request: NextRequest): Promise<string | null> {
     tenant = data
   }
 
+  // Fallback to default tenant
+  if (!tenant) {
+    const { data } = await getSupabase()
+      .from('tenants')
+      .select('id')
+      .eq('slug', process.env.DEFAULT_TENANT_SLUG || 'awake-sa')
+      .single()
+    tenant = data
+  }
+
   return tenant?.id || null
 }
 
@@ -104,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     const orderData = {
       tenant_id: tenantId,
-      order_number: generateOrderNumber(),
+      order_number: body.orderNumber || generateOrderNumber(),
       customer_email: body.customerEmail,
       customer_name: body.customerName,
       customer_phone: body.customerPhone || null,

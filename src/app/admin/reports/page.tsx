@@ -6,11 +6,22 @@ import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
 import { useProductsStore } from '@/store/products'
 
+interface RevenueStats {
+  totalRevenue: number
+  totalOrders: number
+  paidInvoices: number
+  unpaidInvoices: number
+  overdueInvoices: number
+  totalInvoiced: number
+}
+
 export default function AdminReportsPage() {
   const router = useRouter()
   const { isAuthenticated, settings } = useAdminStore()
   const { products } = useProductsStore()
   const [mounted, setMounted] = useState(false)
+  const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null)
+  const [statsLoading, setStatsLoading] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -18,6 +29,39 @@ export default function AdminReportsPage() {
       router.push('/admin')
     }
   }, [isAuthenticated, router])
+
+  // Load live revenue data from Supabase
+  useEffect(() => {
+    if (!isAuthenticated) return
+    setStatsLoading(true)
+
+    Promise.all([
+      fetch('/api/tenant/orders').then(r => r.ok ? r.json() : { orders: [] }),
+      fetch('/api/tenant/invoices').then(r => r.ok ? r.json() : { invoices: [] }),
+    ]).then(([ordersData, invoicesData]) => {
+      const orders   = ordersData.orders   || []
+      const invoices = invoicesData.invoices || []
+
+      const paidOrders = orders.filter((o: any) => o.payment_status === 'paid')
+      const totalRevenue = paidOrders.reduce((sum: number, o: any) => sum + Number(o.total || 0), 0)
+
+      const paidInvoices    = invoices.filter((inv: any) => inv.status === 'paid').length
+      const unpaidInvoices  = invoices.filter((inv: any) => inv.status === 'sent').length
+      const overdueInvoices = invoices.filter((inv: any) => inv.status === 'overdue').length
+      const totalInvoiced   = invoices.reduce((sum: number, inv: any) => sum + Number(inv.total || 0), 0)
+
+      setRevenueStats({
+        totalRevenue,
+        totalOrders:    orders.length,
+        paidInvoices,
+        unpaidInvoices,
+        overdueInvoices,
+        totalInvoiced,
+      })
+    }).catch(() => {
+      // Supabase tables may not exist yet — silent fail
+    }).finally(() => setStatsLoading(false))
+  }, [isAuthenticated])
 
   if (!mounted || !isAuthenticated) {
     return null
@@ -54,6 +98,54 @@ export default function AdminReportsPage() {
 
   return (
     <AdminLayout title="Reports & Analytics">
+        {/* ── Live Revenue Overview ── */}
+        {(revenueStats || statsLoading) && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-700 mb-3">
+              Revenue Overview
+              {statsLoading && <span className="ml-2 text-sm font-normal text-gray-400">Loading…</span>}
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="text-xs font-medium text-green-600 uppercase tracking-wide">Total Revenue</div>
+                <div className="mt-1 text-2xl font-bold text-green-700">
+                  R{Math.round(revenueStats?.totalRevenue ?? 0).toLocaleString()}
+                </div>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="text-xs font-medium text-blue-600 uppercase tracking-wide">Total Orders</div>
+                <div className="mt-1 text-2xl font-bold text-blue-700">
+                  {revenueStats?.totalOrders ?? 0}
+                </div>
+              </div>
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="text-xs font-medium text-purple-600 uppercase tracking-wide">Total Invoiced</div>
+                <div className="mt-1 text-2xl font-bold text-purple-700">
+                  R{Math.round(revenueStats?.totalInvoiced ?? 0).toLocaleString()}
+                </div>
+              </div>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="text-xs font-medium text-green-600 uppercase tracking-wide">Paid Invoices</div>
+                <div className="mt-1 text-2xl font-bold text-green-700">
+                  {revenueStats?.paidInvoices ?? 0}
+                </div>
+              </div>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="text-xs font-medium text-yellow-600 uppercase tracking-wide">Unpaid</div>
+                <div className="mt-1 text-2xl font-bold text-yellow-700">
+                  {revenueStats?.unpaidInvoices ?? 0}
+                </div>
+              </div>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="text-xs font-medium text-red-600 uppercase tracking-wide">Overdue</div>
+                <div className="mt-1 text-2xl font-bold text-red-700">
+                  {revenueStats?.overdueInvoices ?? 0}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
