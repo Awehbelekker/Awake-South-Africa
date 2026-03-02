@@ -652,7 +652,7 @@ export const PRODUCTS = {
       priceExVAT: 16302,
       costEUR: 1120,
       category: "bags",
-      image: AWAKE_IMAGES.accessories.travelBag,
+      image: AWAKE_IMAGES.accessories.boardBag,
       description: "Heavy-duty travel bag for your Awake board. Padded protection for flights and travel.",
       specs: ["Padded protection", "Wheeled option", "Large compartment", "Awake branding"],
       features: ["Travel ready", "Board protection", "Easy transport", "Durable zips"],
@@ -666,7 +666,7 @@ export const PRODUCTS = {
       priceExVAT: 14912,
       costEUR: 1040,
       category: "bags",
-      image: AWAKE_IMAGES.accessories.batteryBag,
+      image: AWAKE_IMAGES.accessories.batteryBackpack,
       description: "Protective carry bag for Awake Flex Battery. Safe storage and transport for your battery.",
       specs: ["Padded interior", "Secure closure", "Awake branding", "Handle and strap"],
       features: ["Battery protection", "Safe transport", "Easy carry"],
@@ -926,6 +926,382 @@ export const PRODUCTS = {
       description: "Wing repair kit for the VINGA 3 eFoil. Keep your wing in top condition with all essential repair components.",
       specs: ["Complete repair kit", "Compatible with VINGA 3 wings", "All tools included", "Easy to use"],
       features: ["Quick repairs", "All-in-one kit", "Extends wing life"],
+    },
+  ],
+};
+
+  // 🪁 eFOIL WING KITS (0% Duty) - Real Awake Products
+  wings: [
+    {
+      categoryTag: "Wing Kit",
+      id: "cruise-1600-wing-kit",
+      name: "CRUISE 1600 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
+      category: "wings",
+      image: AWAKE_IMAGES.accessories.powderWing,
+      description: "CRUISE 1600 wing kit for versatile eFoil performance. Ideal for various water conditions.",
+      specs: ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
+      features: ["All-around performance", "Durable", "Smooth ride"],
+    },
+    {
+      categoryTag: "Wing Kit",
+      id: "powder-1800-wing-kit",
+      name: "POWDER 1800 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
+      category: "wings",
+      image: AWAKE_IMAGES.accessories.powderWing,
+      description: "POWDER 1800 wing kit for versatile eFoil performance. Ideal for various water conditions.",
+      specs: ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
+      features: ["All-around performance", "Durable", "Smooth ride"],
+    },
+    {
+      categoryTag: "Wing Kit",
+      id: "powder-1400-wing-kit",
+      name: "POWDER 1400 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
+      category: "wings",
+      image: AWAKE_IMAGES.accessories.powderWing,
+      description: "POWDER 1400 wing kit for versatile eFoil performance. Ideal for various water conditions.",
+      specs: ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
+      features: ["All-around performance", "Durable", "Smooth ride"],
+    },
+    {
+      categoryTag: "Wing Kit",
+      id: "fluid-1300-wing-kit",
+      name: "FLUID 1300 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
+      category: "wings",
+      image: AWAKE_IMAGES.accessories.fluidWing,
+      description: "FLUID 1300 wing kit for high-speed eFoil performance. Designed for speed and agility.",
+      specs: ["High-speed design", "Carbon fiber", "Precision engineering", "Aerodynamic"],
+      features: ["Maximum speed", "Responsive", "Competition-ready"],
+    },
+    {
+      categoryTag: "Wing Kit",
+      id: "fluid-1000-wing-kit",
+      name: "FLUID 1000 Wing Kit",
+      price: 27200, // Retail inc-VAT R27,168 rounded up
+      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
+      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
+      category: "wings",
+      image: AWAKE_IMAGES.accessories.fluidWing,
+      description: "FLUID 1000 wing kit for high-speed eFoil performance. Designed for speed and agility.",
+      specs: ["High-speed design", "Carbon fiber", "Precision engineering", "Aerodynamic"],
+      features: ["Maximum speed", "Responsive", "Competition-ready"],
+    },
+  ],
+
+  // 🎒 BAGS (20% Duty) - Real Awake Products
+  bags: [
+    {
+      categoryTag: "Bag",
+      id: "board-bag-kit",
+      name: "Board Bag Kit (RÄVIK/VINGA)",
+      price: 19500, // Retail inc-VAT R19,406 rounded up
+      priceExVAT: 17000, // Retail ex-VAT R16,875 rounded up
+      costEUR: 985, // Landed cost R12,500 / 19.85 * 1.15 rounded up (20% duty)
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.boardBag,
+      description: "Protective bag kit for RÄVIK jetboards and VINGA eFoils. Includes board bag and accessories storage.",
+      specs: ["Padded protection", "Weather resistant", "Multiple compartments", "Durable zippers"],
+      features: ["Full protection", "Easy transport", "Quality materials"],
+    },
+    {
+      categoryTag: "Bag",
+      id: "battery-bag",
+      name: "Battery Bag",
+      price: 9700, // Retail inc-VAT R9,620 rounded up
+      priceExVAT: 8400, // Retail ex-VAT R8,365 rounded up
+      costEUR: 485, // Landed cost R6,196 / 19.85 * 1.15 rounded up (20% duty)
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.batteryBackpack,
+      description: "Dedicated battery bag for safe transport of Awake batteries.",
+      specs: ["Battery specific", "Padded protection", "Comfortable straps", "Compact design"],
+      features: ["Safe transport", "Comfortable carry", "Durable"],
+    },
+    {
+      categoryTag: "Bag",
+      id: "premium-travel-bag",
+      name: "Premium Travel Bag",
+      price: 16200, // Retail inc-VAT R16,169 rounded up
+      priceExVAT: 14100, // Retail ex-VAT R14,060 rounded up
+      costEUR: 815, // Landed cost R10,415 / 19.85 * 1.15 rounded up (20% duty)
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.boardBag,
+      description: "Premium travel bag for complete protection during transport.",
+      specs: ["Premium materials", "Padded interior", "Weather resistant", "Multiple compartments"],
+      features: ["Complete protection", "Travel-ready", "Organized storage"],
+    },
+  ],
+
+  // 🛡️ SAFETY & STORAGE (20% Duty) - Real Awake Products
+  safetyStorage: [
+    {
+      categoryTag: "Safety",
+      id: "life-vest",
+      name: "Life Vest (CE Certified)",
+      price: 9700, // Retail inc-VAT R9,620 rounded up
+      priceExVAT: 8400, // Retail ex-VAT R8,365 rounded up
+      costEUR: 485, // Landed cost R6,196 / 19.85 * 1.15 rounded up (20% duty)
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.lifeVest,
+      description: "CE certified life vest designed for water sports. Safety meets style with Awake branding.",
+      specs: ["CE certified", "Adjustable fit", "Comfortable design", "Awake branding"],
+      features: ["Safety certified", "Comfortable", "Stylish"],
+    },
+    {
+      categoryTag: "Storage",
+      id: "awake-dock",
+      name: "Awake Dock (Floating)",
+      price: 78300, // Retail inc-VAT R78,298 rounded up
+      priceExVAT: 68100, // Retail ex-VAT R68,085 rounded up
+      costEUR: 3950, // Landed cost R50,433 / 19.85 * 1.15 rounded up (20% duty)
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.inflatableDock,
+      description: "Floating dock system for easy water access. Perfect for launching and docking your Awake.",
+      specs: ["Floating design", "Stable platform", "Easy setup", "Durable materials"],
+      features: ["Easy access", "Portable", "Stable"],
+    },
+    {
+      categoryTag: "Storage",
+      id: "wall-mount",
+      name: "Wall Mount",
+      price: 29600, // Retail inc-VAT R29,518 rounded up
+      priceExVAT: 25700, // Retail ex-VAT R25,668 rounded up
+      costEUR: 1490, // Landed cost R19,013 / 19.85 * 1.15 rounded up (20% duty)
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.wallMount,
+      description: "Premium wall mounting system for RÄVIK boards. Display your board as art when not in use.",
+      specs: ["Secure mounting", "Premium finish", "Easy installation", "Board protection"],
+      features: ["Display quality", "Secure storage", "Space-saving"],
+    },
+    {
+      categoryTag: "Storage",
+      id: "board-stand",
+      name: "Board Stand",
+      price: 16200, // Retail inc-VAT R16,169 rounded up
+      priceExVAT: 14100, // Retail ex-VAT R14,060 rounded up
+      costEUR: 815, // Landed cost R10,415 / 19.85 * 1.15 rounded up (20% duty)
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.wallMount,
+      description: "Premium board stand for displaying your Awake board.",
+      specs: ["Stable design", "Premium finish", "Easy assembly", "Board protection"],
+      features: ["Display quality", "Secure storage", "Space-saving"],
+    },
+  ],
+
+  // 🎮 ELECTRONICS (0% Duty) - Real Awake Products
+  electronics: [
+    {
+      categoryTag: "Electronics",
+      id: "flex-hand-controller",
+      name: "Flex Hand Controller",
+      price: 16300, // Retail inc-VAT R16,224 rounded up
+      priceExVAT: 14200, // Retail ex-VAT R14,108 rounded up
+      costEUR: 820, // Landed cost R10,450 / 19.85 * 1.15 rounded up
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.handController,
+      description: "Latest generation wireless hand controller with ergonomic design and precise throttle control.",
+      specs: ["Wireless operation", "Ergonomic design", "Precise throttle", "LED indicators"],
+      features: ["Easy to use", "Waterproof", "Long battery life"],
+    },
+    {
+      categoryTag: "Electronics",
+      id: "battery-charger",
+      name: "Battery Charger",
+      price: 24700, // Retail inc-VAT R24,662 rounded up
+      priceExVAT: 21500, // Retail ex-VAT R21,445 rounded up
+      costEUR: 1245, // Landed cost R15,885 / 19.85 * 1.15 rounded up
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.charger,
+      description: "Fast battery charger for all Awake batteries. Charges LR 4 and XR 4 batteries efficiently.",
+      specs: ["Fast charging", "Universal compatibility", "LED status", "Safety features"],
+      features: ["Quick charge", "Compact design", "Safe operation"],
+    },
+    {
+      categoryTag: "Electronics",
+      id: "controller-charger",
+      name: "Controller Charger",
+      price: 5700, // Retail inc-VAT R5,628 rounded up
+      priceExVAT: 4900, // Retail ex-VAT R4,894 rounded up
+      costEUR: 285, // Landed cost R3,625 / 19.85 * 1.15 rounded up
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.controllerCharger,
+      description: "Dedicated charger for Awake hand controllers with USB connectivity.",
+      specs: ["USB charging", "LED indicator", "Compact design", "Universal voltage"],
+      features: ["Easy to use", "Travel-friendly", "Fast charging"],
+    },
+  ],
+
+  // ⚙️ PARTS (0% Duty) - Real Awake Products
+  parts: [
+    {
+      categoryTag: "Parts",
+      id: "ravik-fins",
+      name: "RÄVIK Fins (Set of 3)",
+      price: 5700, // Retail inc-VAT R5,628 rounded up
+      priceExVAT: 4900, // Retail ex-VAT R4,894 rounded up
+      costEUR: 285, // Landed cost R3,625 / 19.85 * 1.15 rounded up
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.ravikFins,
+      description: "Standard fin set for RÄVIK jetboards. Set of 3 high-quality fins for optimal performance.",
+      specs: ["Set of 3 fins", "RÄVIK specific", "Durable material", "Easy installation"],
+      features: ["Reliable performance", "Easy to replace", "Quality construction"],
+    },
+    {
+      categoryTag: "Parts",
+      id: "carbon-fins",
+      name: "Carbon Fins (Set of 3)",
+      price: 8100, // Retail inc-VAT R8,055 rounded up
+      priceExVAT: 7100, // Retail ex-VAT R7,004 rounded up
+      costEUR: 410, // Landed cost R5,188 / 19.85 * 1.15 rounded up
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.carbonFins,
+      description: "Premium carbon fiber fin set. Lightweight and ultra-durable for maximum performance.",
+      specs: ["Carbon fiber", "Set of 3 fins", "Lightweight", "High strength"],
+      features: ["Premium material", "Enhanced performance", "Long-lasting"],
+    },
+    {
+      categoryTag: "Parts",
+      id: "foot-straps",
+      name: "Foot Straps",
+      price: 8400, // Retail inc-VAT R8,325 rounded up
+      priceExVAT: 7300, // Retail ex-VAT R7,239 rounded up
+      costEUR: 420, // Landed cost R5,362 / 19.85 * 1.15 rounded up
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.footStraps,
+      description: "Adjustable foot straps for enhanced control and stability on your Awake board.",
+      specs: ["Adjustable fit", "Comfortable padding", "Secure attachment", "Durable straps"],
+      features: ["Enhanced control", "Comfortable", "Easy adjustment"],
+    },
+    {
+      categoryTag: "Parts",
+      id: "beach-mat",
+      name: "Beach Mat (5% duty)",
+      price: 5700, // Retail inc-VAT R5,614 rounded up
+      priceExVAT: 4900, // Retail ex-VAT R4,882 rounded up
+      costEUR: 285, // Landed cost R3,616 / 19.85 * 1.15 rounded up (5% duty)
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.beachMat,
+      description: "Portable beach mat for protecting your board and gear. Perfect for beach sessions.",
+      specs: ["Portable design", "Water resistant", "Awake branding", "Compact storage"],
+      features: ["Board protection", "Easy to carry", "Durable"],
+    },
+    {
+      categoryTag: "Parts",
+      id: "jetboard-tube",
+      name: "Awake Jetboard Tube",
+      price: 11711, // €590 * 19.85 = R11,711
+      priceExVAT: 10183,
+      costEUR: 590,
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.jetboardTube,
+      description: "Inflatable tube accessory for towing behind your jetboard. Add extra fun to your sessions.",
+      specs: ["Inflatable design", "Durable construction", "Easy inflation", "Tow attachment"],
+      features: ["Extra fun", "Durable", "Easy to use"],
+    },
+    {
+      categoryTag: "Parts",
+      id: "competition-power-key",
+      name: "Competition Power Key",
+      price: 3771, // €190 * 19.85 = R3,771
+      priceExVAT: 3279,
+      costEUR: 190,
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.competitionKey,
+      description: "Competition power key for unlocking maximum performance on your Awake board.",
+      specs: ["Performance unlock", "Competition mode", "Easy installation", "Secure attachment"],
+      features: ["Maximum power", "Competition ready", "Easy to use"],
+    },
+    {
+      categoryTag: "Parts",
+      id: "power-key-leash",
+      name: "Awake Power Key Leash",
+      price: 3771, // €190 * 19.85 = R3,771
+      priceExVAT: 3279,
+      costEUR: 190,
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.powerKeyLeash,
+      description: "Safety leash for your power key. Prevents loss during water sessions.",
+      specs: ["Safety leash", "Secure attachment", "Durable cord", "Easy to use"],
+      features: ["Prevents loss", "Secure", "Durable"],
+    },
+  ],
+
+  // 👕 APPAREL (45% Duty) - Real Awake Products
+  apparel: [
+    {
+      categoryTag: "Apparel",
+      id: "tshirt",
+      name: "T-shirt",
+      price: 3300, // Retail inc-VAT R3,283 rounded up
+      priceExVAT: 2900, // Retail ex-VAT R2,855 rounded up
+      costEUR: 165, // Landed cost R2,115 / 19.85 * 1.15 rounded up (45% duty)
+      category: "apparel",
+      image: AWAKE_IMAGES.accessories.tshirt,
+      description: "Official Awake branded t-shirt. Premium quality cotton with Awake logo.",
+      specs: ["Premium cotton", "Awake branding", "Comfortable fit", "Multiple sizes"],
+      features: ["Comfortable", "Stylish", "Official merchandise"],
+    },
+    {
+      categoryTag: "Apparel",
+      id: "cap",
+      name: "Cap",
+      price: 1700, // Retail inc-VAT R1,689 rounded up
+      priceExVAT: 1500, // Retail ex-VAT R1,469 rounded up
+      costEUR: 85, // Landed cost R1,088 / 19.85 * 1.15 rounded up (45% duty)
+      category: "apparel",
+      image: AWAKE_IMAGES.accessories.cap,
+      description: "Branded Awake cap. Perfect for sunny days on the water.",
+      specs: ["Adjustable fit", "Awake logo", "Sun protection", "Quality materials"],
+      features: ["Sun protection", "Comfortable", "Stylish"],
+    },
+    {
+      categoryTag: "Apparel",
+      id: "wetsuit",
+      name: "Awake Wetsuit",
+      price: 7741, // €390 * 19.85 = R7,741
+      priceExVAT: 6731,
+      costEUR: 390,
+      category: "apparel",
+      image: AWAKE_IMAGES.accessories.wetsuit,
+      description: "Full wetsuit designed for water sports. 4/3mm thickness for year-round comfort.",
+      specs: ["4/3mm thickness", "Flexible neoprene", "Awake branding", "Multiple sizes"],
+      features: ["Warm and comfortable", "Flexible", "Durable"],
+    },
+    {
+      categoryTag: "Apparel",
+      id: "ladys-neo-suit",
+      name: "Awake Lady's Neo Suit",
+      price: 3771, // €190 * 19.85 = R3,771
+      priceExVAT: 3279,
+      costEUR: 190,
+      category: "apparel",
+      image: AWAKE_IMAGES.accessories.ladysNeoSuit,
+      description: "Women's neoprene suit designed for comfort and style on the water.",
+      specs: ["Women's fit", "Neoprene material", "Stylish design", "Multiple sizes"],
+      features: ["Comfortable fit", "Stylish", "Flexible"],
+    },
+    {
+      categoryTag: "Apparel",
+      id: "neo-jacket",
+      name: "Awake Neo Jacket",
+      price: 3771, // €190 * 19.85 = R3,771
+      priceExVAT: 3279,
+      costEUR: 190,
+      category: "apparel",
+      image: AWAKE_IMAGES.accessories.neoJacket,
+      description: "Neoprene jacket for layering. Perfect for cooler water conditions.",
+      specs: ["Neoprene material", "Layering piece", "Awake branding", "Multiple sizes"],
+      features: ["Extra warmth", "Flexible", "Comfortable"],
     },
   ],
 };
