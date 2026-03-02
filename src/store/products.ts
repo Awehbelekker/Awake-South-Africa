@@ -69,16 +69,14 @@ interface ProductsStore {
 const flattenProducts = (): EditableProduct[] => {
   const allProducts = [
     ...DEFAULT_PRODUCTS.jetboards,
+    ...DEFAULT_PRODUCTS.jetpackBundles,
     ...DEFAULT_PRODUCTS.limitedEdition,
     ...DEFAULT_PRODUCTS.efoils,
     ...DEFAULT_PRODUCTS.batteries,
     ...DEFAULT_PRODUCTS.boardsOnly,
-    ...DEFAULT_PRODUCTS.wings,
-    ...DEFAULT_PRODUCTS.bags,
-    ...DEFAULT_PRODUCTS.safetyStorage,
-    ...DEFAULT_PRODUCTS.electronics,
-    ...DEFAULT_PRODUCTS.parts,
-    ...DEFAULT_PRODUCTS.apparel,
+    ...DEFAULT_PRODUCTS.jetpackStandalone,
+    ...DEFAULT_PRODUCTS.accessories,
+    ...DEFAULT_PRODUCTS.efoilAccessories,
   ].map(p => ({
     ...p,
     inStock: true,

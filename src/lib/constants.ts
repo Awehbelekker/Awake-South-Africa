@@ -1,7 +1,8 @@
-// ============================================
+﻿// ============================================
 // Awake Boards SA - Official Price List & Product Catalog
-// Generated from AWAKE_PRICE_LIST_2025_COMPLETE.pdf
-// Exchange Rate: R19.85/EUR | Margin: 35% | Updated: December 2025
+// Prices sourced directly from Official Awake ZAR Price List Q1 2026
+// All prices in South African Rand (ZAR) inc VAT
+// priceExVAT = price / 1.15
 // ============================================
 
 export const AWAKE_IMAGES = {
@@ -31,7 +32,7 @@ export const AWAKE_IMAGES = {
     brabusShadow: "https://awakeboards.com/cdn/shop/files/BRABUS-BP-FRONT-1000x1000_b14c8e8c-1aee-499a-9a60-1abe055b7c4f.png?v=1756807453",
   },
 
-  // RÄVIK Jetboards
+  // RÃ„VIK Jetboards
   ravik: {
     explore: "https://awakeboards.com/cdn/shop/files/23RE-FRONT-ICON.jpg?v=1753177232",
     adventure: "https://awakeboards.com/cdn/shop/files/15RA-FRONT-ICON.jpg?v=1753177159",
@@ -86,8 +87,31 @@ export const AWAKE_IMAGES = {
     impactVest: "https://awakeboards.com/cdn/shop/files/Awake_ImpactVest_2500px_1.jpg?v=1746783247",
     ladysNeoSuit: "https://awakeboards.com/cdn/shop/files/LADIES-SUIT_1000x1000_a2156532-e819-40f3-ba6a-8f03320b377f.jpg?v=1756380888",
     neoJacket: "https://awakeboards.com/cdn/shop/files/JACKET_1000x1000_8a3ff29f-8d65-475c-a241-7e75b5289579.jpg?v=1756380959",
+    // Additional accessories (share closest visual match)
+    controllerLeash: "https://awakeboards.com/cdn/shop/files/HC4-Hanging.png?v=1746782996",
+    controllerCarryBag: "https://awakeboards.com/cdn/shop/files/Awake_cf66763e-fec1-45c2-944f-d9f5e22ae397.png?v=1752232003",
+    deckPad: "https://awakeboards.com/cdn/shop/files/AWAKE-MATT.png?v=1753949058",
+    carryStraps: "https://awakeboards.com/cdn/shop/products/Bindingstop.jpg?v=1746783251",
+    propellerSet: "https://awakeboards.com/cdn/shop/files/CARBON_FINS.png?v=1746783193",
+    jetpackSystem: "https://awakeboards.com/cdn/shop/files/BRABUSx3.png?v=1754380085",
+    jetpackTowRope: "https://awakeboards.com/cdn/shop/files/TUBE_V1.97.jpg?v=1746783016",
+    helmet: "https://awakeboards.com/cdn/shop/files/Awake_ImpactVest_2500px_1.jpg?v=1746783247",
+    sunglasses: "https://awakeboards.com/cdn/shop/products/AwakeCapFront_WhiteBackground.jpg?v=1746783233",
+    stickerSet: "https://awakeboards.com/cdn/shop/products/AwakeT-Shirt_M_Front_Whitebackground.jpg?v=1746783235",
+    wetsuitWomens: "https://awakeboards.com/cdn/shop/files/LADIES-SUIT_1000x1000_a2156532-e819-40f3-ba6a-8f03320b377f.jpg?v=1756380888",
   },
   
+  // eFoil Accessories (Vinga)
+  vingas: {
+    wingSetCarbon: "https://awakeboards.com/cdn/shop/files/Powder1400_Powderrear_topdown_2500px.jpg?v=1746783223",
+    fuselageShort: "https://awakeboards.com/cdn/shop/files/Fluid1000_Fluidrear_topdown_2500px.jpg?v=1746783216",
+    fuselageLong: "https://awakeboards.com/cdn/shop/files/Fluid1000_Fluidrear_topdown_2500px.jpg?v=1746783216",
+    mast: "https://awakeboards.com/cdn/shop/files/FLUIDWING-1300.png?v=1746783197",
+    travelBag: "https://awakeboards.com/cdn/shop/products/Bothbagsattached.jpg?v=1746783240",
+    deckPadSet: "https://awakeboards.com/cdn/shop/files/AWAKE-MATT.png?v=1753949058",
+    wingRepairKit: "https://awakeboards.com/cdn/shop/files/CARBON_FINS.png?v=1746783193",
+  },
+
   // Lifestyle
   lifestyle: {
     riders: "https://awakeboards.com/cdn/shop/files/accessory-ladies_4.png?v=1752224160",
@@ -147,24 +171,30 @@ export const SA_CONTENT = {
     ],
   },
   pricing: {
-    exchangeRate: 19.85,
-    margin: 0.35,
     vatRate: 0.15,
-    note: "All prices include VAT. Customs duties vary by product category.",
+    note: "All prices in ZAR inc VAT, sourced directly from official Awake price list Q1 2026.",
   },
 };
 
-// Complete Product Catalog from Official Price List (December 2025)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Complete Product Catalog â€” prices taken directly from official
+// Awake ZAR price list Q1 2026. No EUR conversion applied.
+// price    = ZAR retail inc VAT (col 5 of price sheet)
+// priceExVAT = price / 1.15
+// costEUR = EUR landed cost (col 2 of price sheet)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const PRODUCTS = {
-  // 🏄 COMPLETE JETBOARDS (0% Duty) - Real Awake Products
+
+  // â”€â”€â”€ COMPLETE BOARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   jetboards: [
     {
       categoryTag: "Jetboard",
       id: "ravik-explore",
-      name: "Awake RÄVIK Explore XR 4",
-      price: 242000, // Retail inc-VAT R241,139 rounded up
-      priceExVAT: 210500, // Retail ex-VAT R209,686 rounded up
-      costEUR: 12150, // Landed cost R155,323 / 19.85 * 1.15 rounded up
+      sku: "99RE-21XR-GL",
+      name: "Awake RÃ„VIK Explore XR 4",
+      price: 265000,
+      priceExVAT: 230435,
+      costEUR: 8560,
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.explore,
       battery: "XR 4 (65 min)",
@@ -176,10 +206,11 @@ export const PRODUCTS = {
     {
       categoryTag: "Jetboard",
       id: "ravik-adventure",
-      name: "Awake RÄVIK Adventure XR 4",
-      price: 350000, // Retail inc-VAT R349,024 rounded up
-      priceExVAT: 304000, // Retail ex-VAT R303,499 rounded up
-      costEUR: 17600, // Landed cost R224,814 / 19.85 * 1.15 rounded up
+      sku: "99RA-21XR-GL",
+      name: "Awake RÃ„VIK Adventure XR 4",
+      price: 350000,
+      priceExVAT: 304348,
+      costEUR: 11920,
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.adventure,
       battery: "XR 4 (65 min)",
@@ -191,10 +222,11 @@ export const PRODUCTS = {
     {
       categoryTag: "Jetboard",
       id: "ravik-ultimate",
-      name: "Awake RÄVIK Ultimate XR 4",
-      price: 403000, // Retail inc-VAT R402,967 rounded up
-      priceExVAT: 351000, // Retail ex-VAT R350,406 rounded up
-      costEUR: 20300, // Landed cost R259,560 / 19.85 * 1.15 rounded up
+      sku: "99RU-21XR-GL",
+      name: "Awake RÃ„VIK Ultimate XR 4",
+      price: 389000,
+      priceExVAT: 338261,
+      costEUR: 11920,
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.ultimate,
       battery: "XR 4 (65 min)",
@@ -205,131 +237,257 @@ export const PRODUCTS = {
     },
     {
       categoryTag: "Jetboard",
-      id: "ravik-s",
-      name: "Awake RÄVIK S",
-      price: 257851, // €12,990 * 19.85 = R257,851
-      priceExVAT: 224218,
-      costEUR: 12990,
+      id: "ravik-explore-lr4",
+      sku: "99RE-22LR-GL",
+      name: "Awake RÃ„VIK Explore LR 4",
+      price: 217164,
+      priceExVAT: 188838,
+      costEUR: 6720,
+      category: "jetboards",
+      image: AWAKE_IMAGES.ravik.explore,
+      battery: "LR 4 (90 min)",
+      skillLevel: "Beginner",
+      description: "Entry-level electric jetboard with long-range battery. 90-minute ride time makes it perfect for extended sessions and beginners who want more time on the water.",
+      specs: ["Max Speed: 50 km/h", "Battery: 90 min ride time", "Weight: 32 kg", "Carbon composite construction"],
+      features: ["Extended battery life", "Intuitive hand controller", "Durable construction", "Perfect for learning"],
+    },
+    {
+      categoryTag: "Jetboard",
+      id: "ravik-adventure-lr4",
+      sku: "99RA-22LR-GL",
+      name: "Awake RÃ„VIK Adventure LR 4",
+      price: 331840,
+      priceExVAT: 288557,
+      costEUR: 10080,
+      category: "jetboards",
+      image: AWAKE_IMAGES.ravik.adventure,
+      battery: "LR 4 (90 min)",
+      skillLevel: "Intermediate",
+      description: "Mid-range performance jetboard with long-range battery. 90-minute ride time for extended adventures without compromising performance.",
+      specs: ["Max Speed: 55 km/h", "Battery: 90 min ride time", "Weight: 32 kg", "Advanced motor system"],
+      features: ["Extended range", "Enhanced power delivery", "Premium build quality", "Adventure-ready"],
+    },
+    {
+      categoryTag: "Jetboard",
+      id: "ravik-ultimate-lr4",
+      sku: "99RU-22LR-GL",
+      name: "Awake RÃ„VIK Ultimate LR 4",
+      price: 389000,
+      priceExVAT: 338261,
+      costEUR: 11360,
+      category: "jetboards",
+      image: AWAKE_IMAGES.ravik.ultimate,
+      battery: "LR 4 (90 min)",
+      skillLevel: "Expert",
+      description: "Top-tier performance with long-range battery. Maximum performance combined with 90-minute ride time for the ultimate jetboard experience.",
+      specs: ["Max Speed: 60 km/h", "Battery: 90 min ride time", "Weight: 32 kg", "Pro-level performance"],
+      features: ["Maximum acceleration", "Extended range", "Carbon fiber components", "Ultimate performance"],
+    },
+  ],
+
+  // â”€â”€â”€ JETPACK BUNDLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  jetpackBundles: [
+    {
+      categoryTag: "Jetpack Bundle",
+      id: "ravik-explore-xr4-jetpack",
+      sku: "99RE-21XR-WJ",
+      name: "RÃ„VIK Explore XR 4 + Jetpack",
+      price: 585653,
+      priceExVAT: 509264,
+      costEUR: 12560,
+      category: "jetboards",
+      image: AWAKE_IMAGES.accessories.jetpackSystem,
+      battery: "XR 4 (65 min)",
+      skillLevel: "Intermediate",
+      description: "Complete RÃ„VIK Explore XR 4 jetboard bundled with the Awake Jetpack system. Everything you need to ride in one package.",
+      specs: ["Complete jetboard package", "Includes jetpack system", "XR 4 battery included", "Max Speed: 50 km/h"],
+      features: ["Bundle saving", "Complete package", "Jetpack included", "Ready to ride"],
+    },
+    {
+      categoryTag: "Jetpack Bundle",
+      id: "ravik-ultimate-xr4-jetpack",
+      sku: "99RU-21XR-WJ",
+      name: "RÃ„VIK Ultimate XR 4 + Jetpack",
+      price: 625663,
+      priceExVAT: 544055,
+      costEUR: 15920,
+      category: "jetboards",
+      image: AWAKE_IMAGES.accessories.jetpackSystem,
+      battery: "XR 4 (65 min)",
+      skillLevel: "Expert",
+      description: "Ultimate performance RÃ„VIK bundled with the Awake Jetpack system. Maximum power, maximum fun.",
+      specs: ["Ultimate jetboard package", "Includes jetpack system", "XR 4 battery included", "Max Speed: 60 km/h"],
+      features: ["Bundle saving", "Ultimate package", "Jetpack included", "Competition ready"],
+    },
+  ],
+
+  // â”€â”€â”€ SPECIAL EDITIONS (RÃ„VIK S) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  limitedEdition: [
+    {
+      categoryTag: "Special Edition",
+      id: "ravik-s-xr4",
+      sku: "99RS-21XR-GL",
+      name: "Awake RÃ„VIK S XR 4",
+      price: 193392,
+      priceExVAT: 168167,
+      costEUR: 7360,
       category: "jetboards",
       image: AWAKE_IMAGES.ravik.s,
       battery: "XR 4 (65 min)",
       skillLevel: "Intermediate",
-      badge: "Special Offer",
-      description: "Award-winning electric jetboard with exceptional performance. Perfect for riders seeking a balance of power and control.",
+      badge: "Special Edition",
+      description: "Award-winning RÃ„VIK S electric jetboard. Perfect blend of performance and style for discerning riders.",
       specs: ["Max Speed: 55 km/h", "Battery: 65 min ride time", "Weight: 32 kg", "Award-winning design"],
-      features: ["Proven performance", "Reliable construction", "Great value", "Award winner"],
+      features: ["Proven performance", "Reliable construction", "Special edition styling", "Award winner"],
     },
-  ],
-
-  // 🏆 LIMITED EDITION - Real Awake Products
-  limitedEdition: [
     {
-      categoryTag: "Limited Edition",
-      id: "brabus-shadow-explore",
-      name: "BRABUS Shadow (Limited)",
-      price: 453000, // Retail inc-VAT R452,216 rounded up
-      priceExVAT: 394000, // Retail ex-VAT R393,231 rounded up
-      costEUR: 22800, // Landed cost R291,282 / 19.85 * 1.15 rounded up
+      categoryTag: "Special Edition",
+      id: "ravik-s-adventure-xr4",
+      sku: "99RSA-21XR-GL",
+      name: "Awake RÃ„VIK S Adventure XR 4",
+      price: 308269,
+      priceExVAT: 268060,
+      costEUR: 10720,
       category: "jetboards",
-      image: AWAKE_IMAGES.brabus.shadowExplore,
-      badge: "Limited Edition",
+      image: AWAKE_IMAGES.ravik.adventure,
+      battery: "XR 4 (65 min)",
+      skillLevel: "Intermediate",
+      badge: "Special Edition",
+      description: "Special Edition RÃ„VIK S Adventure â€” elevated performance with distinctive styling for the adventurous rider.",
+      specs: ["Max Speed: 55 km/h", "Battery: 65 min ride time", "Advanced motor", "Special Edition finish"],
+      features: ["Enhanced power", "Special edition styling", "Premium build", "Adventure-ready"],
+    },
+    {
+      categoryTag: "Special Edition",
+      id: "ravik-s-ultimate-xr4",
+      sku: "99RSU-21XR-GL",
+      name: "Awake RÃ„VIK S Ultimate XR 4",
+      price: 365432,
+      priceExVAT: 317767,
+      costEUR: 12000,
+      category: "jetboards",
+      image: AWAKE_IMAGES.ravik.ultimate,
       battery: "XR 4 (65 min)",
       skillLevel: "Expert",
-      description: "Exclusive BRABUS collaboration - luxury meets performance. One of only 77 limited edition boards worldwide. Features signature BRABUS design and premium finishes.",
-      specs: ["Max Speed: 60 km/h", "Exclusive BRABUS Design", "Carbon Fiber", "Premium finishes", "Limited to 77 units"],
-      features: ["Numbered limited edition", "Signature BRABUS styling", "Collector's item", "Exclusive design"],
+      badge: "Special Edition",
+      description: "The pinnacle of the RÃ„VIK S range. Ultimate performance wrapped in Special Edition design.",
+      specs: ["Max Speed: 60 km/h", "Battery: 65 min ride time", "Pro motor system", "Special Edition finish"],
+      features: ["Maximum power", "Special edition styling", "Carbon components", "Competition ready"],
+    },
+    {
+      categoryTag: "Special Edition",
+      id: "ravik-x-adventure-xr4",
+      sku: "99RXA-21XR-GL",
+      name: "Awake RÃ„VIK X Adventure XR 4",
+      price: 562784,
+      priceExVAT: 489377,
+      costEUR: 16720,
+      category: "jetboards",
+      image: AWAKE_IMAGES.brabus.shadowExplore,
+      battery: "XR 4 (65 min)",
+      skillLevel: "Expert",
+      badge: "Special Edition",
+      description: "The most exclusive RÃ„VIK X Adventure. Premium materials and exclusive design for the ultimate collector's jetboard.",
+      specs: ["Max Speed: 60 km/h", "Exclusive design", "Premium components", "Limited availability"],
+      features: ["Exclusive styling", "Maximum performance", "Collector's piece", "Numbered edition"],
     },
   ],
 
-  // 🪁 COMPLETE eFOILS (0% Duty) - Real Awake Products
+  // â”€â”€â”€ eFOIL COMPLETE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   efoils: [
     {
       categoryTag: "eFoil",
-      id: "vinga-adventure-lr4",
-      name: "Awake VINGA Adventure LR 4",
-      price: 323000, // Retail inc-VAT R322,052 rounded up
-      priceExVAT: 281000, // Retail ex-VAT R280,045 rounded up
-      costEUR: 16250, // Landed cost R207,441 / 19.85 * 1.15 rounded up
+      id: "vinga-3-xr4",
+      sku: "VN3-21XR",
+      name: "Awake VINGA 3 XR 4",
+      price: 291173,
+      priceExVAT: 253194,
+      costEUR: 22400,
+      category: "efoils",
+      image: AWAKE_IMAGES.vinga.adventure,
+      battery: "XR 4 (65 min)",
+      skillLevel: "Beginner to Intermediate",
+      description: "The VINGA 3 XR 4 delivers the magic of eFoiling with compact XR battery technology. Easy to learn, thrilling to master.",
+      specs: ["Max Speed: 40 km/h", "Battery: 65 min ride time", "Silent operation", "Stable foil design"],
+      features: ["Compact battery", "Easy to learn", "Smooth ride", "Travel-friendly"],
+    },
+    {
+      categoryTag: "eFoil",
+      id: "vinga-3-lr4",
+      sku: "VN3-22LR",
+      name: "Awake VINGA 3 LR 4",
+      price: 330866,
+      priceExVAT: 287709,
+      costEUR: 19920,
       category: "efoils",
       image: AWAKE_IMAGES.vinga.adventure,
       battery: "LR 4 (90 min)",
       skillLevel: "Beginner to Intermediate",
-      description: "Extended range eFoil for long sessions. Perfect for learning and exploring the world of electric foiling with extended battery life.",
+      description: "Extended range eFoil for longer sessions. The VINGA 3 LR 4 gives you 90 minutes of silent, effortless foiling.",
       specs: ["Max Speed: 40 km/h", "Battery: 90 min ride time", "Silent operation", "Stable foil design"],
       features: ["Long battery life", "Easy to learn", "Smooth ride", "Extended range"],
     },
     {
       categoryTag: "eFoil",
-      id: "vinga-adventure-xr4",
-      name: "Awake VINGA Adventure XR 4",
-      price: 363000, // Retail inc-VAT R362,509 rounded up
-      priceExVAT: 316000, // Retail ex-VAT R315,225 rounded up
-      costEUR: 18300, // Landed cost R233,500 / 19.85 * 1.15 rounded up
+      id: "vinga-3-lr6",
+      sku: "VN3-22LR6",
+      name: "Awake VINGA 3 LR 6",
+      price: 369087,
+      priceExVAT: 321032,
+      costEUR: 22400,
       category: "efoils",
-      image: AWAKE_IMAGES.vinga.adventure,
-      battery: "XR 4 (65 min)",
+      image: AWAKE_IMAGES.vinga.ultimate,
+      battery: "LR 6 (120+ min)",
       skillLevel: "Intermediate",
-      description: "Performance-focused eFoil with XR battery. Enhanced stability and range for longer explorations with compact design.",
-      specs: ["Max Speed: 40 km/h", "Battery: 65 min ride time", "Silent operation", "Responsive control"],
-      features: ["Compact battery", "Travel-friendly", "Precision handling", "Easy to transport"],
+      description: "Maximum endurance eFoiling with the LR 6 battery. Over 2 hours of continuous riding for the most dedicated foilers.",
+      specs: ["Max Speed: 40 km/h", "Battery: 120+ min ride time", "Silent operation", "Advanced foil"],
+      features: ["Maximum endurance", "Long sessions", "Professional grade", "Extended range"],
     },
     {
       categoryTag: "eFoil",
-      id: "vinga-ultimate-lr4",
-      name: "Awake VINGA Ultimate LR 4",
-      price: 350000, // Retail inc-VAT R349,024 rounded up
-      priceExVAT: 304000, // Retail ex-VAT R303,499 rounded up
-      costEUR: 17600, // Landed cost R224,814 / 19.85 * 1.15 rounded up
+      id: "vinga-3-xr6",
+      sku: "VN3-21XR6",
+      name: "Awake VINGA 3 XR 6",
+      price: 409184,
+      priceExVAT: 355812,
+      costEUR: 24880,
       category: "efoils",
       image: AWAKE_IMAGES.vinga.ultimate,
-      battery: "LR 4 (90 min)",
-      skillLevel: "Intermediate to Expert",
-      description: "Advanced eFoil with extended ride time. Advanced performance and dynamic control for serious riders.",
-      specs: ["Max Speed: 45 km/h", "Battery: 90 min ride time", "Advanced control", "Premium wings"],
-      features: ["High performance", "Long sessions", "Professional grade", "Extended range"],
-    },
-    {
-      categoryTag: "eFoil",
-      id: "vinga-ultimate-xr4",
-      name: "Awake VINGA Ultimate XR 4",
-      price: 390000, // Retail inc-VAT R389,481 rounded up
-      priceExVAT: 339000, // Retail ex-VAT R338,679 rounded up
-      costEUR: 19650, // Landed cost R250,873 / 19.85 * 1.15 rounded up
-      category: "efoils",
-      image: AWAKE_IMAGES.vinga.ultimate,
-      battery: "XR 4 (65 min)",
+      battery: "XR 6 (90 min)",
       skillLevel: "Expert",
-      description: "Top-spec eFoil with ultimate performance. For those seeking peak performance and control with competition-grade features.",
-      specs: ["Max Speed: 45 km/h", "Battery: 65 min ride time", "Advanced control", "Carbon construction"],
-      features: ["Maximum speed", "Precision foiling", "Competition ready", "Expert-level"],
+      description: "Top-spec VINGA 3 with XR 6 dual battery system. Maximum performance and extended range for the most demanding riders.",
+      specs: ["Max Speed: 45 km/h", "Battery: 90 min ride time", "Silent operation", "Carbon construction"],
+      features: ["Maximum speed", "Extended range", "Precision foiling", "Competition ready"],
     },
   ],
 
-  // 🔋 BATTERIES (0% Duty) - Real Awake Products
+  // â”€â”€â”€ BATTERIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   batteries: [
     {
       categoryTag: "Battery",
       id: "flex-battery-lr4",
+      sku: "99CL-22LR",
       name: "Awake Flex Battery LR 4 (90 min)",
-      price: 79000, // Retail inc-VAT R78,765 rounded up
-      priceExVAT: 69000, // Retail ex-VAT R68,491 rounded up
-      costEUR: 4000, // Landed cost R50,734 / 19.85 * 1.15 rounded up
+      price: 197801,
+      priceExVAT: 172001,
+      costEUR: 2320,
       category: "batteries",
       image: AWAKE_IMAGES.batteries.flexLR4,
-      description: "Long range battery - 90 minutes ride time. Perfect for extended sessions on the water with quick swap design.",
+      description: "Long range battery â€” 90 minutes ride time. Quick swap design for extended sessions on the water.",
       specs: ["90 min runtime", "Quick swap design", "LED indicators", "Waterproof"],
       features: ["Extended range", "Fast charging", "Durable construction"],
     },
     {
       categoryTag: "Battery",
       id: "flex-battery-xr4",
+      sku: "99CL-21XR",
       name: "Awake Flex Battery XR 4 (65 min)",
-      price: 122000, // Retail inc-VAT R121,918 rounded up
-      priceExVAT: 107000, // Retail ex-VAT R106,016 rounded up
-      costEUR: 6200, // Landed cost R78,530 / 19.85 * 1.15 rounded up
+      price: 255569,
+      priceExVAT: 222234,
+      costEUR: 3600,
       category: "batteries",
       image: AWAKE_IMAGES.batteries.flexXR4,
-      description: "Extended range battery - 65 minutes ride time. Compact design with fast charging capability.",
+      description: "Extended range battery â€” 65 minutes ride time. Compact design with fast charging capability.",
       specs: ["65 min runtime", "Compact design", "Fast charging", "LED status display"],
       features: ["Lightweight", "Quick swap", "Reliable performance"],
     },
@@ -337,9 +495,9 @@ export const PRODUCTS = {
       categoryTag: "Battery",
       id: "brabus-battery-xr4",
       name: "BRABUS Battery XR 4",
-      price: 89325, // €4,500 * 19.85 = R89,325
-      priceExVAT: 77674,
-      costEUR: 4500,
+      price: 105859,
+      priceExVAT: 92051,
+      costEUR: 4392,
       category: "batteries",
       image: AWAKE_IMAGES.batteries.brabusXR4,
       badge: "Limited Edition",
@@ -349,261 +507,192 @@ export const PRODUCTS = {
     },
   ],
 
-  // 📦 BOARDS ONLY (0% Duty)
+  // â”€â”€â”€ BOARDS ONLY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   boardsOnly: [
-    { categoryTag: "Board Only", id: "ravik-explore-board", name: "RÄVIK Explore (Board Only)", price: 133000, priceExVAT: 116000, category: "boards", image: AWAKE_IMAGES.ravik.explore, description: "Board without battery" },
-    { categoryTag: "Board Only", id: "ravik-adventure-board", name: "RÄVIK Adventure (Board Only)", price: 214000, priceExVAT: 186000, category: "boards", image: AWAKE_IMAGES.ravik.adventure, description: "Board without battery" },
-    { categoryTag: "Board Only", id: "ravik-ultimate-board", name: "RÄVIK Ultimate (Board Only)", price: 241000, priceExVAT: 210000, category: "boards", image: AWAKE_IMAGES.ravik.ultimate, description: "Board without battery" },
-    { categoryTag: "Board Only", id: "vinga-adventure-board", name: "VINGA Adventure (Board Only)", price: 241000, priceExVAT: 210000, category: "boards", image: AWAKE_IMAGES.vinga.adventure, description: "Board without battery" },
-    { categoryTag: "Board Only", id: "vinga-ultimate-board", name: "VINGA Ultimate (Board Only)", price: 255000, priceExVAT: 222000, category: "boards", image: AWAKE_IMAGES.vinga.ultimate, description: "Board without battery" },
-  ],
-
-  // 🪁 eFOIL WING KITS (0% Duty) - Real Awake Products
-  wings: [
     {
-      categoryTag: "Wing Kit",
-      id: "cruise-1600-wing-kit",
-      name: "CRUISE 1600 Wing Kit",
-      price: 27200, // Retail inc-VAT R27,168 rounded up
-      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
-      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
-      category: "wings",
-      image: AWAKE_IMAGES.accessories.powderWing,
-      description: "CRUISE 1600 wing kit for versatile eFoil performance. Ideal for various water conditions.",
-      specs: ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
-      features: ["All-around performance", "Durable", "Smooth ride"],
+      categoryTag: "Board Only",
+      id: "ravik-explore-board",
+      sku: "99RE-GL",
+      name: "RÃ„VIK Explore (Board Only)",
+      price: 39744,
+      priceExVAT: 34560,
+      costEUR: 6320,
+      category: "boards",
+      image: AWAKE_IMAGES.ravik.explore,
+      description: "RÃ„VIK Explore board chassis only â€” no battery included. Ideal if you already own an Awake battery.",
+      specs: ["Board only â€” battery not included", "Carbon composite", "Compatible with all Awake batteries"],
+      features: ["Lightweight", "Compatible with XR 4 and LR 4 batteries", "Durable construction"],
     },
     {
-      categoryTag: "Wing Kit",
-      id: "powder-1800-wing-kit",
-      name: "POWDER 1800 Wing Kit",
-      price: 27200, // Retail inc-VAT R27,168 rounded up
-      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
-      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
-      category: "wings",
-      image: AWAKE_IMAGES.accessories.powderWing,
-      description: "POWDER 1800 wing kit for versatile eFoil performance. Ideal for various water conditions.",
-      specs: ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
-      features: ["All-around performance", "Durable", "Smooth ride"],
-    },
-    {
-      categoryTag: "Wing Kit",
-      id: "powder-1400-wing-kit",
-      name: "POWDER 1400 Wing Kit",
-      price: 27200, // Retail inc-VAT R27,168 rounded up
-      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
-      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
-      category: "wings",
-      image: AWAKE_IMAGES.accessories.powderWing,
-      description: "POWDER 1400 wing kit for versatile eFoil performance. Ideal for various water conditions.",
-      specs: ["Versatile performance", "Carbon construction", "Easy installation", "Optimized design"],
-      features: ["All-around performance", "Durable", "Smooth ride"],
-    },
-    {
-      categoryTag: "Wing Kit",
-      id: "fluid-1300-wing-kit",
-      name: "FLUID 1300 Wing Kit",
-      price: 27200, // Retail inc-VAT R27,168 rounded up
-      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
-      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
-      category: "wings",
-      image: AWAKE_IMAGES.accessories.fluidWing,
-      description: "FLUID 1300 wing kit for high-speed eFoil performance. Designed for speed and agility.",
-      specs: ["High-speed design", "Carbon fiber", "Precision engineering", "Aerodynamic"],
-      features: ["Maximum speed", "Responsive", "Competition-ready"],
-    },
-    {
-      categoryTag: "Wing Kit",
-      id: "fluid-1000-wing-kit",
-      name: "FLUID 1000 Wing Kit",
-      price: 27200, // Retail inc-VAT R27,168 rounded up
-      priceExVAT: 23700, // Retail ex-VAT R23,624 rounded up
-      costEUR: 1370, // Landed cost R17,499 / 19.85 * 1.15 rounded up
-      category: "wings",
-      image: AWAKE_IMAGES.accessories.fluidWing,
-      description: "FLUID 1000 wing kit for high-speed eFoil performance. Designed for speed and agility.",
-      specs: ["High-speed design", "Carbon fiber", "Precision engineering", "Aerodynamic"],
-      features: ["Maximum speed", "Responsive", "Competition-ready"],
+      categoryTag: "Board Only",
+      id: "ravik-adventure-board",
+      sku: "99RA-GL",
+      name: "RÃ„VIK Adventure (Board Only)",
+      price: 79490,
+      priceExVAT: 69122,
+      costEUR: 6320,
+      category: "boards",
+      image: AWAKE_IMAGES.ravik.adventure,
+      description: "RÃ„VIK Adventure board chassis only â€” no battery included. Ideal if you already own an Awake battery.",
+      specs: ["Board only â€” battery not included", "Advanced motor system", "Compatible with all Awake batteries"],
+      features: ["Enhanced performance", "Compatible with XR 4 and LR 4 batteries", "Premium build"],
     },
   ],
 
-  // 🎒 BAGS (20% Duty) - Real Awake Products
-  bags: [
+  // â”€â”€â”€ JETPACK STANDALONE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  jetpackStandalone: [
     {
-      categoryTag: "Bag",
-      id: "board-bag-kit",
-      name: "Board Bag Kit (RÄVIK/VINGA)",
-      price: 19500, // Retail inc-VAT R19,406 rounded up
-      priceExVAT: 17000, // Retail ex-VAT R16,875 rounded up
-      costEUR: 985, // Landed cost R12,500 / 19.85 * 1.15 rounded up (20% duty)
+      categoryTag: "Accessory",
+      id: "awake-jetpack-system",
+      sku: "99JPA-SUB-W",
+      name: "Awake Jetpack System",
+      price: 8949,
+      priceExVAT: 7782,
+      costEUR: 4000,
       category: "accessories",
-      image: AWAKE_IMAGES.accessories.boardBag,
-      description: "Protective bag kit for RÄVIK jetboards and VINGA eFoils. Includes board bag and accessories storage.",
-      specs: ["Padded protection", "Weather resistant", "Multiple compartments", "Durable zippers"],
-      features: ["Full protection", "Easy transport", "Quality materials"],
-    },
-    {
-      categoryTag: "Bag",
-      id: "battery-bag",
-      name: "Battery Bag",
-      price: 9700, // Retail inc-VAT R9,620 rounded up
-      priceExVAT: 8400, // Retail ex-VAT R8,365 rounded up
-      costEUR: 485, // Landed cost R6,196 / 19.85 * 1.15 rounded up (20% duty)
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.batteryBackpack,
-      description: "Dedicated battery bag for safe transport of Awake batteries.",
-      specs: ["Battery specific", "Padded protection", "Comfortable straps", "Compact design"],
-      features: ["Safe transport", "Comfortable carry", "Durable"],
-    },
-    {
-      categoryTag: "Bag",
-      id: "premium-travel-bag",
-      name: "Premium Travel Bag",
-      price: 16200, // Retail inc-VAT R16,169 rounded up
-      priceExVAT: 14100, // Retail ex-VAT R14,060 rounded up
-      costEUR: 815, // Landed cost R10,415 / 19.85 * 1.15 rounded up (20% duty)
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.boardBag,
-      description: "Premium travel bag for complete protection during transport.",
-      specs: ["Premium materials", "Padded interior", "Weather resistant", "Multiple compartments"],
-      features: ["Complete protection", "Travel-ready", "Organized storage"],
+      image: AWAKE_IMAGES.accessories.jetpackSystem,
+      description: "The Awake Jetpack System â€” adds a wearable water jet propulsion unit to your riding kit. Compatible with select RÃ„VIK boards.",
+      specs: ["Water jet propulsion", "Wearable design", "Rechargeable", "Compatible with RÃ„VIK boards"],
+      features: ["Extra thrust", "Hands-free propulsion", "Unique experience", "Easy to attach"],
     },
   ],
 
-  // 🛡️ SAFETY & STORAGE (20% Duty) - Real Awake Products
-  safetyStorage: [
-    {
-      categoryTag: "Safety",
-      id: "life-vest",
-      name: "Life Vest (CE Certified)",
-      price: 9700, // Retail inc-VAT R9,620 rounded up
-      priceExVAT: 8400, // Retail ex-VAT R8,365 rounded up
-      costEUR: 485, // Landed cost R6,196 / 19.85 * 1.15 rounded up (20% duty)
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.lifeVest,
-      description: "CE certified life vest designed for water sports. Safety meets style with Awake branding.",
-      specs: ["CE certified", "Adjustable fit", "Comfortable design", "Awake branding"],
-      features: ["Safety certified", "Comfortable", "Stylish"],
-    },
-    {
-      categoryTag: "Storage",
-      id: "awake-dock",
-      name: "Awake Dock (Floating)",
-      price: 78300, // Retail inc-VAT R78,298 rounded up
-      priceExVAT: 68100, // Retail ex-VAT R68,085 rounded up
-      costEUR: 3950, // Landed cost R50,433 / 19.85 * 1.15 rounded up (20% duty)
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.inflatableDock,
-      description: "Floating dock system for easy water access. Perfect for launching and docking your Awake.",
-      specs: ["Floating design", "Stable platform", "Easy setup", "Durable materials"],
-      features: ["Easy access", "Portable", "Stable"],
-    },
-    {
-      categoryTag: "Storage",
-      id: "wall-mount",
-      name: "Wall Mount",
-      price: 29600, // Retail inc-VAT R29,518 rounded up
-      priceExVAT: 25700, // Retail ex-VAT R25,668 rounded up
-      costEUR: 1490, // Landed cost R19,013 / 19.85 * 1.15 rounded up (20% duty)
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.wallMount,
-      description: "Premium wall mounting system for RÄVIK boards. Display your board as art when not in use.",
-      specs: ["Secure mounting", "Premium finish", "Easy installation", "Board protection"],
-      features: ["Display quality", "Secure storage", "Space-saving"],
-    },
-    {
-      categoryTag: "Storage",
-      id: "board-stand",
-      name: "Board Stand",
-      price: 16200, // Retail inc-VAT R16,169 rounded up
-      priceExVAT: 14100, // Retail ex-VAT R14,060 rounded up
-      costEUR: 815, // Landed cost R10,415 / 19.85 * 1.15 rounded up (20% duty)
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.wallMount,
-      description: "Premium board stand for displaying your Awake board.",
-      specs: ["Stable design", "Premium finish", "Easy assembly", "Board protection"],
-      features: ["Display quality", "Secure storage", "Space-saving"],
-    },
-  ],
-
-  // 🎮 ELECTRONICS (0% Duty) - Real Awake Products
-  electronics: [
+  // â”€â”€â”€ 99-SERIES ACCESSORIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  accessories: [
     {
       categoryTag: "Electronics",
-      id: "flex-hand-controller",
-      name: "Flex Hand Controller",
-      price: 16300, // Retail inc-VAT R16,224 rounded up
-      priceExVAT: 14200, // Retail ex-VAT R14,108 rounded up
-      costEUR: 820, // Landed cost R10,450 / 19.85 * 1.15 rounded up
+      id: "remote-hand-controller",
+      sku: "99RM-21",
+      name: "Remote Hand Controller",
+      price: 6005,
+      priceExVAT: 5222,
+      costEUR: 1360,
+      category: "electronics",
+      image: AWAKE_IMAGES.accessories.remoteController,
+      description: "Official Awake hand controller for precise speed control. Ergonomic grip with intuitive trigger.",
+      specs: ["Waterproof", "Ergonomic grip", "Wireless", "Long battery life"],
+      features: ["Precise control", "Comfortable grip", "Responsive trigger", "Water resistant"],
+    },
+    {
+      categoryTag: "Accessory",
+      id: "controller-leash",
+      sku: "99RM-21L",
+      name: "Controller Leash",
+      price: 8580,
+      priceExVAT: 7461,
+      costEUR: 320,
       category: "accessories",
-      image: AWAKE_IMAGES.accessories.handController,
-      description: "Latest generation wireless hand controller with ergonomic design and precise throttle control.",
-      specs: ["Wireless operation", "Ergonomic design", "Precise throttle", "LED indicators"],
-      features: ["Easy to use", "Waterproof", "Long battery life"],
+      image: AWAKE_IMAGES.accessories.controllerLeash,
+      description: "Safety leash for your hand controller. Prevents loss if dropped in the water.",
+      specs: ["Durable cord", "Secure attachment", "Wrist strap", "Comfortable"],
+      features: ["Prevents controller loss", "Secure", "Easy to attach"],
     },
     {
       categoryTag: "Electronics",
-      id: "battery-charger",
-      name: "Battery Charger",
-      price: 24700, // Retail inc-VAT R24,662 rounded up
-      priceExVAT: 21500, // Retail ex-VAT R21,445 rounded up
-      costEUR: 1245, // Landed cost R15,885 / 19.85 * 1.15 rounded up
-      category: "accessories",
+      id: "standard-charger",
+      sku: "99CH-21",
+      name: "Standard Charger",
+      price: 10657,
+      priceExVAT: 9267,
+      costEUR: 720,
+      category: "electronics",
       image: AWAKE_IMAGES.accessories.charger,
-      description: "Fast battery charger for all Awake batteries. Charges LR 4 and XR 4 batteries efficiently.",
-      specs: ["Fast charging", "Universal compatibility", "LED status", "Safety features"],
-      features: ["Quick charge", "Compact design", "Safe operation"],
+      description: "Standard Awake battery charger. Reliable overnight charging for your Flex Battery.",
+      specs: ["Standard charge rate", "Universal supply", "LED indicator", "Compact design"],
+      features: ["Reliable charging", "LED status indicator", "Compatible with all Awake batteries"],
     },
     {
       categoryTag: "Electronics",
-      id: "controller-charger",
-      name: "Controller Charger",
-      price: 5700, // Retail inc-VAT R5,628 rounded up
-      priceExVAT: 4900, // Retail ex-VAT R4,894 rounded up
-      costEUR: 285, // Landed cost R3,625 / 19.85 * 1.15 rounded up
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.controllerCharger,
-      description: "Dedicated charger for Awake hand controllers with USB connectivity.",
-      specs: ["USB charging", "LED indicator", "Compact design", "Universal voltage"],
-      features: ["Easy to use", "Travel-friendly", "Fast charging"],
-    },
-  ],
-
-  // ⚙️ PARTS (0% Duty) - Real Awake Products
-  parts: [
-    {
-      categoryTag: "Parts",
-      id: "ravik-fins",
-      name: "RÄVIK Fins (Set of 3)",
-      price: 5700, // Retail inc-VAT R5,628 rounded up
-      priceExVAT: 4900, // Retail ex-VAT R4,894 rounded up
-      costEUR: 285, // Landed cost R3,625 / 19.85 * 1.15 rounded up
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.ravikFins,
-      description: "Standard fin set for RÄVIK jetboards. Set of 3 high-quality fins for optimal performance.",
-      specs: ["Set of 3 fins", "RÄVIK specific", "Durable material", "Easy installation"],
-      features: ["Reliable performance", "Easy to replace", "Quality construction"],
+      id: "fast-charger",
+      sku: "99CH-22",
+      name: "Fast Charger",
+      price: 16293,
+      priceExVAT: 14168,
+      costEUR: 1040,
+      category: "electronics",
+      image: AWAKE_IMAGES.accessories.charger,
+      description: "Fast Awake battery charger. Cuts charge time significantly so you can get back on the water faster.",
+      specs: ["Fast charge rate", "Universal supply", "LED indicator", "Compact design"],
+      features: ["Rapid charging", "Reduced downtime", "Compatible with all Awake batteries"],
     },
     {
-      categoryTag: "Parts",
-      id: "carbon-fins",
-      name: "Carbon Fins (Set of 3)",
-      price: 8100, // Retail inc-VAT R8,055 rounded up
-      priceExVAT: 7100, // Retail ex-VAT R7,004 rounded up
-      costEUR: 410, // Landed cost R5,188 / 19.85 * 1.15 rounded up
+      categoryTag: "Accessory",
+      id: "controller-carry-bag",
+      sku: "99CY-21",
+      name: "Controller Carry Bag",
+      price: 3580,
+      priceExVAT: 3113,
+      costEUR: 240,
       category: "accessories",
-      image: AWAKE_IMAGES.accessories.carbonFins,
-      description: "Premium carbon fiber fin set. Lightweight and ultra-durable for maximum performance.",
-      specs: ["Carbon fiber", "Set of 3 fins", "Lightweight", "High strength"],
-      features: ["Premium material", "Enhanced performance", "Long-lasting"],
+      image: AWAKE_IMAGES.accessories.controllerCarryBag,
+      description: "Protective carry bag for your Awake hand controller. Padded interior keeps controller safe.",
+      specs: ["Padded interior", "Zip closure", "Compact size", "Awake branding"],
+      features: ["Controller protection", "Easy carry", "Padded for safety"],
+    },
+    {
+      categoryTag: "Accessory",
+      id: "deck-pad",
+      sku: "99DP-21",
+      name: "Deck Pad",
+      price: 1241,
+      priceExVAT: 1079,
+      costEUR: 80,
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.deckPad,
+      description: "Non-slip deck pad for your Awake board. Improves grip and comfort during riding.",
+      specs: ["Non-slip surface", "EVA foam", "Easy installation", "Durable"],
+      features: ["Improved grip", "Comfortable underfoot", "Durable EVA foam"],
+    },
+    {
+      categoryTag: "Bags",
+      id: "travel-board-bag",
+      sku: "99TB-21",
+      name: "Travel Board Bag",
+      price: 18748,
+      priceExVAT: 16302,
+      costEUR: 1120,
+      category: "bags",
+      image: AWAKE_IMAGES.accessories.travelBag,
+      description: "Heavy-duty travel bag for your Awake board. Padded protection for flights and travel.",
+      specs: ["Padded protection", "Wheeled option", "Large compartment", "Awake branding"],
+      features: ["Travel ready", "Board protection", "Easy transport", "Durable zips"],
+    },
+    {
+      categoryTag: "Bags",
+      id: "battery-bag",
+      sku: "99BB-21",
+      name: "Battery Bag",
+      price: 17149,
+      priceExVAT: 14912,
+      costEUR: 1040,
+      category: "bags",
+      image: AWAKE_IMAGES.accessories.batteryBag,
+      description: "Protective carry bag for Awake Flex Battery. Safe storage and transport for your battery.",
+      specs: ["Padded interior", "Secure closure", "Awake branding", "Handle and strap"],
+      features: ["Battery protection", "Safe transport", "Easy carry"],
+    },
+    {
+      categoryTag: "Accessory",
+      id: "carry-straps",
+      sku: "99CS-21",
+      name: "Carry Straps",
+      price: 17418,
+      priceExVAT: 15146,
+      costEUR: 960,
+      category: "accessories",
+      image: AWAKE_IMAGES.accessories.carryStraps,
+      description: "Padded carry straps for transporting your Awake board hands-free to the beach.",
+      specs: ["Padded straps", "Adjustable length", "Secure attachment", "Comfortable"],
+      features: ["Hands-free carry", "Comfortable padding", "Adjustable fit"],
     },
     {
       categoryTag: "Parts",
-      id: "foot-straps",
-      name: "Foot Straps",
-      price: 8400, // Retail inc-VAT R8,325 rounded up
-      priceExVAT: 7300, // Retail ex-VAT R7,239 rounded up
-      costEUR: 420, // Landed cost R5,362 / 19.85 * 1.15 rounded up
+      id: "foot-strap-set",
+      sku: "99FS-21",
+      name: "Foot Strap Set",
+      price: 3906,
+      priceExVAT: 3396,
+      costEUR: 280,
       category: "accessories",
       image: AWAKE_IMAGES.accessories.footStraps,
       description: "Adjustable foot straps for enhanced control and stability on your Awake board.",
@@ -612,124 +701,232 @@ export const PRODUCTS = {
     },
     {
       categoryTag: "Parts",
-      id: "beach-mat",
-      name: "Beach Mat (5% duty)",
-      price: 5700, // Retail inc-VAT R5,614 rounded up
-      priceExVAT: 4900, // Retail ex-VAT R4,882 rounded up
-      costEUR: 285, // Landed cost R3,616 / 19.85 * 1.15 rounded up (5% duty)
+      id: "propeller-set",
+      sku: "99PR-21",
+      name: "Propeller Set",
+      price: 83606,
+      priceExVAT: 72701,
+      costEUR: 3760,
       category: "accessories",
-      image: AWAKE_IMAGES.accessories.beachMat,
-      description: "Portable beach mat for protecting your board and gear. Perfect for beach sessions.",
-      specs: ["Portable design", "Water resistant", "Awake branding", "Compact storage"],
-      features: ["Board protection", "Easy to carry", "Durable"],
+      image: AWAKE_IMAGES.accessories.propellerSet,
+      description: "Official Awake replacement propeller set. Precision-engineered for maximum efficiency.",
+      specs: ["High efficiency", "Carbon composite", "Easy installation", "Replacement set"],
+      features: ["Maximum efficiency", "Precision engineered", "Easy to replace"],
     },
     {
-      categoryTag: "Parts",
-      id: "jetboard-tube",
-      name: "Awake Jetboard Tube",
-      price: 11711, // €590 * 19.85 = R11,711
-      priceExVAT: 10183,
-      costEUR: 590,
+      categoryTag: "Accessory",
+      id: "jetpack-tow-rope",
+      sku: "99JPA-RP",
+      name: "Jetpack Tow Rope",
+      price: 3699,
+      priceExVAT: 3217,
+      costEUR: 240,
       category: "accessories",
-      image: AWAKE_IMAGES.accessories.jetboardTube,
-      description: "Inflatable tube accessory for towing behind your jetboard. Add extra fun to your sessions.",
-      specs: ["Inflatable design", "Durable construction", "Easy inflation", "Tow attachment"],
-      features: ["Extra fun", "Durable", "Easy to use"],
+      image: AWAKE_IMAGES.accessories.jetpackTowRope,
+      description: "Tow rope accessory for the Awake Jetpack system. Strong, flexible design.",
+      specs: ["Strong cord", "Secure fittings", "Flexible construction", "Easy to attach"],
+      features: ["Secure towing", "Durable", "Compatible with Awake Jetpack"],
     },
     {
-      categoryTag: "Parts",
-      id: "competition-power-key",
-      name: "Competition Power Key",
-      price: 3771, // €190 * 19.85 = R3,771
-      priceExVAT: 3279,
-      costEUR: 190,
+      categoryTag: "Accessory",
+      id: "surf-rack-wall-mount",
+      sku: "99SR-21",
+      name: "Surf Rack Wall Mount",
+      price: 31683,
+      priceExVAT: 27550,
+      costEUR: 1680,
       category: "accessories",
-      image: AWAKE_IMAGES.accessories.competitionKey,
-      description: "Competition power key for unlocking maximum performance on your Awake board.",
-      specs: ["Performance unlock", "Competition mode", "Easy installation", "Secure attachment"],
-      features: ["Maximum power", "Competition ready", "Easy to use"],
-    },
-    {
-      categoryTag: "Parts",
-      id: "power-key-leash",
-      name: "Awake Power Key Leash",
-      price: 3771, // €190 * 19.85 = R3,771
-      priceExVAT: 3279,
-      costEUR: 190,
-      category: "accessories",
-      image: AWAKE_IMAGES.accessories.powerKeyLeash,
-      description: "Safety leash for your power key. Prevents loss during water sessions.",
-      specs: ["Safety leash", "Secure attachment", "Durable cord", "Easy to use"],
-      features: ["Prevents loss", "Secure", "Durable"],
-    },
-  ],
-
-  // 👕 APPAREL (45% Duty) - Real Awake Products
-  apparel: [
-    {
-      categoryTag: "Apparel",
-      id: "tshirt",
-      name: "T-shirt",
-      price: 3300, // Retail inc-VAT R3,283 rounded up
-      priceExVAT: 2900, // Retail ex-VAT R2,855 rounded up
-      costEUR: 165, // Landed cost R2,115 / 19.85 * 1.15 rounded up (45% duty)
-      category: "apparel",
-      image: AWAKE_IMAGES.accessories.tshirt,
-      description: "Official Awake branded t-shirt. Premium quality cotton with Awake logo.",
-      specs: ["Premium cotton", "Awake branding", "Comfortable fit", "Multiple sizes"],
-      features: ["Comfortable", "Stylish", "Official merchandise"],
+      image: AWAKE_IMAGES.accessories.wallMount,
+      description: "Wall-mounted storage rack for your Awake board. Keeps your board safely stored and on display.",
+      specs: ["Wall mounted", "Secure holding", "Easy installation", "Awake branding"],
+      features: ["Space saving", "Secure storage", "Display ready"],
     },
     {
       categoryTag: "Apparel",
-      id: "cap",
-      name: "Cap",
-      price: 1700, // Retail inc-VAT R1,689 rounded up
-      priceExVAT: 1500, // Retail ex-VAT R1,469 rounded up
-      costEUR: 85, // Landed cost R1,088 / 19.85 * 1.15 rounded up (45% duty)
-      category: "apparel",
-      image: AWAKE_IMAGES.accessories.cap,
-      description: "Branded Awake cap. Perfect for sunny days on the water.",
-      specs: ["Adjustable fit", "Awake logo", "Sun protection", "Quality materials"],
-      features: ["Sun protection", "Comfortable", "Stylish"],
-    },
-    {
-      categoryTag: "Apparel",
-      id: "wetsuit",
-      name: "Awake Wetsuit",
-      price: 7741, // €390 * 19.85 = R7,741
-      priceExVAT: 6731,
-      costEUR: 390,
+      id: "wetsuit-mens",
+      sku: "99WS-M",
+      name: "Awake Wetsuit (Mens)",
+      price: 10318,
+      priceExVAT: 8972,
+      costEUR: 640,
       category: "apparel",
       image: AWAKE_IMAGES.accessories.wetsuit,
-      description: "Full wetsuit designed for water sports. 4/3mm thickness for year-round comfort.",
-      specs: ["4/3mm thickness", "Flexible neoprene", "Awake branding", "Multiple sizes"],
+      description: "Men's full wetsuit designed for Awake water sports. 4/3mm neoprene for year-round comfort.",
+      specs: ["4/3mm neoprene", "Men's cut", "Flexible", "Awake branding"],
       features: ["Warm and comfortable", "Flexible", "Durable"],
     },
     {
       categoryTag: "Apparel",
-      id: "ladys-neo-suit",
-      name: "Awake Lady's Neo Suit",
-      price: 3771, // €190 * 19.85 = R3,771
-      priceExVAT: 3279,
-      costEUR: 190,
+      id: "wetsuit-womens",
+      sku: "99WS-W",
+      name: "Awake Wetsuit (Womens)",
+      price: 20859,
+      priceExVAT: 18138,
+      costEUR: 640,
       category: "apparel",
-      image: AWAKE_IMAGES.accessories.ladysNeoSuit,
-      description: "Women's neoprene suit designed for comfort and style on the water.",
-      specs: ["Women's fit", "Neoprene material", "Stylish design", "Multiple sizes"],
-      features: ["Comfortable fit", "Stylish", "Flexible"],
+      image: AWAKE_IMAGES.accessories.wetsuitWomens,
+      description: "Women's full wetsuit designed for Awake water sports. Tailored fit with 4/3mm neoprene.",
+      specs: ["4/3mm neoprene", "Women's cut", "Flexible", "Awake branding"],
+      features: ["Tailored fit", "Warm and comfortable", "Flexible"],
+    },
+    {
+      categoryTag: "Safety",
+      id: "helmet",
+      sku: "99HE-21",
+      name: "Awake Helmet",
+      price: 6862,
+      priceExVAT: 5967,
+      costEUR: 400,
+      category: "safety",
+      image: AWAKE_IMAGES.accessories.helmet,
+      description: "Protective helmet designed for electric water sports. Impact-resistant shell with comfortable liner.",
+      specs: ["Impact resistant", "Comfortable liner", "Adjustable fit", "Awake branding"],
+      features: ["Head protection", "Comfortable", "Secure fit"],
     },
     {
       categoryTag: "Apparel",
-      id: "neo-jacket",
-      name: "Awake Neo Jacket",
-      price: 3771, // €190 * 19.85 = R3,771
-      priceExVAT: 3279,
-      costEUR: 190,
+      id: "sunglasses",
+      sku: "99SG-21",
+      name: "Awake Sunglasses",
+      price: 1910,
+      priceExVAT: 1661,
+      costEUR: 120,
       category: "apparel",
-      image: AWAKE_IMAGES.accessories.neoJacket,
-      description: "Neoprene jacket for layering. Perfect for cooler water conditions.",
-      specs: ["Neoprene material", "Layering piece", "Awake branding", "Multiple sizes"],
-      features: ["Extra warmth", "Flexible", "Comfortable"],
+      image: AWAKE_IMAGES.accessories.sunglasses,
+      description: "Polarized Awake sunglasses. UV protection for bright days on the water.",
+      specs: ["Polarized lenses", "UV protection", "Lightweight frame", "Awake branding"],
+      features: ["Clear vision", "UV protection", "Comfortable wear"],
+    },
+    {
+      categoryTag: "Apparel",
+      id: "sticker-set",
+      sku: "99ST-21",
+      name: "Awake Sticker Set",
+      price: 4438,
+      priceExVAT: 3859,
+      costEUR: 40,
+      category: "apparel",
+      image: AWAKE_IMAGES.accessories.stickerSet,
+      description: "Official Awake sticker set. Deck your board, bag or gear with Awake branding.",
+      specs: ["Multiple stickers", "Weather resistant", "Outdoor grade vinyl", "Awake logos"],
+      features: ["Personalise your gear", "Weather resistant", "Long lasting"],
+    },
+  ],
+
+  // â”€â”€â”€ eFOIL ACCESSORIES (Vinga) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  efoilAccessories: [
+    {
+      categoryTag: "eFoil Accessory",
+      id: "vinga-wing-set-carbon",
+      sku: "VNWI-C",
+      name: "Vinga Wing Set Carbon",
+      price: 22583,
+      priceExVAT: 19637,
+      costEUR: 1440,
+      category: "efoilAccessories",
+      image: AWAKE_IMAGES.vingas.wingSetCarbon,
+      description: "Carbon fibre wing set for the Awake VINGA 3 eFoil. Precision-crafted for optimal lift and glide.",
+      specs: ["Carbon fibre construction", "Precision shape", "Compatible with VINGA 3", "High efficiency"],
+      features: ["Optimal lift", "Carbon construction", "Smooth glide"],
+    },
+    {
+      categoryTag: "eFoil Accessory",
+      id: "vinga-fuselage-short",
+      sku: "VNFU-S",
+      name: "Vinga Fuselage Short",
+      price: 17903,
+      priceExVAT: 15568,
+      costEUR: 960,
+      category: "efoilAccessories",
+      image: AWAKE_IMAGES.vingas.fuselageShort,
+      description: "Short fuselage for the VINGA 3 eFoil. Increases manoeuvrability at higher speeds.",
+      specs: ["Short configuration", "Aluminium alloy", "Precision fit", "Compatible with VINGA 3"],
+      features: ["Increased manoeuvrability", "High speed stability", "Easy swap"],
+    },
+    {
+      categoryTag: "eFoil Accessory",
+      id: "vinga-fuselage-long",
+      sku: "VNFU-L",
+      name: "Vinga Fuselage Long",
+      price: 19463,
+      priceExVAT: 16924,
+      costEUR: 1040,
+      category: "efoilAccessories",
+      image: AWAKE_IMAGES.vingas.fuselageLong,
+      description: "Long fuselage for the VINGA 3 eFoil. Provides stability and smooth riding at all speeds.",
+      specs: ["Long configuration", "Aluminium alloy", "Precision fit", "Compatible with VINGA 3"],
+      features: ["Stable ride", "Smooth performance", "Easy swap"],
+    },
+    {
+      categoryTag: "eFoil Accessory",
+      id: "vinga-mast-24",
+      sku: "VNMA-24",
+      name: "Vinga Mast 24\"",
+      price: 23363,
+      priceExVAT: 20316,
+      costEUR: 1200,
+      category: "efoilAccessories",
+      image: AWAKE_IMAGES.vingas.mast,
+      description: "24\" mast for the VINGA 3 eFoil. Shorter mast for lower lift â€” ideal for beginners and flat water.",
+      specs: ["24\" length", "Aluminium alloy", "Compatible with VINGA 3", "Secure mounting"],
+      features: ["Lower lift height", "Beginner friendly", "Stable"],
+    },
+    {
+      categoryTag: "eFoil Accessory",
+      id: "vinga-mast-32",
+      sku: "VNMA-32",
+      name: "Vinga Mast 32\"",
+      price: 24928,
+      priceExVAT: 21677,
+      costEUR: 1280,
+      category: "efoilAccessories",
+      image: AWAKE_IMAGES.vingas.mast,
+      description: "32\" mast for the VINGA 3 eFoil. Longer mast for higher lift â€” ideal for advanced riders and choppy water.",
+      specs: ["32\" length", "Aluminium alloy", "Compatible with VINGA 3", "Secure mounting"],
+      features: ["Higher lift", "Advanced riding", "Choppy water performance"],
+    },
+    {
+      categoryTag: "eFoil Accessory",
+      id: "vinga-travel-bag",
+      sku: "VNTB-21",
+      name: "Vinga Travel Bag",
+      price: 29578,
+      priceExVAT: 25720,
+      costEUR: 1600,
+      category: "efoilAccessories",
+      image: AWAKE_IMAGES.vingas.travelBag,
+      description: "Padded travel bag for the VINGA 3 eFoil board and components. Designed for flights and transport.",
+      specs: ["Padded protection", "Large compartment", "Wheeled option", "Awake branding"],
+      features: ["Travel protected", "Board safety", "Easy transport"],
+    },
+    {
+      categoryTag: "eFoil Accessory",
+      id: "vinga-deck-pad-set",
+      sku: "VNDP-21",
+      name: "Vinga Deck Pad Set",
+      price: 7003,
+      priceExVAT: 6089,
+      costEUR: 320,
+      category: "efoilAccessories",
+      image: AWAKE_IMAGES.vingas.deckPadSet,
+      description: "Non-slip deck pad set for the VINGA 3 eFoil. Improves grip and comfort when riding.",
+      specs: ["Non-slip surface", "EVA foam", "VINGA 3 compatible", "Easy installation"],
+      features: ["Improved grip", "Comfortable underfoot", "Durable EVA"],
+    },
+    {
+      categoryTag: "eFoil Accessory",
+      id: "vinga-wing-repair-kit",
+      sku: "VNWR-K",
+      name: "Vinga Wing Repair Kit",
+      price: 5453,
+      priceExVAT: 4742,
+      costEUR: 240,
+      category: "efoilAccessories",
+      image: AWAKE_IMAGES.vingas.wingRepairKit,
+      description: "Wing repair kit for the VINGA 3 eFoil. Keep your wing in top condition with all essential repair components.",
+      specs: ["Complete repair kit", "Compatible with VINGA 3 wings", "All tools included", "Easy to use"],
+      features: ["Quick repairs", "All-in-one kit", "Extends wing life"],
     },
   ],
 };
+
