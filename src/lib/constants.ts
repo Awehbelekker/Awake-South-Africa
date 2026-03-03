@@ -928,7 +928,6 @@ export const PRODUCTS = {
       features: ["Quick repairs", "All-in-one kit", "Extends wing life"],
     },
   ],
-};
 
   // 🪁 eFOIL WING KITS (0% Duty) - Real Awake Products
   wings: [
