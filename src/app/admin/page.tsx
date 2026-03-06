@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAdminStore } from '@/store/admin'
-import { useAdminLogin } from '@/lib/medusa-hooks'
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('admin@awakesa.co.za')
@@ -11,8 +10,7 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('')
   const [mounted, setMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const { login, setMedusaAuth, isAuthenticated } = useAdminStore()
-  const adminLoginMutation = useAdminLogin()
+  const { setMedusaAuth, isAuthenticated } = useAdminStore()
   const router = useRouter()
 
   const [hydrated, setHydrated] = useState(false)
@@ -36,30 +34,23 @@ export default function AdminLoginPage() {
     setIsLoading(true)
 
     try {
-      // Try Medusa Admin API first
-      await adminLoginMutation.mutateAsync({ email, password })
-      setMedusaAuth(email)
-      router.push('/admin/dashboard')
-    } catch {
-      // Fallback: authenticate via server-side /api/admin/auth (bcrypt + DB sessions)
-      try {
-        const res = await fetch('/api/admin/auth', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        })
-        const data = await res.json()
-        if (res.ok && data.success) {
-          setMedusaAuth(data.user?.email || email)
-          router.push('/admin/dashboard')
-        } else {
-          setError(data.error || 'Invalid credentials.')
-          setPassword('')
-        }
-      } catch {
-        setError('Invalid credentials. Check your email and password.')
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setMedusaAuth(data.user?.email || email)
+        router.push('/admin/dashboard')
+      } else {
+        setError(data.error || 'Invalid credentials.')
         setPassword('')
       }
+    } catch {
+      setError('Login failed. Please try again.')
+      setPassword('')
     } finally {
       setIsLoading(false)
     }
