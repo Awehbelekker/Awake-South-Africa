@@ -168,7 +168,7 @@ export function rateLimit(
 // Clean up stale buckets every 5 minutes
 setInterval(() => {
   const now = Date.now()
-  for (const [key, bucket] of rateBuckets) {
+  rateBuckets.forEach((bucket, key) => {
     if (now > bucket.resetAt) rateBuckets.delete(key)
-  }
+  })
 }, 5 * 60_000)
