@@ -156,7 +156,7 @@ export default function CheckoutPage() {
         const input = document.createElement('input')
         input.type = 'hidden'
         input.name = key
-        input.value = value
+        input.value = String(value)
         form.appendChild(input)
       })
 
