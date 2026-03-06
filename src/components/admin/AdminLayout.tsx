@@ -43,22 +43,51 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children, title }: AdminLayoutProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const { isAuthenticated, logout } = useAdminStore()
+  const { isAuthenticated, logout, setMedusaAuth } = useAdminStore()
   const [mounted, setMounted] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  // Wait for zustand to hydrate from localStorage before making auth decisions
   useEffect(() => {
     setMounted(true)
-    if (!isAuthenticated) {
-      router.push('/admin')
-    }
-  }, [isAuthenticated, router])
+    // zustand persist hydrates synchronously after first render
+    setHydrated(true)
+  }, [])
 
-  if (!mounted || !isAuthenticated) {
+  // Verify session with server cookie (source of truth)
+  useEffect(() => {
+    if (!mounted || !hydrated) return
+
+    // If zustand says not authenticated, verify via server cookie
+    // This prevents loops caused by hydration timing
+    fetch('/api/admin/auth', { method: 'GET', credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated && data.user?.email) {
+          // Server session valid — sync zustand
+          if (!isAuthenticated) setMedusaAuth(data.user.email)
+        } else {
+          // No valid server session — redirect to login
+          logout()
+          router.push('/admin')
+        }
+      })
+      .catch(() => {
+        // Network error — don't kick user out, rely on zustand
+        if (!isAuthenticated) router.push('/admin')
+      })
+  }, [mounted, hydrated]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!mounted || !hydrated || !isAuthenticated) {
     return null
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Clear server session cookie first
+    try {
+      await fetch('/api/admin/auth', { method: 'DELETE', credentials: 'include' })
+    } catch { /* ignore */ }
     logout()
     router.push('/')
   }

@@ -15,12 +15,20 @@ export default function AdminLoginPage() {
   const adminLoginMutation = useAdminLogin()
   const router = useRouter()
 
+  const [hydrated, setHydrated] = useState(false)
+
   useEffect(() => {
     setMounted(true)
+    // Wait a tick for zustand persist to hydrate from localStorage
+    setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted || !hydrated) return
     if (isAuthenticated) {
       router.push('/admin/dashboard')
     }
-  }, [isAuthenticated, router])
+  }, [mounted, hydrated, isAuthenticated, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
