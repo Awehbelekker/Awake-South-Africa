@@ -110,6 +110,9 @@ export const useProductsStore = create<ProductsStore>()(
     }),
     {
       name: 'products-storage',
+      partialize: (state) => ({
+        productSource: state.productSource,
+      }),
     }
   )
 )
