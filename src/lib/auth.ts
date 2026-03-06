@@ -124,12 +124,12 @@ export function hasRole(userRole: string, requiredRole: AdminRole): boolean {
 export async function getAdminByEmail(email: string) {
   const { data, error } = await getSupabase()
     .from('admin_users')
-    .select('id, email, password_hash, role')
+    .select('id, email, name, password_hash, role')
     .eq('email', email)
     .single()
 
   if (error || !data) return null
-  return { ...data, name: (data as Record<string, unknown>).name ?? '' }
+  return { ...data, name: (data.name as string) || '' }
 }
 
 // ── Rate limiting (in-memory, per-process) ──────────────────────────────────
