@@ -68,12 +68,12 @@ export const useAdminStore = create<AdminStore>()(
       setMedusaAuth: (email: string) => {
         set({ isAuthenticated: true, adminEmail: email, authMode: 'medusa' })
       },
-      // Legacy local auth - fallback when Medusa is unavailable
-      login: (password) => {
-        if (password === 'awake2026admin') {
-          set({ isAuthenticated: true, adminEmail: null, authMode: 'local' })
-          return true
-        }
+      // Legacy local auth — now calls server-side /api/admin/auth
+      // Kept synchronous for backward compat; callers should prefer
+      // the async loginViaApi() in the admin login page.
+      login: (_password) => {
+        // Hardcoded passwords removed for security.
+        // Use the server-side /api/admin/auth endpoint instead.
         return false
       },
       logout: () => set({ isAuthenticated: false, adminEmail: null, authMode: 'local' }),

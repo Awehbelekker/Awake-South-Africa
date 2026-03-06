@@ -3,12 +3,31 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useCartStore } from '@/store/cart'
-import { useOrder } from '@/lib/medusa-hooks'
-import { CheckCircle, Package, Truck, Loader2, Copy, Check } from 'lucide-react'
+import { CheckCircle, Package, Loader2, Copy, Check } from 'lucide-react'
+
+interface OrderItem {
+  description: string
+  quantity: number
+  unitPrice: number
+  total: number
+}
+
+interface OrderDetails {
+  order_number: string
+  customer_name: string
+  customer_email: string
+  items: OrderItem[]
+  subtotal: number
+  tax_amount: number
+  total: number
+  status: string
+}
 
 export default function PaymentSuccessPage() {
   const { clearCart, setMedusaCartId } = useCartStore()
   const [orderId, setOrderId] = useState<string | null>(null)
+  const [order, setOrder] = useState<OrderDetails | null>(null)
+  const [orderLoading, setOrderLoading] = useState(false)
   const [copied, setCopied] = useState(false)
 
   // Get order ID from localStorage
@@ -19,14 +38,24 @@ export default function PaymentSuccessPage() {
     }
   }, [])
 
-  // Fetch order details from Medusa
-  const { data: order, isLoading: orderLoading } = useOrder(orderId)
+  // Fetch order details from Supabase via API
+  useEffect(() => {
+    if (!orderId) return
+    setOrderLoading(true)
+    fetch(`/api/tenant/orders?orderNumber=${encodeURIComponent(orderId)}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.order) setOrder(data.order)
+        else if (Array.isArray(data) && data.length > 0) setOrder(data[0])
+      })
+      .catch(() => {})
+      .finally(() => setOrderLoading(false))
+  }, [orderId])
 
   useEffect(() => {
     // Clear cart on successful payment
     clearCart()
     setMedusaCartId(null)
-    // Clear stored cart ID
     localStorage.removeItem('medusa_cart_id')
   }, [clearCart, setMedusaCartId])
 
@@ -38,9 +67,13 @@ export default function PaymentSuccessPage() {
     }
   }
 
-  // Format price
+  // Format price in ZAR (amounts stored in rands, not cents)
   const formatPrice = (amount: number) => {
-    return `R ${(amount / 100).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`
+    return new Intl.NumberFormat('en-ZA', {
+      style: 'currency',
+      currency: 'ZAR',
+      minimumFractionDigits: 0,
+    }).format(amount)
   }
 
   return (
@@ -89,24 +122,19 @@ export default function PaymentSuccessPage() {
               <Package className="w-5 h-5" /> Order Items
             </h2>
 
-            <div className="space-y-4 mb-6">
-              {order.items?.map((item: any) => (
-                <div key={item.id} className="flex items-center gap-4 pb-4 border-b border-white/10 last:border-0">
-                  {item.thumbnail && (
-                    <img
-                      src={item.thumbnail}
-                      alt={item.title}
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
-                  )}
-                  <div className="flex-1">
-                    <p className="font-medium">{item.title}</p>
-                    <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
+            {order.items && order.items.length > 0 && (
+              <div className="space-y-4 mb-6">
+                {order.items.map((item: OrderItem, idx: number) => (
+                  <div key={idx} className="flex items-center gap-4 pb-4 border-b border-white/10 last:border-0">
+                    <div className="flex-1">
+                      <p className="font-medium">{item.description}</p>
+                      <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
+                    </div>
+                    <p className="font-semibold">{formatPrice(item.total)}</p>
                   </div>
-                  <p className="font-semibold">{formatPrice(item.unit_price * item.quantity)}</p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* Order Total */}
             <div className="border-t border-white/10 pt-4">
@@ -114,15 +142,9 @@ export default function PaymentSuccessPage() {
                 <span>Subtotal</span>
                 <span>{formatPrice(order.subtotal || 0)}</span>
               </div>
-              {order.shipping_total > 0 && (
-                <div className="flex justify-between text-sm text-gray-400 mb-2">
-                  <span>Shipping</span>
-                  <span>{formatPrice(order.shipping_total)}</span>
-                </div>
-              )}
               <div className="flex justify-between text-sm text-gray-400 mb-2">
                 <span>VAT (15% included)</span>
-                <span>{formatPrice(order.tax_total || 0)}</span>
+                <span>{formatPrice(order.tax_amount || 0)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold pt-2 border-t border-white/10">
                 <span>Total</span>
@@ -132,29 +154,13 @@ export default function PaymentSuccessPage() {
           </div>
         ) : null}
 
-        {/* Shipping Info */}
-        {order?.shipping_address && (
-          <div className="bg-awake-gray rounded-xl p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Truck className="w-5 h-5" /> Delivery Address
-            </h2>
-            <div className="text-gray-300">
-              <p>{order.shipping_address.first_name} {order.shipping_address.last_name}</p>
-              <p>{order.shipping_address.address_1}</p>
-              {order.shipping_address.address_2 && <p>{order.shipping_address.address_2}</p>}
-              <p>{order.shipping_address.city}, {order.shipping_address.province} {order.shipping_address.postal_code}</p>
-              {order.shipping_address.phone && <p className="mt-2">Phone: {order.shipping_address.phone}</p>}
-            </div>
-          </div>
-        )}
-
         {/* What's Next */}
         <div className="bg-awake-gray rounded-xl p-6 mb-8">
-          <h3 className="font-semibold mb-4">What's Next?</h3>
+          <h3 className="font-semibold mb-4">What&apos;s Next?</h3>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-              <span className="text-gray-300">Order confirmation email sent to {order?.email || 'your email'}</span>
+              <span className="text-gray-300">Order confirmation email sent to {order?.customer_email || 'your email'}</span>
             </li>
             <li className="flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />

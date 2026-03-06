@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     }
 
     // List files in product-images bucket
-    const { data: rootFiles, error: rootError } = await supabase.storage
+    const { data: rootFiles, error: _rootError } = await supabase.storage
       .from('product-images')
       .list('', { limit: 100 })
 

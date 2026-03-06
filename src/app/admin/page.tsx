@@ -33,11 +33,22 @@ export default function AdminLoginPage() {
       setMedusaAuth(email)
       router.push('/admin/dashboard')
     } catch {
-      // Fallback to local auth if Medusa is unavailable
-      const success = login(password)
-      if (success) {
-        router.push('/admin/dashboard')
-      } else {
+      // Fallback: authenticate via server-side /api/admin/auth (bcrypt + DB sessions)
+      try {
+        const res = await fetch('/api/admin/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        })
+        const data = await res.json()
+        if (res.ok && data.success) {
+          setMedusaAuth(data.user?.email || email)
+          router.push('/admin/dashboard')
+        } else {
+          setError(data.error || 'Invalid credentials.')
+          setPassword('')
+        }
+      } catch {
         setError('Invalid credentials. Check your email and password.')
         setPassword('')
       }

@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
 
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { data: _data, error } = await supabase.storage
       .from('product-images')
       .upload(filePath, arrayBuffer, {
         contentType: file.type,

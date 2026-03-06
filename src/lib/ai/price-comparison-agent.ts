@@ -277,7 +277,7 @@ export async function batchAnalyzePrices(
   )
 
   // Fetch products or pricelist items
-  let query = supabase
+  const query = supabase
     .from('products')
     .select('id, sku, name, price, cost_price, category, metadata')
     .eq('tenant_id', tenantId)
@@ -589,7 +589,7 @@ function generatePriceAlerts(
 // Helpers
 // ============================================================================
 
-function calculateConfidence(validPriceCount: number, totalSourceCount: number): number {
+function calculateConfidence(validPriceCount: number, _totalSourceCount: number): number {
   if (validPriceCount >= 5) return 0.95
   if (validPriceCount >= 3) return 0.85
   if (validPriceCount >= 2) return 0.7
@@ -696,7 +696,7 @@ export async function requestPriceChange(
     requestedBy: 'price_agent',
   }
 
-  const { data, error } = await supabase
+  const { data: insertedData } = await supabase
     .from('price_change_requests')
     .insert({
       tenant_id: request.tenantId,
@@ -713,7 +713,7 @@ export async function requestPriceChange(
     .select('id')
     .single()
 
-  if (data) request.id = data.id
+  if (insertedData) request.id = insertedData.id
   return request
 }
 

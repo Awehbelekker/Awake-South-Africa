@@ -71,16 +71,6 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Master admin API protection
-  if (pathname.startsWith('/api/master-admin')) {
-    const authHeader = request.headers.get('authorization')
-    const masterKey = process.env.MASTER_ADMIN_API_KEY
-
-    if (!masterKey || authHeader !== `Bearer ${masterKey}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
-
   return response
 }
 
@@ -93,7 +83,7 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder files
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)' ,
   ],
 }
 

@@ -107,7 +107,7 @@ export class ProductService {
       if (error) throw error
 
       return { success: true, data: data as Product[] }
-    } catch (error) {
+    } catch (_error) {
       // Fallback to simple text search if RPC not available
       const { data, error: fallbackError } = await supabase
         .from('products')

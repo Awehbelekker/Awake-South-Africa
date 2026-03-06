@@ -72,7 +72,23 @@ export async function GET(request: NextRequest) {
     // TODO: Add admin authentication check here
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
+    const orderNumber = searchParams.get('orderNumber')
     const limit = parseInt(searchParams.get('limit') || '50')
+
+    // Single order lookup by order_number (used by success page)
+    if (orderNumber) {
+      const { data: order, error } = await getSupabase()
+        .from('orders')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('order_number', orderNumber)
+        .single()
+
+      if (error || !order) {
+        return NextResponse.json({ order: null })
+      }
+      return NextResponse.json({ order })
+    }
 
     let query = getSupabase()
       .from('orders')

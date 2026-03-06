@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
-import { createPayFastPayment } from '@/lib/payfast'
 import {
   useUpdateCartForCheckout,
   useSetPaymentSession,
@@ -127,15 +126,25 @@ export default function CheckoutPage() {
         console.warn('Pre-order creation failed (non-fatal):', preCreateError)
       }
 
-      // Create PayFast payment (with Medusa order ID if available)
-      const payment = createPayFastPayment(
-        total(),
-        'Awake Boards SA Order',
-        itemDescription,
-        orderId,
-        email,
-        name
-      )
+      // Create PayFast payment via server-side API (signature generated securely on server)
+      const paymentRes = await fetch('/api/payfast/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: total(),
+          itemName: 'Awake Boards SA Order',
+          itemDescription: itemDescription,
+          paymentId: orderId,
+          email,
+          name: firstName,
+        }),
+      })
+
+      if (!paymentRes.ok) {
+        throw new Error('Failed to create payment')
+      }
+
+      const payment = await paymentRes.json()
 
       // Create a form and submit it
       const form = document.createElement('form')

@@ -10,7 +10,7 @@
 import { useState } from 'react'
 import { useTenant } from '@/contexts/TenantContext'
 import { useSupabaseUpload } from '@/hooks/useSupabaseUpload'
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
+import { Upload, X, Loader2 } from 'lucide-react'
 
 interface ImageUploadProps {
   onImagesUploaded?: (urls: string[]) => void

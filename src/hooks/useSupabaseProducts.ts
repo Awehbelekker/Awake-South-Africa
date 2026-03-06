@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react'
 import { useTenant } from '@/contexts/TenantContext'
 import { getSupabaseProducts, hasSupabaseProducts } from '@/lib/supabase-products'
 import { useProductsStore } from '@/store/products'
-import type { EditableProduct } from '@/store/products'
 
 export function useSupabaseProducts() {
   const { tenant, isLoading: tenantLoading } = useTenant()

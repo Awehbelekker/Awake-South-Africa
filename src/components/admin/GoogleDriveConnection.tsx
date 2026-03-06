@@ -94,7 +94,7 @@ export function GoogleDriveConnection() {
       } else {
         setError('Failed to disconnect')
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to disconnect')
     }
   }

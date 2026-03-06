@@ -57,7 +57,7 @@ export function useSupabaseUpload() {
         : `${tenantId}/${fileName}`
 
       // Upload to Supabase Storage
-      const { data, error } = await getSupabase().storage
+      const { data: _data, error } = await getSupabase().storage
         .from(bucket)
         .upload(filePath, file, {
           cacheControl: '3600',

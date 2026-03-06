@@ -1,31 +1,31 @@
 export const dynamic = 'force-dynamic'
 
 /**
- * Master Admin Authentication API
+ * Admin Authentication API (server-side, bcrypt + DB sessions)
  *
- * POST /api/master-admin/auth - Login (bcrypt + DB session)
- * DELETE /api/master-admin/auth - Logout
- * GET  /api/master-admin/auth - Check session
+ * POST   /api/admin/auth — Login (checks admin_users table with bcrypt)
+ * DELETE /api/admin/auth — Logout (clears session)
+ * GET    /api/admin/auth — Check session status
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import {
   verifyPassword,
-  generateSessionToken,
   createSession,
   verifySession,
   deleteSession,
+  getAdminByEmail,
   rateLimit,
 } from '@/lib/auth'
 
-const COOKIE_NAME = 'master_admin_auth'
+const COOKIE_NAME = 'admin_session'
 
 export async function POST(request: NextRequest) {
   try {
     // Rate limit by IP
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-    if (!rateLimit(`master-login:${ip}`, 5, 60_000)) {
+    if (!rateLimit(`admin-login:${ip}`, 5, 60_000)) {
       return NextResponse.json(
         { error: 'Too many login attempts. Try again in a minute.' },
         { status: 429 }
@@ -39,34 +39,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
     }
 
-    // Check against environment variables (bcrypt hash)
-    const masterEmail = process.env.MASTER_ADMIN_EMAIL
-    const masterPasswordHash = process.env.MASTER_ADMIN_PASSWORD_HASH
+    // Look up user in admin_users table
+    const user = await getAdminByEmail(email)
 
-    if (!masterEmail || !masterPasswordHash) {
-      console.error('Master admin credentials not configured')
-      return NextResponse.json({ error: 'Authentication not configured' }, { status: 500 })
-    }
-
-    if (email !== masterEmail) {
+    if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
-    const valid = await verifyPassword(password, masterPasswordHash)
+    // Verify password with bcrypt
+    const valid = await verifyPassword(password, user.password_hash)
     if (!valid) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
     // Create DB-backed session
     const token = await createSession({
-      id: 'master-admin',
-      email: masterEmail,
-      name: 'Master Admin',
-      role: 'super_admin',
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
     })
 
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
 
+    // Set httpOnly cookie
     const cookieStore = await cookies()
     cookieStore.set(COOKIE_NAME, token, {
       httpOnly: true,
@@ -76,48 +72,64 @@ export async function POST(request: NextRequest) {
       path: '/',
     })
 
+    // Update last_login_at
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    await supabase
+      .from('admin_users')
+      .update({ last_login_at: new Date().toISOString() })
+      .eq('id', user.id)
+
     return NextResponse.json({
       success: true,
-      message: 'Logged in successfully',
+      user: { email: user.email, name: user.name, role: user.role },
       expiresAt: expiresAt.toISOString(),
     })
   } catch (error: unknown) {
-    console.error('Auth error:', error)
+    console.error('Admin auth error:', error)
     return NextResponse.json({ error: 'Authentication failed' }, { status: 500 })
   }
 }
 
-export async function DELETE() {
+export async function DELETE(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get(COOKIE_NAME)?.value
 
-    if (token) await deleteSession(token)
+    if (token) {
+      await deleteSession(token)
+    }
+
     cookieStore.delete(COOKIE_NAME)
 
-    return NextResponse.json({ success: true, message: 'Logged out' })
+    return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ success: true })
   }
 }
 
-export async function GET() {
+export async function GET(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get(COOKIE_NAME)?.value
 
-    if (!token) return NextResponse.json({ authenticated: false })
+    if (!token) {
+      return NextResponse.json({ authenticated: false })
+    }
 
     const user = await verifySession(token)
-    if (!user) return NextResponse.json({ authenticated: false })
+    if (!user) {
+      return NextResponse.json({ authenticated: false })
+    }
 
     return NextResponse.json({
       authenticated: true,
-      email: user.email,
-      role: user.role,
+      user: { email: user.email, name: user.name, role: user.role },
     })
   } catch {
     return NextResponse.json({ authenticated: false })
   }
 }
-

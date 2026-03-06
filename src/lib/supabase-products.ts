@@ -121,19 +121,30 @@ export async function updateSupabaseProduct(
     if (updates.name) productData.name = updates.name
     if (updates.description) productData.description = updates.description
     if (updates.price !== undefined) productData.price = updates.price
-    if (updates.priceExVAT !== undefined) productData.original_price = updates.priceExVAT * 1.15
+    if (updates.priceExVAT !== undefined) productData.price_ex_vat = updates.priceExVAT
+    if (updates.costEUR !== undefined) productData.cost_eur = updates.costEUR
     if (updates.category) productData.category = updates.category
-    if (updates.categoryTag) productData.subcategory = updates.categoryTag
+    if (updates.categoryTag) productData.category_tag = updates.categoryTag
     if (updates.inStock !== undefined) productData.in_stock = updates.inStock
     if (updates.stockQuantity !== undefined) productData.stock_quantity = updates.stockQuantity
-    if (updates.image) productData.thumbnail = updates.image
+    if (updates.image) productData.image = updates.image
     if (updates.images) {
       productData.images = updates.images.map(img =>
         typeof img === 'string' ? img : img.url
       )
     }
-    if (updates.specs) productData.specifications = updates.specs
+    if (updates.videos) {
+      productData.videos = updates.videos.map(vid =>
+        typeof vid === 'string' ? vid : vid.url
+      )
+    }
+    if (updates.video_sections) productData.video_sections = updates.video_sections
+    if (updates.specs) productData.specs = updates.specs
     if (updates.features) productData.features = updates.features
+    if (updates.whatsIncluded) productData.what_is_included = updates.whatsIncluded
+    if (updates.badge) productData.badge = updates.badge
+    if (updates.battery) productData.battery = updates.battery
+    if (updates.skillLevel) productData.skill_level = updates.skillLevel
     if (updates.badge) productData.is_featured = true
 
     productData.updated_at = new Date().toISOString()
@@ -169,18 +180,23 @@ export async function addSupabaseProduct(
       name: product.name,
       description: product.description || '',
       price: product.price,
-      original_price: product.priceExVAT ? product.priceExVAT * 1.15 : null,
-      currency: 'ZAR',
+      price_ex_vat: product.priceExVAT || null,
+      cost_eur: product.costEUR || null,
       category: product.category,
-      subcategory: product.categoryTag,
+      category_tag: product.categoryTag,
       in_stock: product.inStock,
       stock_quantity: product.stockQuantity,
       sku: product.id,
+      image: product.image,
       images: product.images?.map(img => typeof img === 'string' ? img : img.url) || [],
-      thumbnail: product.image,
-      specifications: product.specs || [],
+      videos: product.videos?.map(vid => typeof vid === 'string' ? vid : vid.url) || [],
+      video_sections: product.video_sections || null,
+      specs: product.specs || [],
       features: product.features || [],
-      tags: [product.badge, product.skillLevel, product.battery].filter(Boolean),
+      what_is_included: product.whatsIncluded || [],
+      badge: product.badge || null,
+      battery: product.battery || null,
+      skill_level: product.skillLevel || null,
       is_featured: !!product.badge,
     }
 
@@ -230,24 +246,32 @@ function mapSupabaseToProduct(data: any): EditableProduct {
     id: data.sku || data.slug,
     name: data.name,
     price: parseFloat(data.price),
-    priceExVAT: data.original_price ? parseFloat(data.original_price) / 1.15 : parseFloat(data.price) / 1.15,
-    costEUR: data.cost_eur,
+    priceExVAT: data.price_ex_vat ? parseFloat(data.price_ex_vat) : parseFloat(data.price) / 1.15,
+    costEUR: data.cost_eur ? parseFloat(data.cost_eur) : undefined,
     category: data.category,
-    categoryTag: data.subcategory,
+    categoryTag: data.category_tag,
     description: data.description,
-    image: data.thumbnail,
+    image: data.image,
     images: data.images?.map((url: string) => ({
       id: url,
       url,
       type: 'image' as const,
       source: 'url' as const,
     })) || [],
-    badge: data.is_featured ? 'FEATURED' : data.is_new ? 'NEW' : undefined,
-    battery: data.tags?.find((t: string) => t?.includes('V') || t?.includes('Ah')),
-    skillLevel: data.tags?.find((t: string) => ['Beginner', 'Intermediate', 'Advanced', 'Pro'].includes(t)),
-    specs: data.specifications || [],
+    videos: data.videos?.map((url: string) => ({
+      id: url,
+      url,
+      type: 'video' as const,
+      source: 'url' as const,
+    })) || [],
+    video_sections: data.video_sections || undefined,
+    badge: data.badge || (data.is_featured ? 'FEATURED' : undefined),
+    battery: data.battery,
+    skillLevel: data.skill_level,
+    specs: data.specs || [],
     features: data.features || [],
+    whatsIncluded: data.what_is_included || [],
     inStock: data.in_stock,
-    stockQuantity: data.stock_quantity,
+    stockQuantity: data.stock_quantity || 0,
   }
 }

@@ -83,7 +83,7 @@ async function uploadToSupabase(
   // Upload to Supabase Storage
   const filePath = `${tenantId}/products/${safeFileName}`
   
-  const { data, error } = await supabase.storage
+  const { data: _data, error } = await supabase.storage
     .from('product-images')
     .upload(filePath, fileBuffer, {
       contentType: mimeType,
