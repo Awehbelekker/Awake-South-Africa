@@ -67,6 +67,9 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'Awake Admin',
   },
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
 };
 
 export const viewport: Viewport = {

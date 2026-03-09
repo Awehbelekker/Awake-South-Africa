@@ -64,6 +64,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Skip RSC (React Server Component) payload requests — let Next.js handle them
+  if (url.searchParams.has('_rsc')) {
+    return;
+  }
+  
   // Network first for HTML pages
   if (request.mode === 'navigate') {
     event.respondWith(
