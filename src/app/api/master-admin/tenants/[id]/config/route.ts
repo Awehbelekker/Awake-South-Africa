@@ -46,7 +46,7 @@ export async function GET(
   try {
     const { data: tenant, error } = await supabase
       .from('tenants')
-      .select('id, name, slug, oauth_config, ai_config, automation_config')
+      .select('id, name, slug, package, oauth_config, ai_config, automation_config, email_config, whatsapp_config')
       .eq('id', params.id)
       .single()
 
@@ -73,13 +73,15 @@ export async function PATCH(
 
   try {
     const body = await request.json()
-    const { oauth_config, ai_config, automation_config } = body
+    const { oauth_config, ai_config, automation_config, email_config, whatsapp_config } = body
 
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
-    
-    if (oauth_config) updates.oauth_config = oauth_config
-    if (ai_config) updates.ai_config = ai_config
-    if (automation_config) updates.automation_config = automation_config
+
+    if (oauth_config !== undefined) updates.oauth_config = oauth_config
+    if (ai_config !== undefined) updates.ai_config = ai_config
+    if (automation_config !== undefined) updates.automation_config = automation_config
+    if (email_config !== undefined) updates.email_config = email_config
+    if (whatsapp_config !== undefined) updates.whatsapp_config = whatsapp_config
 
     const { data: tenant, error } = await supabase
       .from('tenants')

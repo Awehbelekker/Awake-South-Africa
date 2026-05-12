@@ -6,6 +6,7 @@ import PackageTab from '@/components/master-admin/PackageTab'
 import OAuthTab from '@/components/master-admin/OAuthTab'
 import AITab from '@/components/master-admin/AITab'
 import AutomationTab from '@/components/master-admin/AutomationTab'
+import IntegrationsTab, { EmailConfig, WhatsAppConfig } from '@/components/master-admin/IntegrationsTab'
 
 interface TenantConfig {
   id: string
@@ -17,6 +18,8 @@ interface TenantConfig {
   oauth_config: any
   ai_config: any
   automation_config: any
+  email_config: EmailConfig | null
+  whatsapp_config: WhatsAppConfig | null
 }
 
 export default function TenantConfigurePage() {
@@ -27,7 +30,7 @@ export default function TenantConfigurePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [config, setConfig] = useState<TenantConfig | null>(null)
-  const [activeTab, setActiveTab] = useState<'package' | 'oauth' | 'ai' | 'automation'>('package')
+  const [activeTab, setActiveTab] = useState<'package' | 'oauth' | 'ai' | 'automation' | 'integrations'>('package')
 
   useEffect(() => {
     loadConfig()
@@ -63,7 +66,9 @@ export default function TenantConfigurePage() {
         body: JSON.stringify({
           oauth_config: config.oauth_config,
           ai_config: config.ai_config,
-          automation_config: config.automation_config
+          automation_config: config.automation_config,
+          email_config: config.email_config,
+          whatsapp_config: config.whatsapp_config,
         })
       })
 
@@ -161,7 +166,8 @@ export default function TenantConfigurePage() {
               { id: 'package', label: 'Package & Features' },
               { id: 'oauth', label: 'OAuth Settings' },
               { id: 'ai', label: 'AI Configuration' },
-              { id: 'automation', label: 'Automation' }
+              { id: 'automation', label: 'Automation' },
+              { id: 'integrations', label: '🔌 Integrations' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -214,6 +220,16 @@ export default function TenantConfigurePage() {
               config={config.automation_config}
               features={config.package_features}
               onChange={(newConfig) => setConfig({ ...config, automation_config: newConfig })}
+            />
+          )}
+
+          {activeTab === 'integrations' && (
+            <IntegrationsTab
+              tenantId={tenantId}
+              emailConfig={config.email_config}
+              whatsappConfig={config.whatsapp_config}
+              onEmailChange={(email_config) => setConfig({ ...config, email_config })}
+              onWhatsAppChange={(whatsapp_config) => setConfig({ ...config, whatsapp_config })}
             />
           )}
         </div>
