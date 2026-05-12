@@ -4,25 +4,15 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
-import {
-  useUpdateCartForCheckout,
-  useSetPaymentSession,
-  useCompleteCart
-} from '@/lib/medusa-hooks'
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, total, clearCart, medusaCartId } = useCartStore()
+  const { items, total, clearCart } = useCartStore()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
-
-  // Medusa checkout hooks
-  const updateCartMutation = useUpdateCartForCheckout(medusaCartId || '')
-  const setPaymentMutation = useSetPaymentSession(medusaCartId || '')
-  const completeCartMutation = useCompleteCart(medusaCartId || '')
 
   useEffect(() => {
     if (items.length === 0) {
@@ -54,42 +44,8 @@ export default function CheckoutPage() {
       const firstName = nameParts[0]
       const lastName = nameParts.slice(1).join(' ') || firstName
 
-      let orderId = `AWK-${Date.now()}`
-
-      // If we have a Medusa cart, create order through Medusa first
-      if (medusaCartId) {
-        try {
-          // Update cart with customer info
-          await updateCartMutation.mutateAsync({
-            email,
-            billing_address: {
-              first_name: firstName,
-              last_name: lastName,
-              phone: phone || undefined,
-              country_code: 'za',
-            },
-            shipping_address: {
-              first_name: firstName,
-              last_name: lastName,
-              phone: phone || undefined,
-              country_code: 'za',
-            },
-          })
-
-          // Set payment session to manual (we handle payment externally via PayFast)
-          await setPaymentMutation.mutateAsync('manual')
-
-          // Complete the cart to create an order
-          const result = await completeCartMutation.mutateAsync()
-          if (result.type === 'order' && result.data) {
-            orderId = result.data.id
-            // Store order ID for success page
-            localStorage.setItem('awake_last_order_id', orderId)
-          }
-        } catch (medusaError) {
-          console.warn('Medusa order creation failed, proceeding with PayFast only:', medusaError)
-        }
-      }
+      const orderId = `AWK-${Date.now()}`
+      localStorage.setItem('awake_last_order_id', orderId)
 
       // Create item description
       const itemNames = items.map(item => `${item.quantity}x ${item.name}`).join(', ')
