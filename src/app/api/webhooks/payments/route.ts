@@ -13,6 +13,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { PaymentGatewayCode } from '@/types/supabase'
 import { verifyWebhook } from '@/lib/payments'
+import { sendEmail } from '@/lib/email-service'
+import { sendWhatsApp } from '@/lib/whatsapp-service'
 
 function getSupabase(): any {
   return createClient(
@@ -66,7 +68,7 @@ export async function POST(request: NextRequest) {
     // Get order to find tenant
     const { data: order } = await getSupabase()
       .from('orders')
-      .select('tenant_id, id, status')
+      .select('tenant_id, id, status, customer_name, customer_email, customer_phone, total, order_number')
       .eq('order_number', orderId)
       .single()
 
@@ -120,6 +122,43 @@ export async function POST(request: NextRequest) {
       .eq('id', order.id)
 
     console.log(`Order ${orderId} updated: ${result.status}`)
+
+    // ── Fire notifications on payment confirmed ───────────────────────────
+    if (result.status === 'completed' && order.customer_email) {
+      const fmt = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', minimumFractionDigits: 0 }).format(order.total || 0)
+      const vars = {
+        name:     order.customer_name || 'Customer',
+        order_id: order.order_number  || orderId,
+        total:    fmt,
+        tracking_url: '',
+      }
+
+      // Email confirmation — fire-and-forget
+      sendEmail({
+        tenantId: tenantId!,
+        to: order.customer_email,
+        subject: `Order ${vars.order_id} confirmed — ${fmt}`,
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;">
+            <h2 style="color:#0a0a0a">Order Confirmed!</h2>
+            <p>Hi ${vars.name},</p>
+            <p>Thank you for your order. Your payment of <strong>${fmt}</strong> has been received.</p>
+            <p style="font-size:14px;color:#666;">Order reference: <strong>${vars.order_id}</strong></p>
+            <p>We'll be in touch soon with shipping details.</p>
+          </div>
+        `,
+      }).catch((e) => console.error('Order confirm email failed:', e))
+
+      // WhatsApp notification — fire-and-forget
+      if (order.customer_phone) {
+        sendWhatsApp({
+          tenantId: tenantId!,
+          to: order.customer_phone,
+          template: 'order_confirmed',
+          vars,
+        }).catch((e) => console.error('Order confirm WhatsApp failed:', e))
+      }
+    }
 
     return NextResponse.json({ success: true, status: result.status })
 

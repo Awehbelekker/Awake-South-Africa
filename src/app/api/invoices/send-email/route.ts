@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import nodemailer from 'nodemailer'
+import { sendEmail } from '@/lib/email-service'
 
 export const runtime = 'nodejs'
 
@@ -195,91 +195,48 @@ export async function POST(request: NextRequest) {
       </div>
     `
 
-    // Create transporter (configure with your SMTP settings)
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    })
+    // Resolve tenant ID — prefer query param, fall back to awake-sa
+    const tenantId = new URL(request.url).searchParams.get('tenant_id') || 'awake-sa'
 
-    // Email options
-    const mailOptions = {
-      from: `${storeName} <${storeEmail || process.env.SMTP_USER}>`,
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Invoice ${invoiceNumber}</title>
+        </head>
+        <body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f4f4f4;">
+          <div style="max-width:600px;margin:20px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.1);">
+            <div style="background:#3b82f6;padding:20px;color:#fff;">
+              <h1 style="margin:0;font-size:24px;">Invoice from ${storeName}</h1>
+            </div>
+            <div style="padding:20px;">
+              <p style="margin:0 0 15px;color:#333;">Hi ${customerName},</p>
+              <p style="margin:0 0 15px;color:#666;">Please find your invoice ${invoiceNumber} below.</p>
+              <div style="margin:20px 0;">${invoiceHtml}</div>
+              <p style="margin:20px 0 0;color:#333;">Best regards,<br>${storeName}</p>
+            </div>
+            <div style="background:#f9fafb;padding:15px;text-align:center;border-top:1px solid #e5e7eb;">
+              <p style="margin:0;font-size:12px;color:#9ca3af;">Automated email — please do not reply directly.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `
+
+    const result = await sendEmail({
+      tenantId,
       to: customerEmail,
       subject: `Invoice ${invoiceNumber} from ${storeName}`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Invoice ${invoiceNumber}</title>
-          </head>
-          <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-            <div style="max-width: 600px; margin: 20px auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-              <div style="background-color: #3b82f6; padding: 20px; color: white;">
-                <h1 style="margin: 0; font-size: 24px;">Invoice from ${storeName}</h1>
-              </div>
-              <div style="padding: 20px;">
-                <p style="margin: 0 0 15px 0; color: #333;">Hi ${customerName},</p>
-                <p style="margin: 0 0 15px 0; color: #666;">
-                  Thank you for your business. Please find your invoice ${invoiceNumber} attached below.
-                </p>
-                <div style="margin: 20px 0;">
-                  ${invoiceHtml}
-                </div>
-                <p style="margin: 20px 0 15px 0; color: #666;">
-                  If you have any questions about this invoice, please contact us.
-                </p>
-                <p style="margin: 0; color: #333;">
-                  Best regards,<br>
-                  ${storeName}
-                </p>
-              </div>
-              <div style="background-color: #f9fafb; padding: 15px; text-align: center; border-top: 1px solid #e5e7eb;">
-                <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                  This is an automated email. Please do not reply directly to this message.
-                </p>
-              </div>
-            </div>
-          </body>
-        </html>
-      `,
+      html,
+    })
+
+    if (!result.success) {
+      return NextResponse.json({ error: result.error || 'Failed to send email' }, { status: 500 })
     }
 
-    // Send email
-    try {
-      await transporter.sendMail(mailOptions)
-      
-      return NextResponse.json({
-        success: true,
-        message: `Invoice sent to ${customerEmail}`,
-      })
-    } catch (emailError: any) {
-      console.error('Email send error:', emailError)
-      
-      // Return specific error message
-      if (emailError.code === 'EAUTH') {
-        return NextResponse.json(
-          { error: 'Email authentication failed. Please check SMTP credentials.' },
-          { status: 500 }
-        )
-      } else if (emailError.code === 'ECONNECTION') {
-        return NextResponse.json(
-          { error: 'Could not connect to email server. Please check SMTP settings.' },
-          { status: 500 }
-        )
-      } else {
-        return NextResponse.json(
-          { error: `Failed to send email: ${emailError.message}` },
-          { status: 500 }
-        )
-      }
-    }
+    return NextResponse.json({ success: true, message: `Invoice sent to ${customerEmail}` })
   } catch (error: any) {
     console.error('Invoice email error:', error)
     return NextResponse.json(
