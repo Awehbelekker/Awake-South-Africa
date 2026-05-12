@@ -129,54 +129,60 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
     }
 
     setUploading(true);
+    const newItems: MediaFile[] = [];
+    let failed = 0;
 
     try {
-      const newItems: MediaFile[] = [];
-      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit for localStorage
-      
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        
-        // Check file size
-        if (file.size > MAX_FILE_SIZE) {
-          toast.error(`${file.name} is too large (max 5MB). Use Google Drive for larger files.`);
-          continue;
-        }
-        
-        // Validate file type
+
         if (type === 'image' && !file.type.startsWith('image/')) {
           toast.error(`${file.name} is not an image file`);
+          failed++;
           continue;
         }
         if (type === 'video' && !file.type.startsWith('video/')) {
           toast.error(`${file.name} is not a video file`);
+          failed++;
           continue;
         }
 
-        // Convert to base64 for preview (client-side storage)
-        const reader = new FileReader();
-        const base64 = await new Promise<string>((resolve) => {
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
-        });
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('folder', 'products');
+        if (tenant?.id) formData.append('tenant_id', tenant.id);
+
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (!res.ok || !data.url) {
+          toast.error(`${file.name}: ${data.error || 'Upload failed'}`);
+          failed++;
+          continue;
+        }
 
         newItems.push({
           id: `upload-${Date.now()}-${i}`,
-          url: base64,
+          url: data.url,
           type,
           name: file.name,
           source: 'upload',
         });
       }
 
-      onChange([...items, ...newItems]);
-      toast.success(`${newItems.length} ${type}(s) uploaded successfully`);
+      if (newItems.length > 0) {
+        onChange([...items, ...newItems]);
+        toast.success(`${newItems.length} ${type}(s) uploaded to Supabase Storage`);
+      }
+      if (failed > 0 && newItems.length === 0) {
+        toast.error('All uploads failed — check file types and sizes');
+      }
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Failed to upload files');
+      toast.error('Upload failed — check your connection');
     } finally {
       setUploading(false);
-      e.target.value = ''; // Reset input
+      e.target.value = '';
     }
   };
 
