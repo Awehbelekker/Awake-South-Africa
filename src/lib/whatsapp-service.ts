@@ -116,6 +116,42 @@ async function sendViaMeta(config: WhatsAppConfig, to: string, body: string): Pr
   return { success: true }
 }
 
+export interface SendCustomWhatsAppOptions {
+  tenantId: string
+  to: string
+  message: string
+}
+
+/**
+ * Send a free-form message to any number using the tenant's configured provider.
+ * Used for admin-triggered messages: registration codes, payment reminders, etc.
+ * Note: Meta Cloud API free-form messages only work within 24h of customer contact.
+ */
+export async function sendCustomWhatsApp(opts: SendCustomWhatsAppOptions): Promise<{ success: boolean; error?: string }> {
+  const { tenantId, to, message } = opts
+
+  // Normalize phone: strip +, convert leading 0 to 27 (South Africa)
+  let phone = to.replace(/[\s\-()]/g, '')
+  if (phone.startsWith('+')) phone = phone.slice(1)
+  if (phone.startsWith('0')) phone = '27' + phone.slice(1)
+
+  let config: WhatsAppConfig | null = null
+  try {
+    config = await getTenantWhatsAppConfig(tenantId)
+  } catch {
+    return { success: false, error: 'Could not load WhatsApp config' }
+  }
+
+  if (!config || !config.provider || config.provider === 'none') {
+    return { success: false, error: 'WhatsApp provider not configured' }
+  }
+
+  if (config.provider === 'twilio') return sendViaTwilio(config, `+${phone}`, message)
+  if (config.provider === 'meta')   return sendViaMeta(config, phone, message)
+
+  return { success: false, error: `Unknown provider: ${config.provider}` }
+}
+
 export async function sendWhatsApp(opts: SendWhatsAppOptions): Promise<{ success: boolean; error?: string }> {
   const { tenantId, to, template, vars } = opts
 

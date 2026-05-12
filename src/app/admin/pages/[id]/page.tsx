@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { useAdminStore } from '@/store/admin'
 import { createClient } from '@supabase/supabase-js'
-import PageBuilder from '@/components/admin/PageBuilder'
 import type { Page } from '@/lib/types/pages'
+
+const PageBuilder = dynamic(() => import('@/components/admin/PageBuilder'), { ssr: false })
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
