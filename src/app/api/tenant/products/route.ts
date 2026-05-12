@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
     const featured = searchParams.get('featured')
-    const limit = parseInt(searchParams.get('limit') || '50')
+    const limit = parseInt(searchParams.get('limit') || '200')
 
     let query = getSupabase()
       .from('products')
@@ -100,12 +100,21 @@ export async function GET(request: NextRequest) {
       query = query.eq('is_featured', true)
     }
 
-    const { data: products, error } = await query
+    const { data: rawProducts, error } = await query
 
     if (error) {
       console.error('Products query error:', JSON.stringify(error))
       throw error
     }
+
+    // Deduplicate by slug (guards against double-upsert edge cases)
+    const seen = new Set<string>()
+    const products = (rawProducts || []).filter((p: any) => {
+      const key = p.slug || p.id
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
 
     return NextResponse.json({ products })
   } catch (error: any) {
@@ -187,6 +196,7 @@ export async function PUT(request: NextRequest) {
       skill_level: p.skillLevel || null,
       specs: p.specs || [],
       features: p.features || [],
+      whats_included: p.whatsIncluded || [],
       in_stock: p.inStock ?? true,
       stock_quantity: p.stockQuantity || 0,
       is_active: true,
@@ -225,12 +235,28 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const singleId = searchParams.get('id')
 
+    const body = await request.json().catch(() => ({}))
+
+    // Purge all: hard-delete every product for this tenant (admin cleanup)
+    if (body.purgeAll === true) {
+      const { error } = await getSupabase()
+        .from('products')
+        .delete()
+        .eq('tenant_id', tenantId)
+
+      if (error) {
+        console.error('Products purge error:', JSON.stringify(error))
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+
+      return NextResponse.json({ success: true, purged: true })
+    }
+
     let ids: string[] = []
 
     if (singleId) {
       ids = [singleId]
     } else {
-      const body = await request.json().catch(() => ({}))
       ids = body.ids || []
     }
 
@@ -286,10 +312,11 @@ export async function PATCH(request: NextRequest) {
     if (p.badge !== undefined)         row.badge         = p.badge
     if (p.battery !== undefined)       row.battery       = p.battery
     if (p.skillLevel !== undefined)    row.skill_level   = p.skillLevel
-    if (p.specs !== undefined)         row.specs         = p.specs
-    if (p.features !== undefined)      row.features      = p.features
-    if (p.inStock !== undefined)       row.in_stock      = p.inStock
-    if (p.stockQuantity !== undefined) row.stock_quantity = p.stockQuantity
+    if (p.specs !== undefined)           row.specs           = p.specs
+    if (p.features !== undefined)        row.features        = p.features
+    if (p.whatsIncluded !== undefined)   row.whats_included  = p.whatsIncluded
+    if (p.inStock !== undefined)         row.in_stock        = p.inStock
+    if (p.stockQuantity !== undefined)   row.stock_quantity  = p.stockQuantity
 
     const { data, error } = await getSupabase()
       .from('products')

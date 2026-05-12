@@ -9,7 +9,8 @@ import { useAdminProducts, useAdminUpdateProduct, useAdminUpdateVariant } from '
 import ProductEditModal from '@/components/admin/ProductEditModal'
 import QuickProductCreate from '@/components/admin/QuickProductCreate'
 import toast, { Toaster } from 'react-hot-toast'
-import { RefreshCw, Database, WifiOff, Trash2, Plus } from 'lucide-react'
+import { RefreshCw, Database, WifiOff, Trash2, Plus, RotateCcw } from 'lucide-react'
+import { PRODUCTS as DEFAULT_PRODUCTS } from '@/lib/constants'
 
 function mapSupabaseProduct(p: any): EditableProduct {
   return {
@@ -29,6 +30,7 @@ function mapSupabaseProduct(p: any): EditableProduct {
     skillLevel: p.skill_level,
     specs: p.specs,
     features: p.features,
+    whatsIncluded: p.whats_included,
     inStock: p.in_stock,
     stockQuantity: p.stock_quantity,
   } as any
@@ -45,6 +47,7 @@ export default function AdminProductsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState(false)
+  const [resetting, setResetting] = useState(false)
   const [sortField, setSortField] = useState<'name' | 'price' | 'category'>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
@@ -328,6 +331,66 @@ export default function AdminProductsPage() {
     }
   }
 
+  const handleResetAndResync = async () => {
+    if (!confirm('This will DELETE all products from Supabase and re-sync the canonical 44 products from the catalog. Continue?')) return
+    setResetting(true)
+    try {
+      // Step 1: Hard-delete all products for this tenant
+      const delRes = await fetch('/api/tenant/products', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ purgeAll: true }),
+      })
+      const delData = await delRes.json()
+      if (!delData.success) throw new Error(delData.error || 'Purge failed')
+
+      // Step 2: Build canonical product list from constants
+      const canonicalProducts = [
+        ...DEFAULT_PRODUCTS.jetboards,
+        ...DEFAULT_PRODUCTS.limitedEdition,
+        ...DEFAULT_PRODUCTS.efoils,
+        ...DEFAULT_PRODUCTS.batteries,
+        ...DEFAULT_PRODUCTS.boardsOnly,
+        ...DEFAULT_PRODUCTS.wings,
+        ...DEFAULT_PRODUCTS.bags,
+        ...DEFAULT_PRODUCTS.safetyStorage,
+        ...DEFAULT_PRODUCTS.electronics,
+        ...DEFAULT_PRODUCTS.parts,
+        ...DEFAULT_PRODUCTS.apparel,
+      ].map(p => ({ ...p, inStock: true, stockQuantity: 5 }))
+
+      // Deduplicate
+      const seen = new Set<string>()
+      const unique = canonicalProducts.filter(p => {
+        if (seen.has(p.id)) return false
+        seen.add(p.id)
+        return true
+      })
+
+      // Step 3: Re-sync canonical products
+      const syncRes = await fetch('/api/tenant/products', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products: unique }),
+      })
+      const syncData = await syncRes.json()
+      if (!syncData.success) throw new Error(syncData.error || 'Sync failed')
+
+      toast.success(`Reset complete: ${syncData.synced} canonical products synced to Supabase`)
+
+      // Step 4: Refresh displayed products
+      const refreshRes = await fetch('/api/tenant/products')
+      const refreshData = await refreshRes.json()
+      if (refreshData.products?.length > 0) {
+        setSupabaseProducts(refreshData.products.map(mapSupabaseProduct))
+      }
+    } catch (err: any) {
+      toast.error('Reset failed: ' + err.message)
+    } finally {
+      setResetting(false)
+    }
+  }
+
   const calculateMargin = (product: any) => {
     if (!product.costEUR) return 'N/A'
     const costZAR = product.costEUR * settings.exchangeRate
@@ -347,7 +410,7 @@ export default function AdminProductsPage() {
       <Toaster position="top-right" />
 
       {/* Data Source Indicator */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2 text-sm">
           {dataSource === 'medusa' && (
             <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full">
@@ -372,12 +435,25 @@ export default function AdminProductsPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {dataSource === 'supabase' && (
+            <button
+              onClick={handleResetAndResync}
+              disabled={resetting}
+              title="Purge all Supabase rows and re-sync the 44 canonical products from the catalog"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm text-orange-700 bg-orange-50 border border-orange-300 hover:bg-orange-100 disabled:opacity-50 rounded-md"
+            >
+              <RotateCcw className={`h-3.5 w-3.5 ${resetting ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">{resetting ? 'Resetting...' : 'Reset & Resync'}</span>
+              <span className="sm:hidden">{resetting ? '...' : 'Reset'}</span>
+            </button>
+          )}
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md shadow-sm transition-colors"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md shadow-sm transition-colors"
           >
             <Plus className="h-4 w-4" />
-            Add Product
+            <span className="hidden sm:inline">Add Product</span>
+            <span className="sm:hidden">Add</span>
           </button>
           {dataSource === 'medusa' && (
             <button
@@ -433,8 +509,8 @@ export default function AdminProductsPage() {
       )}
 
       {/* Products Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white rounded-lg shadow overflow-hidden overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3">

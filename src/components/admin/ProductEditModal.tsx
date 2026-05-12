@@ -121,7 +121,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
+          <div className="flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -131,14 +131,14 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 mb-4">
-                  Edit Product: {formData.name}
+              <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-t-2xl sm:rounded-2xl bg-white p-4 sm:p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Title as="h3" className="text-base sm:text-lg font-medium leading-6 text-gray-900 mb-3 sm:mb-4 pr-6 truncate">
+                  Edit: {formData.name}
                 </Dialog.Title>
 
-                <div className="mt-4 max-h-[70vh] overflow-y-auto space-y-4 pr-2">
+                <div className="mt-2 sm:mt-4 max-h-[75vh] sm:max-h-[70vh] overflow-y-auto space-y-4 pr-1 sm:pr-2">
                   {/* Basic Fields */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Name</label>
                       <input
@@ -163,7 +163,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                   </div>
 
                   {/* Pricing Fields */}
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Price (ZAR)</label>
                       <input
@@ -202,7 +202,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                   </div>
 
                   {/* Stock Fields */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Stock Quantity</label>
                       <input
@@ -307,7 +307,7 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
                 </div>
 
                 {/* Action Buttons */}
-                <div className="mt-6 flex justify-end gap-3">
+                <div className="mt-4 sm:mt-6 flex justify-end gap-2 sm:gap-3">
                   <button
                     type="button"
                     onClick={handleClose}

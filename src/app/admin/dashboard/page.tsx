@@ -124,7 +124,7 @@ export default function AdminDashboard() {
   return (
     <AdminLayout title="Dashboard">
       {/* Data Source Indicator */}
-      <div className="flex items-center gap-3 mb-4 text-sm">
+      <div className="flex flex-wrap items-center gap-2 mb-4 text-sm">
         {useMedusaProducts ? (
           <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full">
             <Database className="h-3.5 w-3.5" />
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Key Metrics Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center gap-2 text-gray-500 text-sm">
             <Package className="h-4 w-4" />
@@ -252,16 +252,13 @@ export default function AdminDashboard() {
           {bookingMetrics.upcomingBookings.length > 0 ? (
             <div className="space-y-2">
               {bookingMetrics.upcomingBookings.map((booking) => (
-                <div key={booking.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <div className="font-medium text-gray-900">{booking.customerName}</div>
-                    <div className="text-sm text-gray-500">{booking.locationName}</div>
+                <div key={booking.id} className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-gray-900 text-sm truncate">{booking.customerName}</div>
+                    <div className="text-xs text-gray-500 truncate">{booking.locationName}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{booking.date} · {booking.timeSlot}</div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">{booking.date}</div>
-                    <div className="text-sm text-gray-500">{booking.timeSlot}</div>
-                  </div>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
+                  <span className={`flex-shrink-0 px-2 py-0.5 text-xs rounded-full ${
                     booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
                   }`}>
                     {booking.status}
@@ -287,7 +284,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <span className="text-gray-600">In Stock</span>
               <div className="flex items-center gap-2">
-                <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="w-20 sm:w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-green-500 rounded-full"
                     style={{ width: `${(productMetrics.inStock / productMetrics.total) * 100}%` }}
@@ -299,7 +296,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Low Stock</span>
               <div className="flex items-center gap-2">
-                <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="w-20 sm:w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-orange-500 rounded-full"
                     style={{ width: `${(productMetrics.lowStock / productMetrics.total) * 100}%` }}
@@ -311,7 +308,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Out of Stock</span>
               <div className="flex items-center gap-2">
-                <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="w-20 sm:w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-red-500 rounded-full"
                     style={{ width: `${(productMetrics.outOfStock / productMetrics.total) * 100}%` }}
@@ -328,7 +325,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <Link href="/admin/products" className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow p-4 text-white hover:from-blue-600 hover:to-blue-700 transition-colors">
           <Package className="h-8 w-8 mb-2 opacity-80" />
           <h3 className="font-semibold">Products</h3>

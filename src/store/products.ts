@@ -65,6 +65,15 @@ interface ProductsStore {
   getProductById: (id: string) => EditableProduct | undefined
 }
 
+const deduplicateById = (products: any[]): any[] => {
+  const seen = new Set<string>()
+  return products.filter(p => {
+    if (seen.has(p.id)) return false
+    seen.add(p.id)
+    return true
+  })
+}
+
 // Flatten default products
 const flattenProducts = (): EditableProduct[] => {
   const allProducts = [
@@ -82,7 +91,7 @@ const flattenProducts = (): EditableProduct[] => {
     inStock: true,
     stockQuantity: 5,
   }))
-  return allProducts
+  return deduplicateById(allProducts)
 }
 
 export const useProductsStore = create<ProductsStore>()(
@@ -105,7 +114,7 @@ export const useProductsStore = create<ProductsStore>()(
           products: state.products.filter((p) => p.id !== id),
         })),
       resetProducts: () => set({ products: flattenProducts(), productSource: 'localStorage' }),
-      setProducts: (products, source = 'localStorage') => set({ products, productSource: source }),
+      setProducts: (products, source = 'localStorage') => set({ products: deduplicateById(products), productSource: source }),
       getProductById: (id) => get().products.find((p) => p.id === id),
     }),
     {

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { SupabaseSync } from "@/components/SupabaseSync";
 import { DebugPanel } from "@/components/DebugPanel";
@@ -96,6 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           {children}
           <Footer />
+          <WhatsAppButton />
           <DebugPanel />
           <PWAInstaller />
         </QueryProvider>

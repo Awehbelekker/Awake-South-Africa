@@ -22,12 +22,13 @@ export async function getSupabaseProducts(tenantId?: string): Promise<EditablePr
     let query = supabase
       .from('products')
       .select('*')
-    
+      .eq('is_active', true)
+
     // Filter by tenant if provided
     if (tenantId) {
       query = query.eq('tenant_id', tenantId)
     }
-    
+
     const { data, error } = await query
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false })

@@ -6,8 +6,8 @@ import { AWAKE_IMAGES, SA_CONTENT } from "@/lib/constants";
 export default function Footer() {
   return (
     <footer className="bg-awake-black border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8">
           {/* Brand */}
           <div className="col-span-2">
             <Link href="/" className="flex items-center gap-3 mb-6">
@@ -35,7 +35,7 @@ export default function Footer() {
                 <MapPin className="w-4 h-4" /><span>{SA_CONTENT.address.city}, {SA_CONTENT.address.country}</span>
               </div>
             </div>
-            <div className="flex gap-4 mt-6">
+            <div className="flex gap-3 mt-5">
               <a href={SA_CONTENT.social.instagram} target="_blank" rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-accent-primary hover:bg-accent-primary/10">
                 <Instagram className="w-5 h-5" />

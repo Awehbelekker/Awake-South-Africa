@@ -4,16 +4,16 @@ import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAdminStore } from '@/store/admin'
-import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingCart, 
-  Users, 
-  MapPin, 
-  Calendar, 
-  FileText, 
-  Settings, 
-  BarChart3, 
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Users,
+  MapPin,
+  Calendar,
+  FileText,
+  Settings,
+  BarChart3,
   Image,
   LogOut,
   Menu,
@@ -21,6 +21,14 @@ import {
   ChevronRight,
   Store
 } from 'lucide-react'
+
+const bottomNav = [
+  { name: 'Home', href: '/admin/dashboard', icon: LayoutDashboard },
+  { name: 'Products', href: '/admin/products', icon: Package },
+  { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
+  { name: 'Bookings', href: '/admin/bookings', icon: Calendar },
+  { name: 'Settings', href: '/admin/settings', icon: Settings },
+]
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
@@ -164,27 +172,55 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
       </aside>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-64 pb-16 lg:pb-0">
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white shadow">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden text-gray-500 hover:text-gray-700"
+                className="lg:hidden p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md"
               >
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               </button>
-              {title && <h1 className="text-xl font-semibold text-gray-900">{title}</h1>}
+              {title && <h1 className="text-base sm:text-xl font-semibold text-gray-900 truncate">{title}</h1>}
             </div>
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-600 lg:hidden"
+            >
+              <Store className="h-4 w-4" />
+              Store
+            </a>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main className="p-3 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>
+
+      {/* Mobile bottom navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex">
+        {bottomNav.map((item) => {
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-xs font-medium transition-colors ${
+                isActive ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <item.icon className={`h-5 w-5 ${isActive ? 'text-blue-600' : ''}`} />
+              <span className="text-[10px]">{item.name}</span>
+            </Link>
+          )
+        })}
+      </nav>
     </div>
   )
 }
