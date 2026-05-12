@@ -15,6 +15,7 @@
     "test:all": "npm run test && npm run test:e2e"
   },
   "dependencies": {
+    "@grapesjs/react": "^2.0.0",
     "@headlessui/react": "^2.2.9",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "@supabase/supabase-js": "^2.78.0",
@@ -38,6 +39,15 @@
     "clsx": "^2.1.0",
     "dotenv": "^17.3.1",
     "googleapis": "^170.1.0",
+    "grapesjs": "^0.22.16",
+    "grapesjs-blocks-basic": "^1.0.2",
+    "grapesjs-component-countdown": "^1.0.2",
+    "grapesjs-custom-code": "^1.0.2",
+    "grapesjs-navbar": "^1.0.2",
+    "grapesjs-plugin-forms": "^2.0.6",
+    "grapesjs-preset-webpage": "^1.0.3",
+    "grapesjs-style-bg": "^2.0.2",
+    "grapesjs-tabs": "^1.0.6",
     "html5-qrcode": "^2.3.8",
     "jsbarcode": "^3.11.6",
     "lucide-react": "^0.309.0",
