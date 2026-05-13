@@ -153,21 +153,21 @@ export default function MasterAdminDashboard() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Link href="/master-admin/tenants" className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow">
+          <Link href="/master-admin/tenants/new" className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow">
             <Building2 className="w-8 h-8 text-blue-600 mb-3" />
-            <h3 className="font-semibold text-lg">Manage Clients</h3>
-            <p className="text-gray-500 text-sm">View and edit all client stores</p>
+            <h3 className="font-semibold text-lg">Add New Client</h3>
+            <p className="text-gray-500 text-sm">Onboard a new store with scraper & branding</p>
           </Link>
-          <Link href="/master-admin/payments" className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-xl shadow p-6">
             <CreditCard className="w-8 h-8 text-purple-600 mb-3" />
             <h3 className="font-semibold text-lg">Payment Gateways</h3>
-            <p className="text-gray-500 text-sm">Configure payment credentials</p>
-          </Link>
-          <Link href="/master-admin/storage" className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow">
+            <p className="text-gray-500 text-sm">Configured per client — click Configure on any store below</p>
+          </div>
+          <div className="bg-white rounded-xl shadow p-6">
             <Cloud className="w-8 h-8 text-orange-600 mb-3" />
             <h3 className="font-semibold text-lg">Cloud Storage</h3>
-            <p className="text-gray-500 text-sm">Set up Google Drive / OneDrive</p>
-          </Link>
+            <p className="text-gray-500 text-sm">Google Drive connected per client — click Configure below</p>
+          </div>
         </div>
 
         {/* Clients Table */}
@@ -249,8 +249,8 @@ export default function MasterAdminDashboard() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <Link href={`/master-admin/tenants/${tenant.id}`} className="text-blue-600 hover:text-blue-800 mr-4">
-                          Edit
+                        <Link href={`/master-admin/tenants/${tenant.id}/configure`} className="text-blue-600 hover:text-blue-800 mr-4">
+                          Configure
                         </Link>
                         <a href={`https://${tenant.domain || `${tenant.subdomain}.yoursaas.com`}`} target="_blank" className="text-gray-600 hover:text-gray-800">
                           Visit
