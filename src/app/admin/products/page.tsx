@@ -18,9 +18,9 @@ function mapSupabaseProduct(p: any): EditableProduct {
     _supabaseId: p.id,          // always keep the real Supabase UUID for direct UPDATE
     _slug: p.slug,
     name: p.name,
-    price: p.price,
-    priceExVAT: p.price_ex_vat || Math.round(p.price / 1.15),
-    costEUR: p.cost_eur,
+    price: p.price || 0,
+    priceExVAT: p.price_ex_vat || Math.round((p.price || 0) / 1.15),
+    costEUR: p.cost_eur || 0,
     category: p.category,
     categoryTag: p.category_tag || p.category,
     description: p.description,
@@ -392,17 +392,17 @@ export default function AdminProductsPage() {
   }
 
   const calculateMargin = (product: any) => {
-    if (!product.costEUR) return 'N/A'
-    const costZAR = product.costEUR * settings.exchangeRate
-    const margin = ((product.priceExVAT - costZAR) / product.priceExVAT) * 100
-    return margin.toFixed(2) + '%'
+    if (!product.costEUR || !product.priceExVAT) return 'N/A'
+    const costZAR = product.costEUR * (settings.exchangeRate || 1)
+    const margin = product.priceExVAT > 0 ? ((product.priceExVAT - costZAR) / product.priceExVAT) * 100 : 0
+    return isNaN(margin) ? 'N/A' : margin.toFixed(2) + '%'
   }
 
   const calculateProfit = (product: any) => {
-    if (!product.costEUR) return 'N/A'
-    const costZAR = product.costEUR * settings.exchangeRate
+    if (!product.costEUR || !product.priceExVAT) return 'N/A'
+    const costZAR = product.costEUR * (settings.exchangeRate || 1)
     const profit = product.priceExVAT - costZAR
-    return 'R' + Math.round(profit).toLocaleString()
+    return isNaN(profit) ? 'N/A' : 'R' + Math.round(profit).toLocaleString()
   }
 
   return (
@@ -560,7 +560,7 @@ export default function AdminProductsPage() {
                       alt={product.name} 
                       className="w-16 h-16 object-cover rounded border border-gray-200"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/64x64?text=No+Image';
+                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64"%3E%3Crect width="64" height="64" fill="%23f3f4f6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="10" fill="%239ca3af"%3ENo Image%3C/text%3E%3C/svg%3E';
                       }}
                     />
                   ) : (
@@ -580,7 +580,7 @@ export default function AdminProductsPage() {
                 <td className="px-6 py-4">
                   <div className="text-sm text-gray-600">{product.categoryTag || product.category}</div>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-900">R{product.price.toLocaleString()}</td>
+                <td className="px-6 py-4 text-sm text-gray-900">R{(product.price || 0).toLocaleString()}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{product.costEUR ? `€${product.costEUR.toLocaleString()}` : 'N/A'}</td>
 
                 <td className="px-6 py-4">

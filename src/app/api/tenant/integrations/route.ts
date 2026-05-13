@@ -44,8 +44,12 @@ async function getTenantId(request: NextRequest): Promise<string | null> {
 
 export async function GET(request: NextRequest) {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json({ email_config: {}, whatsapp_config: {} })
+    }
+
     const tenantId = await getTenantId(request)
-    if (!tenantId) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
+    if (!tenantId) return NextResponse.json({ email_config: {}, whatsapp_config: {} })
 
     const { data, error } = await getSupabase()
       .from('tenants')
@@ -53,11 +57,19 @@ export async function GET(request: NextRequest) {
       .eq('id', tenantId)
       .single()
 
-    if (error) throw error
+    if (error) {
+      // If columns don't exist yet, return empty defaults instead of 500
+      console.warn('Integrations GET warning:', error.message)
+      return NextResponse.json({ email_config: {}, whatsapp_config: {} })
+    }
 
-    return NextResponse.json(data)
+    return NextResponse.json({
+      email_config: data?.email_config || {},
+      whatsapp_config: data?.whatsapp_config || {},
+    })
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('Integrations GET error:', error.message)
+    return NextResponse.json({ email_config: {}, whatsapp_config: {} })
   }
 }
 

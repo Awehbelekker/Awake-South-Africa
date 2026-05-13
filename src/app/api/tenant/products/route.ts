@@ -63,8 +63,11 @@ export async function GET(request: NextRequest) {
   try {
     // Verify env vars are present
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.error('Missing Supabase env vars')
-      return NextResponse.json({ error: 'Server misconfiguration: missing Supabase env vars' }, { status: 500 })
+      console.error('Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set')
+      return NextResponse.json({
+        error: 'Server misconfiguration: missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel.',
+        products: []
+      }, { status: 500 })
     }
 
     const tenantId = await getTenantId(request)

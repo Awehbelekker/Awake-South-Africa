@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Transfer Google Drive Images to Supabase Storage
- * 
+ *
  * Downloads selected images from tenant's Drive and uploads to Supabase Storage
  * POST - Transfer selected files
  */
@@ -82,7 +82,7 @@ async function uploadToSupabase(
 
   // Upload to Supabase Storage
   const filePath = `${tenantId}/products/${safeFileName}`
-  
+
   const { data: _data, error } = await supabase.storage
     .from('product-images')
     .upload(filePath, fileBuffer, {
@@ -286,4 +286,13 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+
+// GET handler — returns usage info instead of 400
+export async function GET() {
+  return NextResponse.json({
+    message: 'Use POST to transfer files. Required body: { tenant_id, file_ids: string[] }',
+    methods: ['POST'],
+  })
 }
