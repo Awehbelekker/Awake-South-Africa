@@ -76,11 +76,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
     }
 
-    // Set RLS context
-    await getSupabase().rpc('set_config', { 
-      setting: 'app.tenant_id', 
-      value: tenantId 
-    }).catch(() => {})
+    // Set RLS context (optional — ignore if set_config RPC doesn't exist)
+    try {
+      await getSupabase().rpc('set_config', {
+        setting: 'app.tenant_id',
+        value: tenantId
+      })
+    } catch {
+      // RPC not available — tenant filtering is done via .eq('tenant_id', ...) below
+    }
 
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')

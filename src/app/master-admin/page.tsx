@@ -158,11 +158,11 @@ export default function MasterAdminDashboard() {
             <h3 className="font-semibold text-lg">Add New Client</h3>
             <p className="text-gray-500 text-sm">Onboard a new store with scraper & branding</p>
           </Link>
-          <div className="bg-white rounded-xl shadow p-6">
+          <Link href="/master-admin/billing" className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow">
             <CreditCard className="w-8 h-8 text-purple-600 mb-3" />
-            <h3 className="font-semibold text-lg">Payment Gateways</h3>
-            <p className="text-gray-500 text-sm">Configured per client — click Configure on any store below</p>
-          </div>
+            <h3 className="font-semibold text-lg">Billing & Plans</h3>
+            <p className="text-gray-500 text-sm">Subscriptions, MRR, plan management</p>
+          </Link>
           <div className="bg-white rounded-xl shadow p-6">
             <Cloud className="w-8 h-8 text-orange-600 mb-3" />
             <h3 className="font-semibold text-lg">Cloud Storage</h3>
