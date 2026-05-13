@@ -19,7 +19,9 @@ import {
   Menu,
   X,
   ChevronRight,
-  Store
+  Store,
+  Layers,
+  Bot
 } from 'lucide-react'
 
 const bottomNav = [
@@ -35,10 +37,12 @@ const navigation = [
   { name: 'Products', href: '/admin/products', icon: Package },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Customers', href: '/admin/customers', icon: Users },
+  { name: 'Pages', href: '/admin/pages', icon: Layers },
   { name: 'Demo Locations', href: '/admin/locations', icon: MapPin },
   { name: 'Demo Bookings', href: '/admin/bookings', icon: Calendar },
   { name: 'Invoices', href: '/admin/invoices', icon: FileText },
   { name: 'Media Library', href: '/admin/media', icon: Image },
+  { name: 'AI Assistant', href: '/admin/ai', icon: Bot },
   { name: 'Reports', href: '/admin/reports', icon: BarChart3 },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
