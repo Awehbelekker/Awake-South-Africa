@@ -39,20 +39,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
     }
 
-    // Check against environment variables (bcrypt hash)
+    // Check against environment variables
     const masterEmail = process.env.MASTER_ADMIN_EMAIL
     const masterPasswordHash = process.env.MASTER_ADMIN_PASSWORD_HASH
+    const masterPasswordPlain = process.env.MASTER_ADMIN_PASSWORD
 
-    if (!masterEmail || !masterPasswordHash) {
+    if (!masterEmail || (!masterPasswordHash && !masterPasswordPlain)) {
       console.error('Master admin credentials not configured')
       return NextResponse.json({ error: 'Authentication not configured' }, { status: 500 })
     }
 
-    if (email !== masterEmail) {
+    if (email.trim() !== masterEmail.trim()) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
-    const valid = await verifyPassword(password, masterPasswordHash)
+    // Support both plain password (env: MASTER_ADMIN_PASSWORD) and bcrypt hash
+    let valid = false
+    if (masterPasswordPlain) {
+      valid = password === masterPasswordPlain.trim()
+    } else if (masterPasswordHash) {
+      valid = await verifyPassword(password, masterPasswordHash.trim())
+    }
     if (!valid) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
