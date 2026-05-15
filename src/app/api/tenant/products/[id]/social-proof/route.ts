@@ -26,19 +26,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
   const productId = params.id
 
-  // Increment view count
-  await sb().rpc('increment_product_view', { product_id_input: productId }).catch(() => {
-    // RPC might not exist — fallback to direct update
-    sb().from('products').update({ view_count: sb().rpc }).eq('id', productId).catch(() => {})
-  })
-
-  // Try raw increment
+  // Increment view count — read current then write back
   try {
-    await sb()
-      .from('products')
-      .update({ view_count: 1 }) // will use RPC below if available
-      .eq('id', productId)
-  } catch {}
+    const { data: cur } = await sb().from('products').select('view_count').eq('id', productId).single()
+    await sb().from('products').update({ view_count: (cur?.view_count || 0) + 1 }).eq('id', productId)
+  } catch { /* non-critical */ }
 
   // Get product view count + stock
   const { data: product } = await sb()

@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   let query = sb()
     .from('reviews')
-    .select('*, products(name)')
+    .select('*')
     .eq('approved', approved)
     .order('created_at', { ascending: false })
 
