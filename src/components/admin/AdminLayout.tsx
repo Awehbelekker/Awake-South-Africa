@@ -21,7 +21,14 @@ import {
   ChevronRight,
   Store,
   Layers,
-  Bot
+  Bot,
+  Tag,
+  Star,
+  BookOpen,
+  MessageSquare,
+  Award,
+  Truck,
+  ClipboardList
 } from 'lucide-react'
 
 const bottomNav = [
@@ -37,6 +44,12 @@ const navigation = [
   { name: 'Products', href: '/admin/products', icon: Package },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Customers', href: '/admin/customers', icon: Users },
+  { name: 'Discounts', href: '/admin/discounts', icon: Tag },
+  { name: 'Reviews', href: '/admin/reviews', icon: Star },
+  { name: 'Blog', href: '/admin/blog', icon: BookOpen },
+  { name: 'WhatsApp', href: '/admin/whatsapp', icon: MessageSquare },
+  { name: 'Quotes', href: '/admin/quotes', icon: ClipboardList },
+  { name: 'Stoke Points', href: '/admin/stoke', icon: Award },
   { name: 'Pages', href: '/admin/pages', icon: Layers },
   { name: 'Demo Locations', href: '/admin/locations', icon: MapPin },
   { name: 'Demo Bookings', href: '/admin/bookings', icon: Calendar },

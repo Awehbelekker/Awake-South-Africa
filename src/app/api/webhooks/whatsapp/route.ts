@@ -9,6 +9,8 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { getSession, saveSession, handleMessage } from '@/lib/whatsapp-bot'
+import { sendCustomWhatsApp } from '@/lib/whatsapp-service'
 
 function supabase() {
   return createClient(
@@ -68,8 +70,8 @@ export async function POST(request: NextRequest) {
           .limit(1)
           .single()
 
-        if (tenant) {
-          // Store inbound message for future support inbox
+        if (tenant && text) {
+          // Store inbound message
           await supabase().from('whatsapp_messages').insert({
             tenant_id:    tenant.id,
             direction:    'inbound',
@@ -79,6 +81,16 @@ export async function POST(request: NextRequest) {
             provider:     'meta',
             provider_id:  msgId,
           }).maybeSingle()
+
+          // Run commerce bot
+          try {
+            const session = await getSession(tenant.id, from)
+            const { reply, session: newSession } = await handleMessage(session, text)
+            await saveSession(newSession)
+            await sendCustomWhatsApp({ to: from, message: reply, tenantId: tenant.id })
+          } catch (botErr: any) {
+            console.error('WhatsApp bot error:', botErr.message)
+          }
         }
       }
 

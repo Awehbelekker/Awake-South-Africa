@@ -7,8 +7,9 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
-  variantId?: string; // Medusa variant ID for API operations
-  lineItemId?: string; // Medusa line item ID for updates
+  variantId?: string;
+  variantName?: string;
+  lineItemId?: string;
 }
 
 interface CartState {
