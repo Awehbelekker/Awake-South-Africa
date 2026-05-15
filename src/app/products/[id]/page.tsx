@@ -7,7 +7,10 @@ import { useWishlistStore } from "../../../store/wishlist";
 import { useProductsStore } from "../../../store/products";
 import { useProduct } from "../../../lib/medusa-hooks";
 import { ProductVideoSection } from "../../../components/products/ProductVideoSection";
-import { Loader2, Play } from "lucide-react";
+import VariantSelector from "../../../components/storefront/VariantSelector";
+import SocialProof from "../../../components/storefront/SocialProof";
+import ReviewSection from "../../../components/storefront/ReviewSection";
+import { Loader2 } from "lucide-react";
 import { SA_CONTENT } from "../../../lib/constants";
 
 export default function ProductDetailPage() {
@@ -18,23 +21,21 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [mounted, setMounted] = useState(false);
 
+  // Variant state
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+  const [selectedVariantName, setSelectedVariantName] = useState<string | null>(null);
+  const [displayPrice, setDisplayPrice] = useState<number | null>(null);
+
   const productId = typeof params.id === 'string' ? params.id : '';
 
-  // Try Medusa API first
   const { data: medusaProduct, isLoading: medusaLoading, error: medusaError } = useProduct(productId);
-
-  // Fall back to local store
   const { getProductById, products: localProducts } = useProductsStore();
   const localProduct = getProductById(productId);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
-  // Determine which product to use: Medusa first, then local
   const product = medusaProduct || localProduct;
 
-  // Show loading state
   if (!mounted || (medusaLoading && !localProduct)) {
     return (
       <div className="min-h-screen bg-awake-black text-white pt-32 flex items-center justify-center">
@@ -62,39 +63,38 @@ export default function ProductDetailPage() {
     );
   }
 
-  // Get related products from local store for "You May Also Like" section
   const allLocalProducts = localProducts;
-
+  const basePrice = product.price || 0;
+  const shownPrice = displayPrice ?? basePrice;
   const formatPrice = (price: number) => `R${price.toLocaleString()}`;
   const isInWishlist = wishlistItems.some(item => item.id === product.id);
 
-  // Build gallery from product images and videos uploaded in admin
   const defaultImage = product.image || '/images/awake-default.jpg';
-
-  // Use uploaded images - NO VIDEOS in the gallery anymore
   const productImages = ('images' in product && product.images && product.images.length > 0)
-    ? product.images.filter(img => img.type === 'image').map(img => ({ url: img.url, type: 'image' as const, id: img.id }))
+    ? product.images.filter((img: any) => img.type === 'image').map((img: any) => ({ url: img.url, type: 'image' as const, id: img.id }))
     : [{ url: defaultImage, type: 'image' as const, id: 'default' }];
-
-  // Gallery is images only
   const productGallery = productImages;
 
   const toggleWishlist = () => {
-    if (isInWishlist) {
-      removeFromWishlist(product.id);
-    } else {
-      addToWishlist({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image || '/placeholder-product.jpg',
-      });
-    }
+    if (isInWishlist) removeFromWishlist(product.id);
+    else addToWishlist({ id: product.id, name: product.name, price: basePrice, image: product.image || '/placeholder-product.jpg' });
+  };
+
+  const handleAddToCart = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: shownPrice,
+      image: product.image || '/placeholder-product.jpg',
+      quantity: 1,
+      variantId: selectedVariantId || undefined,
+      variantName: selectedVariantName || undefined,
+    });
+    router.push("/cart");
   };
 
   return (
     <div className="min-h-screen bg-awake-black text-white pt-24">
-      {/* Back Button */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         <button
           onClick={() => router.push("/products")}
@@ -104,12 +104,10 @@ export default function ProductDetailPage() {
         </button>
       </div>
 
-      {/* Product Detail */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <div className="grid md:grid-cols-2 gap-12">
-          {/* Left Column - Product Images */}
+          {/* Left Column - Images */}
           <div>
-            {/* Product Image Gallery - Images Only */}
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900 mb-4">
               <Image
                 src={productGallery[selectedImage]?.url || defaultImage}
@@ -118,37 +116,28 @@ export default function ProductDetailPage() {
                 className="object-cover"
                 priority
               />
-              {'badge' in product && product.badge && (
+              {'badge' in product && (product as any).badge && (
                 <div className="absolute top-6 left-6 bg-accent-primary text-awake-black px-4 py-2 rounded-full text-sm font-bold">
-                  {product.badge}
+                  {(product as any).badge}
                 </div>
               )}
             </div>
-            {/* Thumbnail Gallery */}
             <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
-              {productGallery.map((item, idx) => (
+              {productGallery.map((item: any, idx: number) => (
                 <button
                   key={item.id || idx}
                   onClick={() => setSelectedImage(idx)}
                   className={`relative aspect-square rounded-lg overflow-hidden transition-all ${
-                    selectedImage === idx
-                      ? 'ring-2 ring-accent-primary'
-                      : 'ring-1 ring-white/20 hover:ring-white/40'
+                    selectedImage === idx ? 'ring-2 ring-accent-primary' : 'ring-1 ring-white/20 hover:ring-white/40'
                   }`}
                 >
-                  <Image
-                    src={item.url}
-                    alt={`View ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={item.url} alt={`View ${idx + 1}`} fill className="object-cover" />
                 </button>
               ))}
             </div>
-
           </div>
 
-          {/* Right Column - Product Info */}
+          {/* Right Column - Info */}
           <div className="flex flex-col">
             <div className="mb-4">
               <span className="text-accent-primary text-sm font-medium">
@@ -158,47 +147,61 @@ export default function ProductDetailPage() {
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">{product.name}</h1>
 
-            {'skillLevel' in product && product.skillLevel && (
+            {'skillLevel' in product && (product as any).skillLevel && (
               <div className="mb-6">
                 <span className="inline-block px-4 py-2 bg-accent-primary/10 text-accent-primary text-sm font-medium rounded-full">
-                  Skill Level: {product.skillLevel}
+                  Skill Level: {(product as any).skillLevel}
                 </span>
               </div>
             )}
 
-            {/* Costs */}
-            <div className="mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
-              <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Costs</div>
+            {/* Price */}
+            <div className="mb-4 p-4 bg-white/5 rounded-xl border border-white/10">
+              <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Price</div>
               <div className="text-2xl sm:text-4xl font-bold text-accent-primary mb-1">
-                {formatPrice(product.price)}
+                {formatPrice(shownPrice)}
               </div>
               <div className="text-sm text-gray-400">incl. VAT</div>
-              {product.priceExVAT && (
+              {(product as any).priceExVAT && (
                 <div className="text-lg text-gray-400 mt-1">
-                  {formatPrice(product.priceExVAT)} <span className="text-sm">ex-VAT</span>
+                  {formatPrice((product as any).priceExVAT)} <span className="text-sm">ex-VAT</span>
                 </div>
               )}
             </div>
 
-            {/* Battery Info */}
-            {'battery' in product && product.battery && (
-              <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
+            {/* Variant Selector */}
+            <VariantSelector
+              productId={product.id}
+              basePrice={basePrice}
+              onVariantChange={(variantId, variantName, price) => {
+                setSelectedVariantId(variantId);
+                setSelectedVariantName(variantName);
+                setDisplayPrice(price);
+              }}
+            />
+
+            {/* Social Proof */}
+            <SocialProof productId={product.id} />
+
+            {/* Battery */}
+            {'battery' in product && (product as any).battery && (
+              <div className="mt-4 p-4 bg-white/5 rounded-lg border border-white/10">
                 <div className="text-sm text-gray-400 mb-1">Battery</div>
-                <div className="text-lg font-medium">🔋 {product.battery}</div>
+                <div className="text-lg font-medium">🔋 {(product as any).battery}</div>
               </div>
             )}
 
             {/* Description */}
             {product.description && (
-              <p className="text-lg text-gray-300 mb-8 leading-relaxed">{product.description}</p>
+              <p className="text-lg text-gray-300 mt-6 mb-6 leading-relaxed">{product.description}</p>
             )}
 
             {/* Specs */}
-            {'specs' in product && product.specs && product.specs.length > 0 && (
+            {'specs' in product && (product as any).specs && (product as any).specs.length > 0 && (
               <div className="mb-8">
                 <h3 className="text-xl font-bold mb-4">Specifications</h3>
                 <ul className="space-y-3">
-                  {product.specs.map((spec, i) => (
+                  {(product as any).specs.map((spec: string, i: number) => (
                     <li key={i} className="flex items-start gap-3">
                       <span className="text-accent-primary">✓</span>
                       <span className="text-gray-300">{spec}</span>
@@ -209,11 +212,11 @@ export default function ProductDetailPage() {
             )}
 
             {/* Features */}
-            {'features' in product && product.features && product.features.length > 0 && (
+            {'features' in product && (product as any).features && (product as any).features.length > 0 && (
               <div className="mb-8">
                 <h3 className="text-xl font-bold mb-4">Key Features</h3>
                 <ul className="space-y-3">
-                  {product.features.map((feature, i) => (
+                  {(product as any).features.map((feature: string, i: number) => (
                     <li key={i} className="flex items-start gap-3">
                       <span className="text-accent-primary">★</span>
                       <span className="text-gray-300">{feature}</span>
@@ -223,15 +226,14 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Equipment - Package Contents */}
-            {'whatsIncluded' in product && product.whatsIncluded && product.whatsIncluded.length > 0 && (
+            {/* What's Included */}
+            {'whatsIncluded' in product && (product as any).whatsIncluded && (product as any).whatsIncluded.length > 0 && (
               <div className="mb-8 p-6 bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 rounded-2xl border border-accent-primary/20">
                 <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                  <span className="text-2xl">📦</span>
-                  Equipment
+                  <span>📦</span> Equipment
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {product.whatsIncluded.map((item, i) => (
+                  {(product as any).whatsIncluded.map((item: string, i: number) => (
                     <div key={i} className="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
                       <span className="text-accent-primary text-lg">✓</span>
                       <span className="text-gray-200">{item}</span>
@@ -241,40 +243,27 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Primary Actions */}
+            {/* Actions */}
             <div className="mt-auto pt-8 space-y-3">
-              {/* Top row: Add to Cart + Wishlist */}
               <div className="flex gap-3">
                 <button
-                  onClick={() => {
-                    addItem({
-                      id: product.id,
-                      name: product.name,
-                      price: product.price,
-                      image: product.image || '/placeholder-product.jpg',
-                      quantity: 1,
-                    });
-                    router.push("/cart");
-                  }}
+                  onClick={handleAddToCart}
                   className="flex-1 bg-accent-primary text-awake-black py-4 rounded-lg font-bold hover:bg-accent-secondary transition-colors text-lg"
                 >
-                  Add to Cart
+                  {selectedVariantName ? `Add ${selectedVariantName} to Cart` : 'Add to Cart'}
                 </button>
                 <button
                   onClick={toggleWishlist}
                   className={`px-5 py-4 rounded-lg font-bold transition-colors ${
-                    isInWishlist
-                      ? 'bg-red-500 text-white hover:bg-red-600'
-                      : 'bg-white/10 text-white hover:bg-white/20'
+                    isInWishlist ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white/10 text-white hover:bg-white/20'
                   }`}
                 >
                   ♥
                 </button>
               </div>
 
-              {/* Contact Sales — equal prominence */}
               <a
-                href={`https://wa.me/${SA_CONTENT.contact.whatsapp.replace(/[^0-9]/g, '')}?text=Hi%2C%20I%27m%20interested%20in%20the%20${encodeURIComponent(product.name)}%20(${formatPrice(product.price)}).%20Can%20you%20help%20me%3F`}
+                href={`https://wa.me/${SA_CONTENT.contact.whatsapp.replace(/[^0-9]/g, '')}?text=Hi%2C%20I%27m%20interested%20in%20the%20${encodeURIComponent(product.name)}%20(${formatPrice(shownPrice)}).%20Can%20you%20help%20me%3F`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-3 w-full py-4 rounded-lg font-bold border-2 border-accent-primary text-accent-primary hover:bg-accent-primary hover:text-awake-black transition-all text-lg"
@@ -285,7 +274,6 @@ export default function ProductDetailPage() {
                 Contact Sales via WhatsApp
               </a>
 
-              {/* Secondary: Book a Demo */}
               <a
                 href="/demo"
                 className="flex items-center justify-center gap-2 w-full py-3 rounded-lg font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all border border-white/10"
@@ -294,12 +282,10 @@ export default function ProductDetailPage() {
               </a>
             </div>
 
-            {/* Trust line */}
             <p className="mt-4 text-center text-xs text-gray-500">
               High-value purchase? Our team is available on WhatsApp to answer questions, arrange test rides, and assist with financing.
             </p>
 
-            {/* Compare boards link */}
             <div className="mt-6 text-center">
               <a href="/compare" className="text-xs text-gray-500 hover:text-accent-primary transition-colors underline underline-offset-2">
                 Compare all boards side by side →
@@ -308,9 +294,9 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* See It In Action - Video Section */}
-        {'video_sections' in product && product.video_sections && (
-          <ProductVideoSection videoSections={product.video_sections} />
+        {/* Video Section */}
+        {'video_sections' in product && (product as any).video_sections && (
+          <ProductVideoSection videoSections={(product as any).video_sections} />
         )}
 
         {/* Related Products */}
@@ -336,14 +322,15 @@ export default function ProductDetailPage() {
                   </div>
                   <div className="p-4">
                     <h3 className="font-bold text-lg mb-2">{relatedProduct.name}</h3>
-                    <div className="text-accent-primary font-bold">
-                      {formatPrice(relatedProduct.price)}
-                    </div>
+                    <div className="text-accent-primary font-bold">{formatPrice(relatedProduct.price)}</div>
                   </div>
                 </div>
               ))}
           </div>
         </div>
+
+        {/* Reviews */}
+        <ReviewSection productId={product.id} />
       </div>
     </div>
   );
