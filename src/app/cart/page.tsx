@@ -45,7 +45,7 @@ export default function CartPage() {
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
               <div
-                key={item.id}
+                key={`${item.id}-${item.variantId ?? 'base'}`}
                 className="bg-awake-gray rounded-xl p-4 flex gap-4"
               >
                 <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
@@ -60,12 +60,15 @@ export default function CartPage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-bold text-lg">{item.name}</h3>
-                      <p className="text-accent-primary font-semibold">
+                      {item.variantName && (
+                        <p className="text-sm text-accent-primary mt-0.5">{item.variantName}</p>
+                      )}
+                      <p className="text-accent-primary font-semibold mt-1">
                         {formatPrice(item.price)}
                       </p>
                     </div>
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item.id, item.variantId)}
                       className="text-gray-400 hover:text-red-500 transition-colors"
                     >
                       ✕
@@ -73,14 +76,14 @@ export default function CartPage() {
                   </div>
                   <div className="flex items-center gap-3 mt-3">
                     <button
-                      onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                      onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1), item.variantId)}
                       className="w-8 h-8 bg-awake-black rounded flex items-center justify-center hover:bg-white/10"
                     >
                       -
                     </button>
                     <span className="w-8 text-center">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.id, item.quantity + 1, item.variantId)}
                       className="w-8 h-8 bg-awake-black rounded flex items-center justify-center hover:bg-white/10"
                     >
                       +

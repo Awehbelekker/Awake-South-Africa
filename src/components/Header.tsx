@@ -20,9 +20,11 @@ const navigation = [
       { name: "RÄVIK Jetboards", href: "/products?category=jetboards" },
       { name: "VINGA eFoils", href: "/products?category=efoils" },
       { name: "Accessories", href: "/products?category=accessories" },
+      { name: "Compare Models", href: "/compare" },
     ],
   },
   { name: "Demo Rides", href: "/demo" },
+  { name: "Blog", href: "/blog" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
@@ -40,7 +42,7 @@ export default function Header() {
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   // Hide header on admin pages
-  const isAdminPage = pathname?.startsWith('/admin');
+  const isAdminPage = pathname?.startsWith('/admin') || pathname?.startsWith('/master-admin');
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);

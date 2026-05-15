@@ -16,13 +16,16 @@ interface CartState {
   items: CartItem[];
   medusaCartId: string | null;
   addItem: (item: CartItem) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  removeItem: (id: string, variantId?: string) => void;
+  updateQuantity: (id: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
   total: () => number;
   setMedusaCartId: (id: string | null) => void;
   syncFromMedusa: (items: CartItem[], cartId: string) => void;
 }
+
+const lineMatch = (a: CartItem, id: string, variantId?: string) =>
+  a.id === id && (variantId ? a.variantId === variantId : !a.variantId)
 
 export const useCartStore = create<CartState>()(
   persist(
@@ -32,28 +35,34 @@ export const useCartStore = create<CartState>()(
 
       addItem: (item) => {
         set((state) => {
-          const existingIndex = state.items.findIndex((i) => i.id === item.id);
+          const existingIndex = state.items.findIndex(
+            (i) => i.id === item.id && i.variantId === item.variantId
+          )
           if (existingIndex > -1) {
-            const newItems = [...state.items];
-            newItems[existingIndex].quantity += item.quantity || 1;
-            return { items: newItems };
+            const newItems = [...state.items]
+            newItems[existingIndex].quantity += item.quantity || 1
+            return { items: newItems }
           }
-          return { items: [...state.items, { ...item, quantity: item.quantity || 1 }] };
-        });
+          return { items: [...state.items, { ...item, quantity: item.quantity || 1 }] }
+        })
       },
 
-      removeItem: (id) => {
-        set((state) => ({ items: state.items.filter((item) => item.id !== id) }));
+      removeItem: (id, variantId) => {
+        set((state) => ({
+          items: state.items.filter((item) => !lineMatch(item, id, variantId)),
+        }))
       },
 
-      updateQuantity: (id, quantity) => {
+      updateQuantity: (id, quantity, variantId) => {
         if (quantity < 1) {
-          get().removeItem(id);
-          return;
+          get().removeItem(id, variantId)
+          return
         }
         set((state) => ({
-          items: state.items.map((item) => (item.id === id ? { ...item, quantity } : item)),
-        }));
+          items: state.items.map((item) =>
+            lineMatch(item, id, variantId) ? { ...item, quantity } : item
+          ),
+        }))
       },
 
       clearCart: () => set({ items: [], medusaCartId: null }),

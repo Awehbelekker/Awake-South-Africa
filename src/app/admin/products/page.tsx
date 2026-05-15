@@ -9,7 +9,8 @@ import { useAdminProducts, useAdminUpdateProduct, useAdminUpdateVariant } from '
 import ProductEditModal from '@/components/admin/ProductEditModal'
 import QuickProductCreate from '@/components/admin/QuickProductCreate'
 import toast, { Toaster } from 'react-hot-toast'
-import { RefreshCw, Database, WifiOff, Trash2, Plus, RotateCcw } from 'lucide-react'
+import { RefreshCw, Database, WifiOff, Trash2, Plus, RotateCcw, Layers } from 'lucide-react'
+import Link from 'next/link'
 import { PRODUCTS as DEFAULT_PRODUCTS } from '@/lib/constants'
 
 function mapSupabaseProduct(p: any): EditableProduct {
@@ -591,6 +592,14 @@ export default function AdminProductsPage() {
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <button onClick={() => startEdit(product)} className="text-blue-600 hover:text-blue-900 text-sm">Edit</button>
+                    <Link
+                      href={`/admin/products/${(product as any)._supabaseId || product.id}/variants`}
+                      className="flex items-center gap-1 text-purple-600 hover:text-purple-900 text-sm"
+                      title="Manage variants"
+                    >
+                      <Layers className="h-3.5 w-3.5" />
+                      Variants
+                    </Link>
                     <button
                       onClick={() => handleDelete(product.id)}
                       disabled={deleting}
