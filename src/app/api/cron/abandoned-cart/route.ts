@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
     if (hasPhone) {
       try {
         await sendCustomWhatsApp({
+          tenantId: cart.tenant_id,
           to: cart.customer_phone,
           message: `Hey! You left items in your ${storeName} cart 🛒\n\n${itemList}\n\nTotal: ${total}\n\nComplete your order here: ${process.env.NEXT_PUBLIC_SITE_URL || 'https://awakesa.co.za'}/cart`,
         })

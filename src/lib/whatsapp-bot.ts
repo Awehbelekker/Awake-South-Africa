@@ -66,7 +66,7 @@ async function getCategories(tenantId: string): Promise<string[]> {
     .select('category')
     .eq('tenant_id', tenantId)
     .eq('is_active', true)
-  const cats = [...new Set((data || []).map((p: any) => p.category).filter(Boolean))]
+  const cats = Array.from(new Set((data || []).map((p: any) => p.category).filter(Boolean)))
   return cats.slice(0, 8)
 }
 

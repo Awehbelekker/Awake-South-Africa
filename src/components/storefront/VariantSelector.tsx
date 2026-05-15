@@ -83,7 +83,7 @@ export default function VariantSelector({ productId, tenantSlug, basePrice, onVa
   return (
     <div className="mt-4 space-y-3">
       {optionKeys.map(key => {
-        const uniqueValues = [...new Set(variants.map(v => v.options[key]).filter(Boolean))]
+        const uniqueValues = Array.from(new Set(variants.map(v => v.options[key]).filter(Boolean)))
         return (
           <div key={key}>
             <p className="text-sm font-medium text-gray-400 mb-2 capitalize">{key}</p>

@@ -92,7 +92,6 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         sb().from('products').update({ view_count: (data.view_count || 0) + 1 }).eq('id', params.id).then(() => {})
       }
     })
-    .catch(() => {})
 
   return NextResponse.json({ success: true })
 }
