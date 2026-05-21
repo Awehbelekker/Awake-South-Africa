@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
 import CheckoutDiscount from '@/components/storefront/CheckoutDiscount'
+import CheckoutStoke from '@/components/storefront/CheckoutStoke'
 
 const SA_PROVINCES = [
   { code: 'WC', name: 'Western Cape' },
@@ -32,6 +33,10 @@ export default function CheckoutPage() {
   const [discountAmount, setDiscountAmount] = useState(0)
   const [discountCodeId, setDiscountCodeId] = useState<string | null>(null)
   const [discountMessage, setDiscountMessage] = useState('')
+
+  // Stoke points redemption
+  const [stokeDiscount, setStokeDiscount] = useState(0)
+  const [stokeApplied, setStokeApplied] = useState(false)
 
   // Shipping state
   const [shippingRate, setShippingRate] = useState<number | null>(null)
@@ -62,7 +67,7 @@ export default function CheckoutPage() {
 
   const subtotal = total()
   const shipping = shippingRate ?? 0
-  const grandTotal = Math.max(0, subtotal - discountAmount) + shipping
+  const grandTotal = Math.max(0, subtotal - discountAmount - stokeDiscount) + shipping
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', minimumFractionDigits: 0 }).format(price)
@@ -273,6 +278,16 @@ export default function CheckoutPage() {
                 />
               </div>
 
+              {/* Stoke Points */}
+              <div className="mb-4">
+                <CheckoutStoke
+                  subtotal={subtotal - discountAmount}
+                  applied={stokeApplied}
+                  onRedeem={(amount) => { setStokeDiscount(amount); setStokeApplied(true) }}
+                  onClear={() => { setStokeDiscount(0); setStokeApplied(false) }}
+                />
+              </div>
+
               <div className="border-t border-white/10 pt-4 space-y-2">
                 <div className="flex justify-between text-sm text-gray-400">
                   <span>Subtotal</span>
@@ -283,6 +298,13 @@ export default function CheckoutPage() {
                   <div className="flex justify-between text-sm text-green-400">
                     <span>Discount</span>
                     <span>−{formatPrice(discountAmount)}</span>
+                  </div>
+                )}
+
+                {stokeDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-yellow-400">
+                    <span>⭐ Stoke Points</span>
+                    <span>−{formatPrice(stokeDiscount)}</span>
                   </div>
                 )}
 

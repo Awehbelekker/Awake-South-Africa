@@ -30,13 +30,19 @@ export default function AdminSettingsPage() {
   const [saved, setSaved] = useState(false)
 
   // Integrations state
-  const [activeSection, setActiveSection] = useState<'store' | 'pricing' | 'payments' | 'email' | 'whatsapp'>('store')
+  const [activeSection, setActiveSection] = useState<'store' | 'pricing' | 'payments' | 'email' | 'whatsapp' | 'shipping'>('store')
   const [emailConfig, setEmailConfig] = useState<EmailConfig>(defaultEmail())
   const [waConfig, setWaConfig] = useState<WhatsAppConfig>(defaultWhatsApp())
   const [integLoading, setIntegLoading] = useState(false)
   const [integSaving, setIntegSaving] = useState(false)
   const [integMsg, setIntegMsg] = useState('')
   const [activeGateways, setActiveGateways] = useState<any[]>([])
+
+  // Shipping zones state
+  const [zones, setZones] = useState<any[]>([])
+  const [zonesLoading, setZonesLoading] = useState(false)
+  const [newZone, setNewZone] = useState({ name: '', provinces: '*', flat_rate_zar: '99', free_above_zar: '', rate_type: 'flat' })
+  const [zoneSaving, setZoneSaving] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -47,6 +53,7 @@ export default function AdminSettingsPage() {
     if (!mounted || !isAuthenticated) return
     loadIntegrations()
     loadGateways()
+    loadZones()
   }, [mounted, isAuthenticated])
 
   async function loadIntegrations() {
@@ -70,6 +77,39 @@ export default function AdminSettingsPage() {
         setActiveGateways(data.gateways || [])
       }
     } catch {}
+  }
+
+  async function loadZones() {
+    setZonesLoading(true)
+    try {
+      const res = await fetch('/api/tenant/shipping/quote')
+      if (res.ok) { const d = await res.json(); setZones(d.zones || []) }
+    } catch {} finally { setZonesLoading(false) }
+  }
+
+  async function addZone() {
+    setZoneSaving(true)
+    try {
+      const provinces = newZone.provinces === '*' ? ['*'] : newZone.provinces.split(',').map(p => p.trim().toUpperCase()).filter(Boolean)
+      const res = await fetch('/api/tenant/shipping/quote', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newZone.name,
+          provinces,
+          rate_type: newZone.rate_type,
+          flat_rate_zar: parseFloat(newZone.flat_rate_zar) || 99,
+          free_above_zar: newZone.free_above_zar ? parseFloat(newZone.free_above_zar) : null,
+        }),
+      })
+      if (res.ok) { setNewZone({ name: '', provinces: '*', flat_rate_zar: '99', free_above_zar: '', rate_type: 'flat' }); loadZones() }
+    } catch {} finally { setZoneSaving(false) }
+  }
+
+  async function deleteZone(id: string) {
+    if (!confirm('Delete this shipping zone?')) return
+    await fetch(`/api/tenant/shipping/quote?id=${id}`, { method: 'DELETE' })
+    loadZones()
   }
 
   async function saveIntegrations() {
@@ -103,6 +143,7 @@ export default function AdminSettingsPage() {
     { id: 'store', label: '🏪 Store' },
     { id: 'pricing', label: '💰 Pricing' },
     { id: 'payments', label: '💳 Payments' },
+    { id: 'shipping', label: '🚚 Shipping' },
     { id: 'email', label: '📧 Email' },
     { id: 'whatsapp', label: '💬 WhatsApp' },
   ] as const
@@ -254,6 +295,77 @@ export default function AdminSettingsPage() {
                   })}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ── SHIPPING ────────────────────────────────────────── */}
+          {activeSection === 'shipping' && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Shipping Zones</h3>
+                <p className="text-sm text-gray-500 mt-1">Define rates per province. If no zone matches, free delivery above R10 000 and R99 flat rate below.</p>
+              </div>
+
+              {zonesLoading ? (
+                <p className="text-sm text-gray-400">Loading zones…</p>
+              ) : zones.length === 0 ? (
+                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
+                  <p className="text-gray-500 text-sm">No zones configured — using defaults (free &gt; R10k, R99 flat).</p>
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      {['Zone Name', 'Provinces', 'Rate (R)', 'Free above (R)', ''].map(h => (
+                        <th key={h} className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {zones.map((z: any) => (
+                      <tr key={z.id}>
+                        <td className="px-3 py-2 font-medium text-gray-900">{z.name}</td>
+                        <td className="px-3 py-2 text-gray-600">{(z.provinces || []).join(', ')}</td>
+                        <td className="px-3 py-2 text-gray-600">R{z.flat_rate_zar ?? '—'}</td>
+                        <td className="px-3 py-2 text-gray-600">{z.free_above_zar ? `R${z.free_above_zar}` : '—'}</td>
+                        <td className="px-3 py-2">
+                          <button onClick={() => deleteZone(z.id)} className="text-red-500 hover:text-red-700 text-xs">Delete</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">Add Zone</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Zone Name</label>
+                    <input value={newZone.name} onChange={e => setNewZone({ ...newZone, name: e.target.value })}
+                      placeholder="Cape Town Local" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Provinces (comma-sep or * for all)</label>
+                    <input value={newZone.provinces} onChange={e => setNewZone({ ...newZone, provinces: e.target.value })}
+                      placeholder="WC, GP or *" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Flat Rate (R)</label>
+                    <input type="number" value={newZone.flat_rate_zar} onChange={e => setNewZone({ ...newZone, flat_rate_zar: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Free above order value (R, optional)</label>
+                    <input type="number" value={newZone.free_above_zar} onChange={e => setNewZone({ ...newZone, free_above_zar: e.target.value })}
+                      placeholder="e.g. 5000" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" />
+                  </div>
+                </div>
+                <button onClick={addZone} disabled={zoneSaving || !newZone.name}
+                  className="mt-3 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 font-medium">
+                  {zoneSaving ? 'Adding…' : '+ Add Zone'}
+                </button>
+              </div>
             </div>
           )}
 
