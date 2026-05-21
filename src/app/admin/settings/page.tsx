@@ -54,7 +54,19 @@ export default function AdminSettingsPage() {
     loadIntegrations()
     loadGateways()
     loadZones()
+    loadStoreSettings()
   }, [mounted, isAuthenticated])
+
+  async function loadStoreSettings() {
+    try {
+      const res = await fetch('/api/tenant/settings')
+      if (res.ok) {
+        const data = await res.json()
+        setForm(prev => ({ ...prev, ...data }))
+        updateSettings(data)
+      }
+    } catch {}
+  }
 
   async function loadIntegrations() {
     setIntegLoading(true)
@@ -131,8 +143,15 @@ export default function AdminSettingsPage() {
     }
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     updateSettings(form)
+    try {
+      await fetch('/api/tenant/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+    } catch {}
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
   }

@@ -74,6 +74,11 @@ export function GoogleDriveConnection() {
       return
     }
 
+    if (!process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID) {
+      setError('Google Drive OAuth is not configured on this server. Add NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID to your environment variables.')
+      return
+    }
+
     // Redirect to OAuth flow
     window.location.href = `/api/oauth/google/authorize?tenant_id=${tenant.id}`
   }
