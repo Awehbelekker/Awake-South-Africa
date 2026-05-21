@@ -42,35 +42,72 @@ export interface SessionUser {
   role: string
 }
 
+function sessionSecret(): string {
+  return process.env.SESSION_SECRET || process.env.NEXTAUTH_SECRET || 'awake-session-fallback-secret'
+}
+
+function signPayload(payload: string): string {
+  return crypto.createHmac('sha256', sessionSecret()).update(payload).digest('hex')
+}
+
 /**
- * Create a session in the admin_sessions table and return the token.
- * If the table doesn't exist yet it falls back to cookie-only mode (returns token).
+ * Create a stateless HMAC-signed session token embedding user data.
+ * Also attempts to persist in admin_sessions for revocation (best-effort).
  */
 export async function createSession(user: SessionUser): Promise<string> {
-  const token = generateSessionToken()
-  const expiresAt = new Date(Date.now() + SESSION_TTL_MS).toISOString()
+  const payload = JSON.stringify({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    exp: Date.now() + SESSION_TTL_MS,
+  })
+  const b64 = Buffer.from(payload).toString('base64url')
+  const sig = signPayload(b64)
+  const token = `${b64}.${sig}`
 
+  // Best-effort DB persist for future revocation support
   try {
     await getSupabase().from('admin_sessions').insert({
       token,
       user_id: user.id,
       email: user.email,
       role: user.role,
-      expires_at: expiresAt,
+      expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString(),
     })
   } catch {
-    // Table may not exist yet — token still works as a cookie value
+    // Table may not exist — signed token is self-contained
   }
 
   return token
 }
 
 /**
- * Verify a session token. Returns the user if valid, null otherwise.
+ * Verify a session token. Validates HMAC signature and expiry from the token
+ * itself — no DB round-trip required. DB lookup is used only when available
+ * to support future revocation.
  */
 export async function verifySession(token: string): Promise<SessionUser | null> {
   if (!token) return null
 
+  // Stateless path: verify HMAC signature
+  const parts = token.split('.')
+  if (parts.length === 2) {
+    const [b64, sig] = parts
+    if (sig === signPayload(b64)) {
+      try {
+        const data = JSON.parse(Buffer.from(b64, 'base64url').toString())
+        if (data.exp && Date.now() < data.exp) {
+          return { id: data.id, email: data.email, name: data.name || '', role: data.role }
+        }
+      } catch {
+        // malformed payload
+      }
+      return null
+    }
+  }
+
+  // Legacy path: look up raw token in DB (for sessions created before this change)
   try {
     const { data, error } = await getSupabase()
       .from('admin_sessions')
@@ -80,7 +117,6 @@ export async function verifySession(token: string): Promise<SessionUser | null> 
 
     if (error || !data) return null
     if (new Date(data.expires_at) < new Date()) {
-      // Expired — clean up
       await getSupabase().from('admin_sessions').delete().eq('token', token)
       return null
     }
