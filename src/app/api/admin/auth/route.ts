@@ -39,6 +39,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
     }
 
+    // Check plain-text env var first (fastest, no DB round-trip)
+    const envEmail = process.env.ADMIN_EMAIL || process.env.MASTER_ADMIN_EMAIL
+    const envPassword = process.env.ADMIN_PASSWORD
+    if (envEmail && envPassword && email.trim() === envEmail.trim() && password === envPassword.trim()) {
+      const token = await createSession({ id: 'env-admin', email: email.trim(), name: 'Admin', role: 'super_admin' })
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
+      const cookieStore = await cookies()
+      cookieStore.set(COOKIE_NAME, token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', expires: expiresAt, path: '/' })
+      return NextResponse.json({ success: true, user: { email: email.trim(), name: 'Admin', role: 'super_admin' }, expiresAt: expiresAt.toISOString() })
+    }
+
     // Look up user in admin_users table
     const user = await getAdminByEmail(email)
 
