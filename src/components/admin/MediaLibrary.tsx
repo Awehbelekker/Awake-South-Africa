@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTenant } from '@/contexts/TenantContext'
-import { 
+import {
   Image as ImageIcon,
   Upload,
   Trash2,
@@ -18,7 +18,11 @@ import {
   X,
   Search,
   Grid3x3,
-  List
+  List,
+  HardDrive,
+  FolderOpen,
+  ChevronRight,
+  Download,
 } from 'lucide-react'
 
 interface MediaFile {
@@ -37,8 +41,20 @@ interface MediaLibraryProps {
   maxSelect?: number
 }
 
+interface DriveFile {
+  id: string
+  name: string
+  mimeType: string
+  thumbnailLink?: string
+  size?: string
+}
+interface DriveFolder { id: string; name: string }
+
 export function MediaLibrary({ onSelect, multiSelect = true, maxSelect = 10 }: MediaLibraryProps) {
   const { tenant, isLoading: tenantLoading } = useTenant()
+  const [activeTab, setActiveTab] = useState<'library' | 'drive'>('library')
+
+  // Library state
   const [files, setFiles] = useState<MediaFile[]>([])
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
@@ -48,11 +64,72 @@ export function MediaLibrary({ onSelect, multiSelect = true, maxSelect = 10 }: M
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
+  // Google Drive browser state
+  const [driveConnected, setDriveConnected] = useState<boolean | null>(null)
+  const [driveLoading, setDriveLoading] = useState(false)
+  const [driveFolderPath, setDriveFolderPath] = useState<DriveFolder[]>([{ id: 'root', name: 'My Drive' }])
+  const [driveFolders, setDriveFolders] = useState<DriveFolder[]>([])
+  const [driveImages, setDriveImages] = useState<DriveFile[]>([])
+  const [driveSelected, setDriveSelected] = useState<Set<string>>(new Set())
+  const [driveImporting, setDriveImporting] = useState(false)
+  const [driveError, setDriveError] = useState<string | null>(null)
+
   useEffect(() => {
     if (tenant?.id && !tenantLoading) {
       loadMediaLibrary()
+      checkDriveConnection()
     }
   }, [tenant?.id, tenantLoading])
+
+  async function checkDriveConnection() {
+    try {
+      const res = await fetch(`/api/tenant/google-drive/status?tenant_id=${tenant?.id}`)
+      const d = await res.json()
+      setDriveConnected(d.connected || false)
+    } catch {
+      setDriveConnected(false)
+    }
+  }
+
+  async function browseDrive(folderId = 'root', folderName = 'My Drive') {
+    setDriveLoading(true)
+    setDriveError(null)
+    try {
+      const res = await fetch(`/api/tenant/google-drive/browse?tenant_id=${tenant?.id}&folder_id=${folderId}`)
+      const d = await res.json()
+      if (!res.ok) throw new Error(d.error || 'Failed to browse Drive')
+      setDriveFolderPath(d.folderPath || [{ id: folderId, name: folderName }])
+      setDriveFolders(d.folders || [])
+      setDriveImages(d.files || [])
+    } catch (e: any) {
+      setDriveError(e.message)
+    } finally {
+      setDriveLoading(false)
+    }
+  }
+
+  async function importFromDrive() {
+    if (driveSelected.size === 0) return
+    setDriveImporting(true)
+    setDriveError(null)
+    try {
+      const res = await fetch('/api/tenant/google-drive/transfer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenant_id: tenant?.id, file_ids: Array.from(driveSelected) }),
+      })
+      const d = await res.json()
+      if (!res.ok) throw new Error(d.error || 'Import failed')
+      setSuccess(`${d.transferred} image${d.transferred !== 1 ? 's' : ''} imported to your library!`)
+      setDriveSelected(new Set())
+      setActiveTab('library')
+      loadMediaLibrary()
+    } catch (e: any) {
+      setDriveError(e.message)
+    } finally {
+      setDriveImporting(false)
+    }
+  }
 
   async function loadMediaLibrary() {
     setLoading(true)
@@ -196,6 +273,155 @@ export function MediaLibrary({ onSelect, multiSelect = true, maxSelect = 10 }: M
 
   return (
     <div className="space-y-4">
+      {/* Tabs */}
+      <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
+        <button
+          onClick={() => setActiveTab('library')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'library' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+        >
+          <ImageIcon className="w-4 h-4" /> Library
+        </button>
+        <button
+          onClick={() => { setActiveTab('drive'); if (driveConnected && driveImages.length === 0) browseDrive() }}
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'drive' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+        >
+          <HardDrive className="w-4 h-4" />
+          Google Drive
+          {driveConnected && <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />}
+        </button>
+      </div>
+
+      {/* ── GOOGLE DRIVE TAB ────────────────────────────────── */}
+      {activeTab === 'drive' && (
+        <div className="space-y-4">
+          {driveConnected === false && (
+            <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+              <HardDrive className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <p className="text-lg font-medium text-gray-700">Google Drive not connected</p>
+              <p className="text-sm text-gray-500 mt-1 mb-4">Connect your Drive in Settings to browse and import images.</p>
+              <a href="/admin/settings" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium">
+                Go to Settings
+              </a>
+            </div>
+          )}
+
+          {driveConnected === true && (
+            <>
+              {/* Breadcrumb */}
+              <div className="flex items-center gap-1 text-sm text-gray-600 flex-wrap">
+                {driveFolderPath.map((crumb, i) => (
+                  <span key={crumb.id} className="flex items-center gap-1">
+                    {i > 0 && <ChevronRight className="w-3 h-3 text-gray-400" />}
+                    <button
+                      onClick={() => browseDrive(crumb.id, crumb.name)}
+                      className={i === driveFolderPath.length - 1 ? 'text-gray-900 font-medium' : 'hover:text-blue-600'}
+                    >
+                      {crumb.name}
+                    </button>
+                  </span>
+                ))}
+              </div>
+
+              {driveError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm flex items-center justify-between">
+                  {driveError}
+                  <button onClick={() => setDriveError(null)}><X className="w-4 h-4" /></button>
+                </div>
+              )}
+
+              {driveLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Folders */}
+                  {driveFolders.length > 0 && (
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-2">Folders</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                        {driveFolders.map(folder => (
+                          <button
+                            key={folder.id}
+                            onClick={() => browseDrive(folder.id, folder.name)}
+                            className="flex flex-col items-center gap-1 p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors text-center"
+                          >
+                            <FolderOpen className="w-8 h-8 text-yellow-500" />
+                            <span className="text-xs text-gray-700 truncate w-full">{folder.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Images */}
+                  {driveImages.length > 0 ? (
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
+                          Images ({driveImages.length}) {driveSelected.size > 0 && `· ${driveSelected.size} selected`}
+                        </p>
+                        <div className="flex gap-2">
+                          {driveSelected.size > 0 && (
+                            <button
+                              onClick={importFromDrive}
+                              disabled={driveImporting}
+                              className="flex items-center gap-2 px-4 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium disabled:opacity-50"
+                            >
+                              {driveImporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                              {driveImporting ? 'Importing…' : `Import ${driveSelected.size} to Library`}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setDriveSelected(new Set(driveImages.map(f => f.id)))}
+                            className="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                          >
+                            Select all
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                        {driveImages.map(img => (
+                          <div
+                            key={img.id}
+                            onClick={() => setDriveSelected(prev => {
+                              const s = new Set(prev)
+                              s.has(img.id) ? s.delete(img.id) : s.add(img.id)
+                              return s
+                            })}
+                            className={`relative cursor-pointer border-2 rounded-lg overflow-hidden transition-all ${driveSelected.has(img.id) ? 'border-blue-600 ring-2 ring-blue-600 ring-offset-1' : 'border-gray-200 hover:border-blue-300'}`}
+                          >
+                            {img.thumbnailLink ? (
+                              <img src={img.thumbnailLink} alt={img.name} className="w-full h-24 object-cover" />
+                            ) : (
+                              <div className="w-full h-24 bg-gray-100 flex items-center justify-center">
+                                <ImageIcon className="w-8 h-8 text-gray-400" />
+                              </div>
+                            )}
+                            {driveSelected.has(img.id) && (
+                              <div className="absolute top-1 right-1 bg-blue-600 text-white rounded-full p-0.5">
+                                <Check className="w-3 h-3" />
+                              </div>
+                            )}
+                            <div className="p-1.5 bg-white">
+                              <p className="text-xs text-gray-600 truncate">{img.name}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : driveFolders.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500 text-sm">No images or folders found here.</div>
+                  ) : null}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── LIBRARY TAB ─────────────────────────────────────── */}
+      {activeTab === 'library' && (<>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
@@ -385,6 +611,7 @@ export function MediaLibrary({ onSelect, multiSelect = true, maxSelect = 10 }: M
           ))}
         </div>
       )}
+      </>)}
     </div>
   )
 }
