@@ -29,11 +29,11 @@ async function refreshAccessToken(clientId: string, clientSecret: string, refres
     }),
   })
 
+  const data = await response.json()
   if (!response.ok) {
-    throw new Error('Failed to refresh access token')
+    throw new Error(`Token refresh failed: ${data.error} — ${data.error_description || ''}`)
   }
 
-  const data = await response.json()
   return data.access_token
 }
 
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
 
     if (!tenant.google_drive_enabled || !tenant.google_drive_refresh_token) {
       return NextResponse.json(
-        { error: 'Google Drive not connected for this tenant' },
+        { error: 'Google Drive not connected', enabled: tenant.google_drive_enabled, hasToken: !!tenant.google_drive_refresh_token },
         { status: 400 }
       )
     }
@@ -136,6 +136,10 @@ export async function GET(request: NextRequest) {
     // Get access token
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID!
     const clientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET!
+
+    if (!clientId || clientId === 'PLACEHOLDER' || !clientSecret || clientSecret === 'PLACEHOLDER') {
+      return NextResponse.json({ error: 'Google Drive OAuth not configured on server' }, { status: 500 })
+    }
     const accessToken = await refreshAccessToken(
       clientId,
       clientSecret,
