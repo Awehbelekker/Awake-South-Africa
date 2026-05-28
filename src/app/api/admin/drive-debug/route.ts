@@ -13,12 +13,32 @@ export async function GET() {
   if (error) return NextResponse.json({ error: error.message })
 
   const token = data?.google_drive_refresh_token
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID!
+  const clientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET!
+
+  // Try the actual token refresh
+  let refreshResult: any = null
+  if (token) {
+    const res = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: token,
+        grant_type: 'refresh_token',
+      }),
+    })
+    refreshResult = await res.json()
+    // Don't expose the access token
+    if (refreshResult.access_token) refreshResult.access_token = '***valid***'
+  }
+
   return NextResponse.json({
     enabled: data?.google_drive_enabled,
-    tokenPresent: !!token,
     tokenLength: token?.length ?? 0,
-    tokenPrefix: token ? token.slice(0, 8) : null,  // first 8 chars only
-    clientIdSet: !!(process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID && process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID !== 'PLACEHOLDER'),
-    clientSecretSet: !!(process.env.GOOGLE_DRIVE_CLIENT_SECRET && process.env.GOOGLE_DRIVE_CLIENT_SECRET !== 'PLACEHOLDER'),
+    tokenPrefix: token ? token.slice(0, 8) : null,
+    clientIdPrefix: clientId.slice(0, 12),
+    refreshResult,
   })
 }
