@@ -23,8 +23,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Create response with tenant headers
-  const response = NextResponse.next()
+  // Build forwarded request headers (these reach API routes and server components)
+  const requestHeaders = new Headers(request.headers)
 
   // Extract potential tenant identifier
   let tenantSlug: string | null = null
@@ -35,43 +35,32 @@ export async function middleware(request: NextRequest) {
   const isMainDomain = mainDomains.some(d => host.includes(d))
 
   if (!isMainDomain) {
-    // This is a custom domain - we'll look it up in the TenantContext
+    // Strip www prefix so both awakesa.co.za and www.awakesa.co.za resolve the same tenant
+    const cleanHost = host.replace(/^www\./, '')
     isCustomDomain = true
-    response.headers.set('x-custom-domain', host)
+    requestHeaders.set('x-custom-domain', cleanHost)
+    requestHeaders.set('x-is-custom-domain', 'true')
   } else {
     // Extract subdomain from platform domain
     const subdomain = host.split('.')[0]
-
-    // Skip main domain identifiers
     if (subdomain && subdomain !== 'www' && subdomain !== 'app' && subdomain !== 'localhost' && subdomain !== '127') {
       tenantSlug = subdomain
+      requestHeaders.set('x-tenant-slug', tenantSlug)
     }
   }
 
-  // Set headers for downstream use (including API routes)
-  if (tenantSlug) {
-    response.headers.set('x-tenant-slug', tenantSlug)
-  }
-
-  if (isCustomDomain) {
-    response.headers.set('x-is-custom-domain', 'true')
-  }
-
-  // Master admin route protection (basic check - full auth in page)
+  // Master admin route protection
   if (pathname.startsWith('/master-admin')) {
-    // Allow access to dashboard and login
     if (pathname === '/master-admin' || pathname === '/master-admin/login') {
-      return response
+      return NextResponse.next({ request: { headers: requestHeaders } })
     }
-
-    // For other master-admin routes, check for auth cookie (basic check)
     const authCookie = request.cookies.get('master_admin_auth')
     if (!authCookie) {
       return NextResponse.redirect(new URL('/master-admin', request.url))
     }
   }
 
-  return response
+  return NextResponse.next({ request: { headers: requestHeaders } })
 }
 
 export const config = {
