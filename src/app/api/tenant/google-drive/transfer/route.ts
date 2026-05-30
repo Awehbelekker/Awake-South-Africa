@@ -75,10 +75,18 @@ async function uploadToSupabase(
 ) {
   const supabase = getSupabase()
 
-  // Generate clean filename
+  // Generate clean filename — handle accents, spaces, brackets, unicode
   const timestamp = Date.now()
-  const cleanName = fileName.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase()
-  const safeFileName = `${timestamp}-${cleanName}`
+  const ext = fileName.match(/\.[a-zA-Z0-9]+$/)?.[0]?.toLowerCase() || '.jpg'
+  const baseName = fileName.replace(/\.[^/.]+$/, '') // strip extension
+  const cleanBase = baseName
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') // remove accents
+    .replace(/[^a-zA-Z0-9]+/g, '-')                  // non-alphanumeric → dash
+    .replace(/-+/g, '-')                              // collapse consecutive dashes
+    .replace(/^-|-$/g, '')                            // trim leading/trailing dashes
+    .toLowerCase()
+    .slice(0, 60)                                     // cap length
+  const safeFileName = `${timestamp}-${cleanBase || 'file'}${ext}`
 
   // Upload to Supabase Storage
   const filePath = `${tenantId}/products/${safeFileName}`
@@ -88,7 +96,7 @@ async function uploadToSupabase(
     .upload(filePath, fileBuffer, {
       contentType: mimeType,
       cacheControl: '3600',
-      upsert: false,
+      upsert: true, // allow re-import of same file
     })
 
   if (error) {
