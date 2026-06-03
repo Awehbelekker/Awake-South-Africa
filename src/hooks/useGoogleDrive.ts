@@ -158,18 +158,16 @@ export function useGoogleDrive() {
       throw new Error('No tenant available')
     }
 
-    const response = await fetch(
-      `/api/tenant/google-drive/transfer?tenant_id=${tenant.id}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fileIds,
-          createProducts: options?.createProducts ?? false,
-          category: options?.category ?? 'uncategorized',
-        }),
-      }
-    )
+    const response = await fetch('/api/tenant/google-drive/transfer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tenant_id: tenant.id,
+        file_ids: fileIds,
+        create_products: options?.createProducts ?? false,
+        category: options?.category ?? 'uncategorized',
+      }),
+    })
 
     const data = await response.json()
 
@@ -177,8 +175,15 @@ export function useGoogleDrive() {
       throw new Error(data.error || 'Transfer failed')
     }
 
+    // Normalise response — API returns `results` array
+    const successes = (data.results || []).map((r: any) => ({
+      fileId: r.driveFileId,
+      fileName: r.driveName,
+      url: r.supabaseUrl,
+    }))
+
     return {
-      success: data.success || [],
+      success: successes,
       errors: data.errors || [],
     }
   }, [tenant?.id])
