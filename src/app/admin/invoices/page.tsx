@@ -10,6 +10,7 @@ import {
   XCircle, Clock, FileText, Printer, Mail, Plus, Trash2, RefreshCw
 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { exportToCSV } from '@/lib/csv'
 
 const statusColors: Record<InvoiceStatus, string> = {
   draft: 'bg-gray-100 text-gray-800',
@@ -158,6 +159,20 @@ export default function AdminInvoicesPage() {
     return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', minimumFractionDigits: 2 }).format(amount)
   }
 
+  const exportInvoices = () => exportToCSV(
+    filteredInvoices.map(inv => ({
+      'Invoice #': inv.invoiceNumber,
+      Customer: inv.customerName,
+      Email: inv.customerEmail || '',
+      'Invoice Date': new Date(inv.createdAt).toLocaleDateString('en-ZA'),
+      'Due Date': new Date(inv.dueDate).toLocaleDateString('en-ZA'),
+      'Paid Date': inv.paidDate ? new Date(inv.paidDate).toLocaleDateString('en-ZA') : '',
+      Total: inv.total,
+      Status: inv.status,
+    })),
+    `invoices-${new Date().toISOString().slice(0, 10)}`
+  )
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' })
   }
@@ -302,6 +317,13 @@ export default function AdminInvoicesPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={exportInvoices}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </button>
           <button
             onClick={refreshFromSupabase}
             disabled={supabaseLoading}

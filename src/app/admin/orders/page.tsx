@@ -6,9 +6,10 @@ import { useInvoicesStore } from '@/store/invoices'
 import { useAdminStore } from '@/store/admin'
 import {
   Search, Filter, Eye, FileText, Package,
-  XCircle, RefreshCw, Bell, CheckCircle2, Layers
+  XCircle, RefreshCw, Bell, CheckCircle2, Layers, Download
 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { exportToCSV } from '@/lib/csv'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -157,6 +158,9 @@ export default function AdminOrdersPage() {
   // Bulk selection
   const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set())
   const [bulkStatusSaving, setBulkStatusSaving] = useState(false)
+  // Pagination
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(50)
 
   const formatCurrency = (n: number) =>
     new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', minimumFractionDigits: 0 }).format(n)
@@ -342,6 +346,26 @@ export default function AdminOrdersPage() {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
   [orders, searchQuery, statusFilter])
 
+  const totalPages = Math.ceil(filtered.length / pageSize)
+  const pagedOrders = filtered.slice((page - 1) * pageSize, page * pageSize)
+
+  const exportOrders = () => exportToCSV(
+    filtered.map(o => ({
+      'Order #': o.orderNumber,
+      Date: new Date(o.createdAt).toLocaleDateString('en-ZA'),
+      Customer: o.customerName,
+      Email: o.customerEmail,
+      Phone: o.customerPhone || '',
+      Items: o.items.length,
+      Total: o.total,
+      Status: o.status,
+      Payment: o.paymentStatus,
+      'Payment Method': o.paymentMethod || '',
+      'Tracking #': o.trackingNumber || '',
+    })),
+    `orders-${new Date().toISOString().slice(0, 10)}`
+  )
+
   const stats = useMemo(() => ({
     total:      orders.length,
     pending:    orders.filter(o => o.status === 'pending').length,
@@ -360,14 +384,23 @@ export default function AdminOrdersPage() {
         <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
           ● Supabase
         </span>
-        <button
-          onClick={() => loadOrders()}
-          disabled={loading}
-          className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm disabled:opacity-50"
-        >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportOrders}
+            className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </button>
+          <button
+            onClick={() => loadOrders()}
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -395,7 +428,7 @@ export default function AdminOrdersPage() {
               type="text"
               placeholder="Search order number, customer name, or email..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => { setSearchQuery(e.target.value); setPage(1) }}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm"
             />
           </div>
@@ -403,7 +436,7 @@ export default function AdminOrdersPage() {
             <Filter className="h-4 w-4 text-gray-400" />
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as OrderStatus | 'all')}
+              onChange={(e) => { setStatusFilter(e.target.value as OrderStatus | 'all'); setPage(1) }}
               className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm"
             >
               <option value="all">All Statuses</option>
@@ -458,7 +491,7 @@ export default function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filtered.map(order => (
+                {pagedOrders.map(order => (
                   <tr key={order.id} className={`hover:bg-gray-50 ${selectedOrderIds.has(order.id) ? 'bg-blue-50' : ''}`}>
                     <td className="px-4 py-3">
                       <input type="checkbox" checked={selectedOrderIds.has(order.id)} onChange={() => toggleSelectOrder(order.id)} className="h-4 w-4 text-blue-600 rounded border-gray-300" />
@@ -518,6 +551,24 @@ export default function AdminOrdersPage() {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {filtered.length > 25 && (
+        <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
+          <div className="flex items-center gap-2">
+            <span>Show</span>
+            <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 bg-white">
+              {[25, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
+            <span>per page · {filtered.length} orders</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40">← Prev</button>
+            <span>{page} / {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40">Next →</button>
+          </div>
+        </div>
+      )}
 
       {/* ── Status Change Modal ──────────────────────────────────────────────── */}
       {pendingChange && (

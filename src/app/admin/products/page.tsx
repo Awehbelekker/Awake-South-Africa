@@ -9,9 +9,10 @@ import { useAdminProducts, useAdminUpdateProduct, useAdminUpdateVariant } from '
 import ProductEditModal from '@/components/admin/ProductEditModal'
 import QuickProductCreate from '@/components/admin/QuickProductCreate'
 import toast, { Toaster } from 'react-hot-toast'
-import { RefreshCw, Database, WifiOff, Trash2, Plus, RotateCcw, Layers, GripVertical, Save } from 'lucide-react'
+import { RefreshCw, Database, WifiOff, Trash2, Plus, RotateCcw, Layers, GripVertical, Save, Download } from 'lucide-react'
 import Link from 'next/link'
 import { PRODUCTS as DEFAULT_PRODUCTS } from '@/lib/constants'
+import { exportToCSV } from '@/lib/csv'
 
 function mapSupabaseProduct(p: any): EditableProduct {
   return {
@@ -61,6 +62,8 @@ export default function AdminProductsPage() {
   const [savingOrder, setSavingOrder] = useState(false)
   const [bulkStockInput, setBulkStockInput] = useState('')
   const [bulkStockSaving, setBulkStockSaving] = useState(false)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(50)
 
   const { data: medusaData, isLoading, error: medusaError, refetch } = useAdminProducts()
   const updateProductMutation = useAdminUpdateProduct()
@@ -145,9 +148,25 @@ export default function AdminProductsPage() {
   });
 
   // In Supabase mode: use drag-ordered list (filtered); otherwise use column-sorted list
-  const tableProducts = useSupabase
+  const allTableProducts = useSupabase
     ? displayOrder.filter(p => filter === 'all' || (p.categoryTag || p.category) === filter)
     : sortedProducts
+  const totalPages = Math.ceil(allTableProducts.length / pageSize)
+  const tableProducts = allTableProducts.slice((page - 1) * pageSize, page * pageSize)
+
+  const exportProducts = () => exportToCSV(
+    allTableProducts.map(p => ({
+      Name: p.name,
+      Category: p.categoryTag || p.category,
+      'Price (ZAR)': p.price,
+      'Price ex VAT': p.priceExVAT,
+      'Cost (EUR)': p.costEUR || '',
+      'In Stock': p.inStock ? 'Yes' : 'No',
+      'Stock Qty': p.stockQuantity,
+      Badge: p.badge || '',
+    })),
+    `products-${new Date().toISOString().slice(0, 10)}`
+  )
 
   const categories = ['all', ...Array.from(new Set(products.map(p => p.categoryTag || p.category)))];
 
@@ -555,6 +574,13 @@ export default function AdminProductsPage() {
             </button>
           )}
           <button
+            onClick={exportProducts}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">Export CSV</span>
+          </button>
+          <button
             onClick={() => setIsCreateModalOpen(true)}
             className="flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md shadow-sm transition-colors"
           >
@@ -596,7 +622,7 @@ export default function AdminProductsPage() {
         </label>
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => { setFilter(e.target.value); setPage(1) }}
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white"
         >
           {categories.map((cat) => (
@@ -789,6 +815,24 @@ export default function AdminProductsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {allTableProducts.length > 25 && (
+        <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
+          <div className="flex items-center gap-2">
+            <span>Show</span>
+            <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }} className="border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 bg-white">
+              {[25, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
+            <span>per page · {allTableProducts.length} total</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40">← Prev</button>
+            <span>{page} / {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40">Next →</button>
+          </div>
+        </div>
+      )}
 
       {/* Product Edit Modal */}
       <ProductEditModal

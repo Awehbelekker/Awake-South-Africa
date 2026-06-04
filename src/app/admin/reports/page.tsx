@@ -35,6 +35,7 @@ export default function AdminReportsPage() {
   const [liveProducts, setLiveProducts] = useState<ProductRow[]>([])
   const [ordersByStatus, setOrdersByStatus] = useState<Record<string, number>>({})
   const [lowStockProducts, setLowStockProducts] = useState<ProductRow[]>([])
+  const [monthlyRevenue, setMonthlyRevenue] = useState<{ label: string; revenue: number; orders: number }[]>([])
 
   useEffect(() => {
     setMounted(true)
@@ -70,6 +71,22 @@ export default function AdminReportsPage() {
       const byStatus: Record<string, number> = {}
       orders.forEach((o: any) => { byStatus[o.status] = (byStatus[o.status] || 0) + 1 })
       setOrdersByStatus(byStatus)
+
+      // Monthly revenue — last 12 months
+      const now = new Date()
+      const months = Array.from({ length: 12 }, (_, i) => {
+        const d = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1)
+        return { year: d.getFullYear(), month: d.getMonth(), label: d.toLocaleDateString('en-ZA', { month: 'short', year: '2-digit' }), revenue: 0, orders: 0 }
+      })
+      orders.forEach((o: any) => {
+        const d = new Date(o.created_at || o.createdAt)
+        const idx = months.findIndex(m => m.year === d.getFullYear() && m.month === d.getMonth())
+        if (idx !== -1) {
+          months[idx].orders++
+          if (o.payment_status === 'paid') months[idx].revenue += Number(o.total || 0)
+        }
+      })
+      setMonthlyRevenue(months)
 
       // Normalise products from Supabase schema to camelCase
       if (rawProducts.length > 0) {
@@ -172,6 +189,53 @@ export default function AdminReportsPage() {
                   {revenueStats?.overdueInvoices ?? 0}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Monthly Revenue Chart */}
+        {monthlyRevenue.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-700 mb-3">Revenue — Last 12 Months</h2>
+            <div className="bg-white rounded-lg shadow p-6">
+              {(() => {
+                const maxRev = Math.max(...monthlyRevenue.map(m => m.revenue), 1)
+                const W = 780, H = 140, pad = 40, barW = Math.floor((W - pad) / 12)
+                return (
+                  <svg viewBox={`0 0 ${W} ${H + 40}`} className="w-full" aria-label="Monthly revenue chart">
+                    {/* Y-axis guide lines */}
+                    {[0, 0.25, 0.5, 0.75, 1].map(f => (
+                      <line key={f} x1={pad} x2={W} y1={H - f * H} y2={H - f * H} stroke="#e5e7eb" strokeWidth="1" />
+                    ))}
+                    {/* Bars */}
+                    {monthlyRevenue.map((m, i) => {
+                      const bh = Math.max((m.revenue / maxRev) * H, m.revenue > 0 ? 2 : 0)
+                      const x = pad + i * barW + barW * 0.1
+                      const bw = barW * 0.8
+                      return (
+                        <g key={m.label}>
+                          <rect x={x} y={H - bh} width={bw} height={bh} fill="#3b82f6" rx="2" />
+                          {m.revenue > 0 && (
+                            <text x={x + bw / 2} y={H - bh - 4} textAnchor="middle" fontSize="9" fill="#6b7280">
+                              {m.revenue >= 1000 ? `R${Math.round(m.revenue / 1000)}k` : `R${Math.round(m.revenue)}`}
+                            </text>
+                          )}
+                          <text x={x + bw / 2} y={H + 16} textAnchor="middle" fontSize="9" fill="#9ca3af">{m.label}</text>
+                          {m.orders > 0 && (
+                            <text x={x + bw / 2} y={H + 28} textAnchor="middle" fontSize="8" fill="#d1d5db">{m.orders} ord</text>
+                          )}
+                        </g>
+                      )
+                    })}
+                    {/* Y-axis labels */}
+                    {[0, 0.5, 1].map(f => (
+                      <text key={f} x={pad - 4} y={H - f * H + 4} textAnchor="end" fontSize="9" fill="#9ca3af">
+                        {f === 0 ? 'R0' : `R${Math.round(maxRev * f / 1000)}k`}
+                      </text>
+                    ))}
+                  </svg>
+                )
+              })()}
             </div>
           </div>
         )}
