@@ -25,6 +25,7 @@ const navigation = [
   },
   { name: "Demo Rides", href: "/demo" },
   { name: "Blog", href: "/blog" },
+  { name: "Get a Quote", href: "/quote" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];

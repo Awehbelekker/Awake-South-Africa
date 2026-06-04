@@ -277,7 +277,7 @@ export async function GET(request: NextRequest) {
     const supabase = getSupabase()
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, name, slug, image, images, thumbnail')
+      .select('id, name, slug, image, images')
       .eq('tenant_id', tenantId)
       .eq('is_active', true)
 
@@ -285,8 +285,8 @@ export async function GET(request: NextRequest) {
 
     const summary = (products || []).map((p: any) => {
       const imageCount = Array.isArray(p.images) ? p.images.length : 0
-      const hasThumb = !!(p.thumbnail || p.image)
-      const hasCdnOnly = hasThumb && (p.thumbnail || p.image || '').includes('awakeboards.com/cdn')
+      const hasThumb = !!(p.image)
+      const hasCdnOnly = hasThumb && (p.image || '').includes('awakeboards.com/cdn')
       const hasSupabase = imageCount > 0 && (p.images || []).some((img: string) => img?.includes('supabase'))
       const scrapeUrl = findProductUrl(p.slug || '')
 
@@ -337,7 +337,7 @@ export async function POST(request: NextRequest) {
     // Fetch products
     let query = supabase
       .from('products')
-      .select('id, name, slug, image, images, thumbnail')
+      .select('id, name, slug, image, images')
       .eq('tenant_id', tenantId)
       .eq('is_active', true)
 
@@ -441,9 +441,8 @@ export async function POST(request: NextRequest) {
           }
 
           // Set thumbnail to first uploaded image if current thumbnail is a CDN URL or empty
-          const currentThumb = product.thumbnail || product.image
+          const currentThumb = product.image
           if (!currentThumb || currentThumb.includes('awakeboards.com/cdn')) {
-            updateData.thumbnail = uploadedUrls[0]
             updateData.image = uploadedUrls[0]
           }
 
