@@ -7,7 +7,6 @@ import ArrayFieldEditor from './ArrayFieldEditor';
 import RichTextEditor from './RichTextEditor';
 import MediaManager from './MediaManager';
 import { VideoSectionManager } from './VideoSectionManager';
-import { validateProduct } from '@/lib/validation/productValidation';
 import toast from 'react-hot-toast';
 
 interface ProductEditModalProps {
@@ -61,29 +60,26 @@ export default function ProductEditModal({ isOpen, onClose, product, onSave }: P
   const handleSave = async () => {
     if (!formData) return;
 
+    // Minimal client-side checks — coerce NaN numerics to 0 before saving
+    const sanitized: EditableProduct = {
+      ...formData,
+      price: isNaN(formData.price) ? 0 : formData.price,
+      priceExVAT: isNaN(formData.priceExVAT as number) ? 0 : formData.priceExVAT,
+      costEUR: isNaN(formData.costEUR as number) ? 0 : formData.costEUR,
+      stockQuantity: isNaN(formData.stockQuantity as number) ? 0 : formData.stockQuantity,
+    };
+
+    if (!sanitized.name?.trim()) {
+      setErrors({ name: 'Product name is required' });
+      toast.error('Product name is required');
+      return;
+    }
+
     setSaving(true);
     try {
-      // Validate
-      const result = validateProduct(formData);
-
-      if (!result.success) {
-        const fieldErrors: Record<string, string> = {};
-        result.error.issues.forEach((err) => {
-          if (err.path[0]) {
-            fieldErrors[err.path[0] as string] = err.message;
-          }
-        });
-        setErrors(fieldErrors);
-        toast.error('Please fix validation errors');
-        setSaving(false);
-        return;
-      }
-
-      // Save
-      onSave(formData);
+      onSave(sanitized);
       setHasUnsavedChanges(false);
-      toast.success('Product updated successfully!');
-      onClose();
+      setErrors({});
     } catch (error) {
       console.error('Save error:', error);
       toast.error('Failed to save product');
