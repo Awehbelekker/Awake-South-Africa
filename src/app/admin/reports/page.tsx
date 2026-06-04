@@ -6,6 +6,16 @@ import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminStore } from '@/store/admin'
 import { useProductsStore } from '@/store/products'
 
+interface ProductRow {
+  id: string
+  name: string
+  price: number
+  priceExVAT: number
+  costEUR: number
+  stockQuantity: number
+  inStock: boolean
+}
+
 interface RevenueStats {
   totalRevenue: number
   totalOrders: number
@@ -18,10 +28,13 @@ interface RevenueStats {
 export default function AdminReportsPage() {
   const router = useRouter()
   const { isAuthenticated, settings } = useAdminStore()
-  const { products } = useProductsStore()
+  const { products: localProducts } = useProductsStore()
   const [mounted, setMounted] = useState(false)
   const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null)
   const [statsLoading, setStatsLoading] = useState(false)
+  const [liveProducts, setLiveProducts] = useState<ProductRow[]>([])
+  const [ordersByStatus, setOrdersByStatus] = useState<Record<string, number>>({})
+  const [lowStockProducts, setLowStockProducts] = useState<ProductRow[]>([])
 
   useEffect(() => {
     setMounted(true)
@@ -30,7 +43,7 @@ export default function AdminReportsPage() {
     }
   }, [isAuthenticated, router])
 
-  // Load live revenue data from Supabase
+  // Load live data from Supabase
   useEffect(() => {
     if (!isAuthenticated) return
     setStatsLoading(true)
@@ -38,26 +51,40 @@ export default function AdminReportsPage() {
     Promise.all([
       fetch('/api/tenant/orders').then(r => r.ok ? r.json() : { orders: [] }),
       fetch('/api/tenant/invoices').then(r => r.ok ? r.json() : { invoices: [] }),
-    ]).then(([ordersData, invoicesData]) => {
+      fetch('/api/tenant/products').then(r => r.ok ? r.json() : { products: [] }),
+    ]).then(([ordersData, invoicesData, productsData]) => {
       const orders   = ordersData.orders   || []
       const invoices = invoicesData.invoices || []
+      const rawProducts = productsData.products || []
 
+      // Revenue stats
       const paidOrders = orders.filter((o: any) => o.payment_status === 'paid')
       const totalRevenue = paidOrders.reduce((sum: number, o: any) => sum + Number(o.total || 0), 0)
-
       const paidInvoices    = invoices.filter((inv: any) => inv.status === 'paid').length
       const unpaidInvoices  = invoices.filter((inv: any) => inv.status === 'sent').length
       const overdueInvoices = invoices.filter((inv: any) => inv.status === 'overdue').length
       const totalInvoiced   = invoices.reduce((sum: number, inv: any) => sum + Number(inv.total || 0), 0)
+      setRevenueStats({ totalRevenue, totalOrders: orders.length, paidInvoices, unpaidInvoices, overdueInvoices, totalInvoiced })
 
-      setRevenueStats({
-        totalRevenue,
-        totalOrders:    orders.length,
-        paidInvoices,
-        unpaidInvoices,
-        overdueInvoices,
-        totalInvoiced,
-      })
+      // Orders by status breakdown
+      const byStatus: Record<string, number> = {}
+      orders.forEach((o: any) => { byStatus[o.status] = (byStatus[o.status] || 0) + 1 })
+      setOrdersByStatus(byStatus)
+
+      // Normalise products from Supabase schema to camelCase
+      if (rawProducts.length > 0) {
+        const normalised: ProductRow[] = rawProducts.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price || 0,
+          priceExVAT: p.price_ex_vat || Math.round((p.price || 0) / 1.15),
+          costEUR: p.cost_eur || 0,
+          stockQuantity: p.stock_quantity ?? 0,
+          inStock: p.in_stock ?? true,
+        }))
+        setLiveProducts(normalised)
+        setLowStockProducts(normalised.filter(p => p.inStock && p.stockQuantity <= 2))
+      }
     }).catch(() => {
       // Supabase tables may not exist yet — silent fail
     }).finally(() => setStatsLoading(false))
@@ -67,8 +94,11 @@ export default function AdminReportsPage() {
     return null
   }
 
+  // Use live Supabase products; fall back to localStorage if API hasn't loaded yet
+  const products = liveProducts.length > 0 ? liveProducts : localProducts
+
   const productsWithCosts = products.filter(p => p.costEUR)
-  
+
   const reports = productsWithCosts.map(p => {
     const costZAR = (p.costEUR || 0) * settings.exchangeRate
     const margin = ((p.priceExVAT - costZAR) / p.priceExVAT) * 100
@@ -142,6 +172,57 @@ export default function AdminReportsPage() {
                   {revenueStats?.overdueInvoices ?? 0}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Orders by Status */}
+        {Object.keys(ordersByStatus).length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-700 mb-3">Orders by Status</h2>
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+              {(['pending','confirmed','processing','shipped','delivered','cancelled'] as const).map(status => (
+                <div key={status} className="bg-white rounded-lg shadow p-4 text-center">
+                  <div className="text-2xl font-bold text-gray-900">{ordersByStatus[status] || 0}</div>
+                  <div className="text-xs text-gray-500 capitalize mt-1">{status}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Low Stock Alerts */}
+        {lowStockProducts.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-700 mb-3">
+              Low Stock <span className="ml-2 px-2 py-0.5 text-sm bg-red-100 text-red-700 rounded-full">{lowStockProducts.length}</span>
+            </h2>
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200 text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {['Product', 'Stock', 'Price', 'Action'].map(h => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {lowStockProducts.map(p => (
+                    <tr key={p.id}>
+                      <td className="px-4 py-3 font-medium text-gray-900">{p.name}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${p.stockQuantity === 0 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {p.stockQuantity} left
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-600">R{p.price.toLocaleString()}</td>
+                      <td className="px-4 py-3">
+                        <a href="/admin/products" className="text-blue-600 hover:underline text-xs">Update stock →</a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

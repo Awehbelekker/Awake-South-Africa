@@ -5,8 +5,8 @@ import AdminLayout from '@/components/admin/AdminLayout'
 import { useInvoicesStore } from '@/store/invoices'
 import { useAdminStore } from '@/store/admin'
 import {
-  Search, Filter, Eye, FileText, Package, Truck,
-  XCircle, RefreshCw, Bell, BellOff, CheckCircle2
+  Search, Filter, Eye, FileText, Package,
+  XCircle, RefreshCw, Bell, CheckCircle2, Layers
 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 
@@ -154,6 +154,10 @@ export default function AdminOrdersPage() {
   const [pendingChange, setPendingChange] = useState<{ order: Order; newStatus: OrderStatus } | null>(null)
   const [saving, setSaving] = useState(false)
 
+  // Bulk selection
+  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set())
+  const [bulkStatusSaving, setBulkStatusSaving] = useState(false)
+
   const formatCurrency = (n: number) =>
     new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', minimumFractionDigits: 0 }).format(n)
 
@@ -256,6 +260,63 @@ export default function AdminOrdersPage() {
     }
   }
 
+  const toggleSelectOrder = (id: string) => {
+    setSelectedOrderIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAllOrders = () => {
+    setSelectedOrderIds(
+      selectedOrderIds.size === filtered.length
+        ? new Set()
+        : new Set(filtered.map(o => o.id))
+    )
+  }
+
+  const handleBulkStatusChange = async (newStatus: OrderStatus) => {
+    if (selectedOrderIds.size === 0) return
+    if (!confirm(`Change ${selectedOrderIds.size} order(s) to "${newStatus}"? Customers will not be notified.`)) return
+    setBulkStatusSaving(true)
+    try {
+      await Promise.all(
+        Array.from(selectedOrderIds).map(id =>
+          fetch(`/api/tenant/orders/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus, notify: false }),
+          })
+        )
+      )
+      setOrders(prev => prev.map(o =>
+        selectedOrderIds.has(o.id) ? { ...o, status: newStatus } : o
+      ))
+      toast.success(`${selectedOrderIds.size} order(s) → ${newStatus}`)
+      setSelectedOrderIds(new Set())
+    } catch {
+      toast.error('Bulk status update failed')
+    } finally {
+      setBulkStatusSaving(false)
+    }
+  }
+
+  const handleBulkGenerateInvoices = () => {
+    if (selectedOrderIds.size === 0) return
+    const selected = filtered.filter(o => selectedOrderIds.has(o.id))
+    let created = 0
+    selected.forEach(order => {
+      if (!invoices.find(i => i.referenceId === order.id)) {
+        addInvoice(createInvoiceFromOrder(order as any))
+        created++
+      }
+    })
+    const skipped = selected.length - created
+    toast.success(`${created} invoice(s) created${skipped > 0 ? `, ${skipped} already existed` : ''}`)
+    setSelectedOrderIds(new Set())
+  }
+
   const handleGenerateInvoice = (order: Order) => {
     if (invoices.find(i => i.referenceId === order.id)) {
       toast.error('Invoice already exists for this order')
@@ -352,6 +413,33 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
+      {/* Bulk Actions Bar */}
+      {selectedOrderIds.size > 0 && (
+        <div className="flex flex-wrap items-center gap-3 px-4 py-3 mb-2 bg-gray-50 border border-gray-200 rounded-lg">
+          <span className="text-sm font-medium text-gray-700">{selectedOrderIds.size} selected</span>
+          <select
+            disabled={bulkStatusSaving}
+            defaultValue=""
+            onChange={e => { if (e.target.value) handleBulkStatusChange(e.target.value as OrderStatus) }}
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-900 bg-white disabled:opacity-40"
+          >
+            <option value="" disabled>Change status…</option>
+            {STATUSES.map(s => (
+              <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+            ))}
+          </select>
+          <button
+            onClick={handleBulkGenerateInvoices}
+            disabled={bulkStatusSaving}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-40"
+          >
+            <Layers className="h-3.5 w-3.5" />
+            Generate Invoices
+          </button>
+          <button onClick={() => setSelectedOrderIds(new Set())} className="text-sm text-gray-500 hover:text-gray-700">Clear</button>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading && orders.length === 0 ? (
@@ -361,6 +449,9 @@ export default function AdminOrdersPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-4 py-3">
+                    <input type="checkbox" checked={selectedOrderIds.size === filtered.length && filtered.length > 0} onChange={toggleSelectAllOrders} className="h-4 w-4 text-blue-600 rounded border-gray-300" />
+                  </th>
                   {['Order', 'Customer', 'Items', 'Total', 'Status', 'Payment', 'Actions'].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
                   ))}
@@ -368,7 +459,10 @@ export default function AdminOrdersPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filtered.map(order => (
-                  <tr key={order.id} className="hover:bg-gray-50">
+                  <tr key={order.id} className={`hover:bg-gray-50 ${selectedOrderIds.has(order.id) ? 'bg-blue-50' : ''}`}>
+                    <td className="px-4 py-3">
+                      <input type="checkbox" checked={selectedOrderIds.has(order.id)} onChange={() => toggleSelectOrder(order.id)} className="h-4 w-4 text-blue-600 rounded border-gray-300" />
+                    </td>
                     <td className="px-4 py-3">
                       <div className="font-medium text-gray-900 text-sm">{order.orderNumber}</div>
                       <div className="text-xs text-gray-500">{formatDate(order.createdAt)}</div>

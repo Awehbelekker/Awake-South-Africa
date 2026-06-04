@@ -59,6 +59,8 @@ export default function AdminProductsPage() {
   const [displayOrder, setDisplayOrder] = useState<EditableProduct[]>([])
   const [orderChanged, setOrderChanged] = useState(false)
   const [savingOrder, setSavingOrder] = useState(false)
+  const [bulkStockInput, setBulkStockInput] = useState('')
+  const [bulkStockSaving, setBulkStockSaving] = useState(false)
 
   const { data: medusaData, isLoading, error: medusaError, refetch } = useAdminProducts()
   const updateProductMutation = useAdminUpdateProduct()
@@ -89,13 +91,13 @@ export default function AdminProductsPage() {
     }
   }, [useMedusa, isLoading])
 
-  // Keep displayOrder in sync with supabaseProducts (already sorted by sort_order from API)
+  // Initialise displayOrder once on first load; updates applied in-place to preserve drag order
   useEffect(() => {
-    if (supabaseProducts.length > 0) {
+    if (supabaseProducts.length > 0 && displayOrder.length === 0) {
       setDisplayOrder(supabaseProducts)
       setOrderChanged(false)
     }
-  }, [supabaseProducts])
+  }, [supabaseProducts, displayOrder.length])
 
   const autoSyncToSupabase = async (products: EditableProduct[]) => {
     try {
@@ -217,6 +219,43 @@ export default function AdminProductsPage() {
       toast.error('Failed to save order')
     } finally {
       setSavingOrder(false)
+    }
+  }
+
+  const handleBulkStockUpdate = async (mode: 'set' | 'in-stock' | 'out-of-stock', qty?: number) => {
+    if (selectedIds.size === 0) return
+    setBulkStockSaving(true)
+    try {
+      const targets = (useSupabase ? displayOrder : products).filter(p => selectedIds.has(p.id))
+      await Promise.all(
+        targets.map(product => {
+          const supabaseId = (product as any)._supabaseId
+          if (!supabaseId) return Promise.resolve()
+          const patch: any = { id: supabaseId }
+          if (mode === 'set') { patch.stockQuantity = qty ?? 0; patch.inStock = (qty ?? 0) > 0 }
+          else if (mode === 'in-stock') { patch.inStock = true }
+          else { patch.inStock = false }
+          return fetch('/api/tenant/products', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(patch),
+          })
+        })
+      )
+      const updater = (p: EditableProduct) => {
+        if (!selectedIds.has(p.id)) return p
+        if (mode === 'set') return { ...p, stockQuantity: qty ?? 0, inStock: (qty ?? 0) > 0 }
+        if (mode === 'in-stock') return { ...p, inStock: true }
+        return { ...p, inStock: false }
+      }
+      setSupabaseProducts(prev => prev.map(updater))
+      setDisplayOrder(prev => prev.map(updater))
+      toast.success(`${selectedIds.size} product(s) updated`)
+      setBulkStockInput('')
+    } catch {
+      toast.error('Bulk stock update failed')
+    } finally {
+      setBulkStockSaving(false)
     }
   }
 
@@ -570,15 +609,54 @@ export default function AdminProductsPage() {
 
       {/* Bulk Actions Bar */}
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 px-4 py-2 mb-2 bg-red-50 border border-red-200 rounded-lg">
-          <span className="text-sm text-red-700 font-medium">{selectedIds.size} selected</span>
+        <div className="flex flex-wrap items-center gap-3 px-4 py-3 mb-2 bg-gray-50 border border-gray-200 rounded-lg">
+          <span className="text-sm font-medium text-gray-700">{selectedIds.size} selected</span>
+
+          {/* Stock controls — Supabase only */}
+          {dataSource === 'supabase' && (
+            <>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Qty"
+                  value={bulkStockInput}
+                  onChange={e => setBulkStockInput(e.target.value)}
+                  className="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md text-gray-900 bg-white"
+                />
+                <button
+                  onClick={() => handleBulkStockUpdate('set', parseInt(bulkStockInput) || 0)}
+                  disabled={bulkStockSaving || bulkStockInput === ''}
+                  className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-40"
+                >
+                  Set Stock
+                </button>
+              </div>
+              <button
+                onClick={() => handleBulkStockUpdate('in-stock')}
+                disabled={bulkStockSaving}
+                className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-40"
+              >
+                ✓ In Stock
+              </button>
+              <button
+                onClick={() => handleBulkStockUpdate('out-of-stock')}
+                disabled={bulkStockSaving}
+                className="px-3 py-1.5 text-sm bg-yellow-500 text-white rounded-md hover:bg-yellow-600 disabled:opacity-40"
+              >
+                Out of Stock
+              </button>
+              <div className="h-5 border-l border-gray-300" />
+            </>
+          )}
+
           <button
             onClick={handleBulkDelete}
-            disabled={deleting}
+            disabled={deleting || bulkStockSaving}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-md"
           >
             <Trash2 className="h-3.5 w-3.5" />
-            Delete Selected
+            Delete
           </button>
           <button onClick={() => setSelectedIds(new Set())} className="text-sm text-gray-500 hover:text-gray-700">Clear</button>
         </div>
