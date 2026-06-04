@@ -45,6 +45,7 @@ interface GoogleDrivePickerProps {
   onSelect: (files: DriveFile[]) => void
   multiSelect?: boolean
   title?: string
+  type?: 'image' | 'video' | 'all'
 }
 
 export default function GoogleDrivePicker({
@@ -52,7 +53,8 @@ export default function GoogleDrivePicker({
   onClose,
   onSelect,
   multiSelect = true,
-  title = 'Select from Google Drive'
+  title = 'Select from Google Drive',
+  type = 'image',
 }: GoogleDrivePickerProps) {
   const { isConnected, checking, connect, browseFolder } = useGoogleDrive()
   const [currentFolder, setCurrentFolder] = useState('root')
@@ -84,7 +86,7 @@ export default function GoogleDrivePicker({
     setError(null)
 
     try {
-      const result = await browseFolder(folderId)
+      const result = await browseFolder(folderId, type)
       setFolderPath(result.folderPath)
       setFolders(result.folders)
       setFiles(result.files)

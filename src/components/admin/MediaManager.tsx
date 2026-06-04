@@ -426,6 +426,7 @@ export default function MediaManager({ type, items = [], onChange, label, maxIte
         onClose={() => setShowDrivePicker(false)}
         onSelect={handleDriveSelect}
         multiSelect={true}
+        type={type}
         title={`Select ${type === 'image' ? 'Images' : 'Videos'} from Google Drive`}
       />
     </div>

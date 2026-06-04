@@ -116,6 +116,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const tenantId = searchParams.get('tenant_id')
     const folderId = searchParams.get('folder_id') || 'root'
+    const fileType = searchParams.get('file_type') || 'image' // 'image' | 'video' | 'all'
 
     const tenant = await resolveTenant(tenantId)
 
@@ -160,19 +161,20 @@ export async function GET(request: NextRequest) {
       f.mimeType !== 'application/vnd.google-apps.folder'
     )
 
-    // Filter for image files
-    const imageFiles = files.filter((f: any) => 
-      f.mimeType?.startsWith('image/')
-    )
+    // Filter by requested file type
+    const filteredFiles = files.filter((f: any) => {
+      if (fileType === 'video') return f.mimeType?.startsWith('video/')
+      if (fileType === 'all') return true
+      return f.mimeType?.startsWith('image/') // default: images only
+    })
 
     return NextResponse.json({
       success: true,
       currentFolder: folderId,
       folderPath,
       folders,
-      files: imageFiles,
+      files: filteredFiles,
       totalFiles: files.length,
-      totalImages: imageFiles.length,
     })
 
   } catch (error: any) {

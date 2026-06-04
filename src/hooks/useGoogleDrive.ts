@@ -124,13 +124,13 @@ export function useGoogleDrive() {
   }, [tenant?.id])
 
   // Browse folder
-  const browseFolder = useCallback(async (folderId: string = 'root'): Promise<BrowseResult> => {
+  const browseFolder = useCallback(async (folderId: string = 'root', fileType: 'image' | 'video' | 'all' = 'image'): Promise<BrowseResult> => {
     if (!tenant?.id) {
       throw new Error('No tenant available')
     }
 
     const response = await fetch(
-      `/api/tenant/google-drive/browse?tenant_id=${tenant.id}&folder_id=${folderId}`
+      `/api/tenant/google-drive/browse?tenant_id=${tenant.id}&folder_id=${folderId}&file_type=${fileType}`
     )
     
     const data = await response.json()
