@@ -9,14 +9,14 @@ import { useAdminProducts, useAdminUpdateProduct, useAdminUpdateVariant } from '
 import ProductEditModal from '@/components/admin/ProductEditModal'
 import QuickProductCreate from '@/components/admin/QuickProductCreate'
 import toast, { Toaster } from 'react-hot-toast'
-import { RefreshCw, Database, WifiOff, Trash2, Plus, RotateCcw, Layers } from 'lucide-react'
+import { RefreshCw, Database, WifiOff, Trash2, Plus, RotateCcw, Layers, GripVertical, Save } from 'lucide-react'
 import Link from 'next/link'
 import { PRODUCTS as DEFAULT_PRODUCTS } from '@/lib/constants'
 
 function mapSupabaseProduct(p: any): EditableProduct {
   return {
     id: p.metadata?.localId || p.id,
-    _supabaseId: p.id,          // always keep the real Supabase UUID for direct UPDATE
+    _supabaseId: p.id,
     _slug: p.slug,
     name: p.name,
     price: p.price || 0,
@@ -34,6 +34,7 @@ function mapSupabaseProduct(p: any): EditableProduct {
     whatsIncluded: p.whats_included,
     inStock: p.in_stock,
     stockQuantity: p.stock_quantity,
+    sort_order: p.sort_order,
   } as any
 }
 
@@ -52,7 +53,13 @@ export default function AdminProductsPage() {
   const [sortField, setSortField] = useState<'name' | 'price' | 'category'>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
-  // Fetch products from Medusa Admin API
+  // Drag-and-drop ordering state
+  const [dragId, setDragId] = useState<string | null>(null)
+  const [dragOverId, setDragOverId] = useState<string | null>(null)
+  const [displayOrder, setDisplayOrder] = useState<EditableProduct[]>([])
+  const [orderChanged, setOrderChanged] = useState(false)
+  const [savingOrder, setSavingOrder] = useState(false)
+
   const { data: medusaData, isLoading, error: medusaError, refetch } = useAdminProducts()
   const updateProductMutation = useAdminUpdateProduct()
   const updateVariantMutation = useAdminUpdateVariant()
@@ -64,7 +71,6 @@ export default function AdminProductsPage() {
   const [supabaseAvailable, setSupabaseAvailable] = useState(true)
   const [supabaseLoading, setSupabaseLoading] = useState(false)
 
-  // Load from Supabase whenever Medusa is unavailable
   useEffect(() => {
     if (!useMedusa && !isLoading) {
       setSupabaseLoading(true)
@@ -75,7 +81,6 @@ export default function AdminProductsPage() {
           if (data.products?.length > 0) {
             setSupabaseProducts(data.products.map(mapSupabaseProduct))
           } else if (localProducts.length > 0) {
-            // Supabase reachable but empty — auto-sync local products up
             autoSyncToSupabase(localProducts)
           }
         })
@@ -84,7 +89,14 @@ export default function AdminProductsPage() {
     }
   }, [useMedusa, isLoading])
 
-  // Silently push local products to Supabase and switch to Supabase source
+  // Keep displayOrder in sync with supabaseProducts (already sorted by sort_order from API)
+  useEffect(() => {
+    if (supabaseProducts.length > 0) {
+      setDisplayOrder(supabaseProducts)
+      setOrderChanged(false)
+    }
+  }, [supabaseProducts])
+
   const autoSyncToSupabase = async (products: EditableProduct[]) => {
     try {
       const res = await fetch('/api/tenant/products', {
@@ -118,7 +130,6 @@ export default function AdminProductsPage() {
     ? products
     : products.filter(p => (p.categoryTag || p.category) === filter)
 
-  // Sort products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     let compareValue = 0;
     if (sortField === 'name') {
@@ -130,6 +141,11 @@ export default function AdminProductsPage() {
     }
     return sortDirection === 'asc' ? compareValue : -compareValue;
   });
+
+  // In Supabase mode: use drag-ordered list (filtered); otherwise use column-sorted list
+  const tableProducts = useSupabase
+    ? displayOrder.filter(p => filter === 'all' || (p.categoryTag || p.category) === filter)
+    : sortedProducts
 
   const categories = ['all', ...Array.from(new Set(products.map(p => p.categoryTag || p.category)))];
 
@@ -147,6 +163,63 @@ export default function AdminProductsPage() {
     return sortDirection === 'asc' ? <span>↑</span> : <span>↓</span>;
   };
 
+  // Drag-and-drop handlers
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    setDragId(id)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (dragOverId !== id) setDragOverId(id)
+  }
+
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault()
+    if (!dragId || dragId === targetId) { setDragOverId(null); return }
+    setDisplayOrder(prev => {
+      const items = [...prev]
+      const from = items.findIndex(p => p.id === dragId)
+      const to = items.findIndex(p => p.id === targetId)
+      if (from === -1 || to === -1) return prev
+      const [moved] = items.splice(from, 1)
+      items.splice(to, 0, moved)
+      return items
+    })
+    setOrderChanged(true)
+    setDragId(null)
+    setDragOverId(null)
+  }
+
+  const handleDragEnd = () => {
+    setDragId(null)
+    setDragOverId(null)
+  }
+
+  const saveOrder = async () => {
+    setSavingOrder(true)
+    try {
+      await Promise.all(
+        displayOrder.map((product, index) => {
+          const supabaseId = (product as any)._supabaseId
+          if (!supabaseId) return Promise.resolve()
+          return fetch('/api/tenant/products', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: supabaseId, sort_order: index }),
+          })
+        })
+      )
+      setOrderChanged(false)
+      toast.success('Display order saved!')
+    } catch {
+      toast.error('Failed to save order')
+    } finally {
+      setSavingOrder(false)
+    }
+  }
+
   const startEdit = (product: EditableProduct) => {
     setEditingProduct(product)
     setIsModalOpen(true)
@@ -156,7 +229,6 @@ export default function AdminProductsPage() {
     const supabaseId = (product as any)._supabaseId
 
     if (supabaseId) {
-      // Product came from Supabase — update directly by UUID
       const res = await fetch('/api/tenant/products', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -165,7 +237,6 @@ export default function AdminProductsPage() {
       const data = await res.json()
       if (!data.success) throw new Error(data.error || 'Save failed')
     } else {
-      // Local/new product — upsert by slug
       const res = await fetch('/api/tenant/products', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -209,11 +280,9 @@ export default function AdminProductsPage() {
             },
           })
         }
-        // Always update localStorage to persist changes across reloads
         updateLocalProduct(product.id, product)
         toast.success('Product saved!')
       } catch (err) {
-        // Medusa failed mid-session — fall through to Supabase
         try {
           await saveToSupabase(product)
           updateLocalProduct(product.id, product)
@@ -224,14 +293,11 @@ export default function AdminProductsPage() {
         }
       }
     } else {
-      // Primary path when Medusa is down: always save to Supabase
       try {
         await saveToSupabase(product)
-        // Always update localStorage to persist changes across reloads
         updateLocalProduct(product.id, product)
         toast.success('Product saved!')
       } catch {
-        // Supabase also unreachable — offline fallback only
         updateLocalProduct(product.id, product)
         toast('Saved offline — will sync when connected', { icon: '⚠️' })
       }
@@ -248,7 +314,6 @@ export default function AdminProductsPage() {
 
   const handleProductCreated = async () => {
     setIsCreateModalOpen(false)
-    // Refresh product list
     if (dataSource === 'supabase') {
       const res = await fetch('/api/tenant/products')
       const data = await res.json()
@@ -282,7 +347,6 @@ export default function AdminProductsPage() {
     setDeleting(true)
     try {
       if (dataSource === 'supabase') {
-        // Use the real Supabase UUID, not the local slug
         const product = supabaseProducts.find(p => p.id === id)
         const supabaseId = (product as any)?._supabaseId || id
         const res = await fetch(`/api/tenant/products?id=${supabaseId}`, { method: 'DELETE' })
@@ -290,7 +354,6 @@ export default function AdminProductsPage() {
         if (!data.success) throw new Error(data.error)
         setSupabaseProducts(prev => prev.filter(p => p.id !== id))
       }
-      // Always update localStorage to persist deletion across reloads
       deleteLocalProduct(id)
       setSelectedIds(prev => { const n = new Set(prev); n.delete(id); return n })
       toast.success('Product deleted')
@@ -307,7 +370,6 @@ export default function AdminProductsPage() {
     setDeleting(true)
     try {
       if (dataSource === 'supabase') {
-        // Map local IDs (slugs) → real Supabase UUIDs before sending
         const supabaseIds = Array.from(selectedIds).map(id => {
           const product = supabaseProducts.find(p => p.id === id)
           return (product as any)?._supabaseId || id
@@ -321,7 +383,6 @@ export default function AdminProductsPage() {
         if (!data.success) throw new Error(data.error)
         setSupabaseProducts(prev => prev.filter(p => !selectedIds.has(p.id)))
       }
-      // Always update localStorage to persist deletion across reloads
       selectedIds.forEach(id => deleteLocalProduct(id))
       toast.success(`${selectedIds.size} product(s) deleted`)
       setSelectedIds(new Set())
@@ -336,7 +397,6 @@ export default function AdminProductsPage() {
     if (!confirm('This will DELETE all products from Supabase and re-sync the canonical 44 products from the catalog. Continue?')) return
     setResetting(true)
     try {
-      // Step 1: Hard-delete all products for this tenant
       const delRes = await fetch('/api/tenant/products', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
@@ -345,7 +405,6 @@ export default function AdminProductsPage() {
       const delData = await delRes.json()
       if (!delData.success) throw new Error(delData.error || 'Purge failed')
 
-      // Step 2: Build canonical product list from constants
       const canonicalProducts = [
         ...DEFAULT_PRODUCTS.jetboards,
         ...DEFAULT_PRODUCTS.limitedEdition,
@@ -360,7 +419,6 @@ export default function AdminProductsPage() {
         ...DEFAULT_PRODUCTS.apparel,
       ].map(p => ({ ...p, inStock: true, stockQuantity: 5 }))
 
-      // Deduplicate
       const seen = new Set<string>()
       const unique = canonicalProducts.filter(p => {
         if (seen.has(p.id)) return false
@@ -368,7 +426,6 @@ export default function AdminProductsPage() {
         return true
       })
 
-      // Step 3: Re-sync canonical products
       const syncRes = await fetch('/api/tenant/products', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -379,7 +436,6 @@ export default function AdminProductsPage() {
 
       toast.success(`Reset complete: ${syncData.synced} canonical products synced to Supabase`)
 
-      // Step 4: Refresh displayed products
       const refreshRes = await fetch('/api/tenant/products')
       const refreshData = await refreshRes.json()
       if (refreshData.products?.length > 0) {
@@ -410,7 +466,7 @@ export default function AdminProductsPage() {
     <AdminLayout title="Products">
       <Toaster position="top-right" />
 
-      {/* Data Source Indicator */}
+      {/* Data Source Indicator + Actions */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2 text-sm">
           {dataSource === 'medusa' && (
@@ -436,6 +492,17 @@ export default function AdminProductsPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {/* Save Order button — only visible when user has dragged something */}
+          {orderChanged && dataSource === 'supabase' && (
+            <button
+              onClick={saveOrder}
+              disabled={savingOrder}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-md shadow-sm"
+            >
+              <Save className="h-3.5 w-3.5" />
+              {savingOrder ? 'Saving...' : 'Save Order'}
+            </button>
+          )}
           {dataSource === 'supabase' && (
             <button
               onClick={handleResetAndResync}
@@ -468,10 +535,18 @@ export default function AdminProductsPage() {
           )}
         </div>
       </div>
-      {/* Loading State */}
+
       {isLoading && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 text-center text-blue-700">
           Loading products from Medusa...
+        </div>
+      )}
+
+      {/* Drag-order hint */}
+      {dataSource === 'supabase' && (
+        <div className="flex items-center gap-2 px-3 py-2 mb-4 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500">
+          <GripVertical className="h-3.5 w-3.5 flex-shrink-0" />
+          Drag rows to reorder how products appear in the shop. Click <strong>Save Order</strong> when done.
         </div>
       )}
 
@@ -514,51 +589,73 @@ export default function AdminProductsPage() {
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-50">
             <tr>
+              {/* Drag handle column — only in Supabase mode */}
+              {useSupabase && (
+                <th className="w-8 px-3 py-3" aria-label="Drag to reorder" />
+              )}
               <th className="px-4 py-3">
                 <input type="checkbox" checked={selectedIds.size === filteredProducts.length && filteredProducts.length > 0} onChange={toggleSelectAll} className="h-4 w-4 text-blue-600 rounded border-gray-300" />
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-              <th 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('name')}
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${!useSupabase ? 'cursor-pointer hover:bg-gray-100' : ''}`}
+                onClick={!useSupabase ? () => handleSort('name') : undefined}
               >
                 <div className="flex items-center gap-2">
-                  Product <SortIcon field="name" />
+                  Product {!useSupabase && <SortIcon field="name" />}
                 </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                onClick={() => handleSort('category')}
-                style={{ cursor: 'pointer' }}
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${!useSupabase ? 'cursor-pointer hover:bg-gray-100' : ''}`}
+                onClick={!useSupabase ? () => handleSort('category') : undefined}
               >
                 <div className="flex items-center gap-2">
-                  Category <SortIcon field="category" />
+                  Category {!useSupabase && <SortIcon field="category" />}
                 </div>
               </th>
-              <th 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('price')}
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${!useSupabase ? 'cursor-pointer hover:bg-gray-100' : ''}`}
+                onClick={!useSupabase ? () => handleSort('price') : undefined}
               >
                 <div className="flex items-center gap-2">
-                  Price (inc VAT) <SortIcon field="price" />
+                  Price (inc VAT) {!useSupabase && <SortIcon field="price" />}
                 </div>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost EUR</th>
-
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {sortedProducts.map((product) => (
-              <tr key={product.id} className={selectedIds.has(product.id) ? 'bg-blue-50' : ''}>
+            {tableProducts.map((product) => (
+              <tr
+                key={product.id}
+                draggable={useSupabase}
+                onDragStart={useSupabase ? (e) => handleDragStart(e, product.id) : undefined}
+                onDragOver={useSupabase ? (e) => handleDragOver(e, product.id) : undefined}
+                onDrop={useSupabase ? (e) => handleDrop(e, product.id) : undefined}
+                onDragEnd={useSupabase ? handleDragEnd : undefined}
+                className={[
+                  selectedIds.has(product.id) ? 'bg-blue-50' : '',
+                  dragOverId === product.id && dragId !== product.id ? 'border-t-2 border-blue-500' : '',
+                  dragId === product.id ? 'opacity-40' : '',
+                  useSupabase ? 'cursor-default' : '',
+                ].filter(Boolean).join(' ')}
+              >
+                {/* Drag handle */}
+                {useSupabase && (
+                  <td className="px-3 py-4 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing select-none">
+                    <GripVertical className="h-4 w-4" />
+                  </td>
+                )}
                 <td className="px-4 py-4">
                   <input type="checkbox" checked={selectedIds.has(product.id)} onChange={() => toggleSelect(product.id)} className="h-4 w-4 text-blue-600 rounded border-gray-300" />
                 </td>
                 <td className="px-6 py-4">
                   {product.image ? (
-                    <img 
-                      src={product.image} 
-                      alt={product.name} 
+                    <img
+                      src={product.image}
+                      alt={product.name}
                       className="w-16 h-16 object-cover rounded border border-gray-200"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64"%3E%3Crect width="64" height="64" fill="%23f3f4f6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="10" fill="%239ca3af"%3ENo Image%3C/text%3E%3C/svg%3E';
@@ -583,7 +680,6 @@ export default function AdminProductsPage() {
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900">R{(product.price || 0).toLocaleString()}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{product.costEUR ? `€${product.costEUR.toLocaleString()}` : 'N/A'}</td>
-
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 text-xs rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {product.stockQuantity}
@@ -633,5 +729,3 @@ export default function AdminProductsPage() {
     </AdminLayout>
   )
 }
-
-

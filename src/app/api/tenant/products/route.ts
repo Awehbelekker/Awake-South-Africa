@@ -96,6 +96,7 @@ export async function GET(request: NextRequest) {
       .select('*')
       .eq('tenant_id', tenantId)
       .eq('is_active', true)
+      .order('sort_order', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: false })
       .limit(limit)
 
@@ -324,6 +325,7 @@ export async function PATCH(request: NextRequest) {
     if (p.whatsIncluded !== undefined)   row.whats_included  = p.whatsIncluded
     if (p.inStock !== undefined)         row.in_stock        = p.inStock
     if (p.stockQuantity !== undefined)   row.stock_quantity  = p.stockQuantity
+    if (p.sort_order !== undefined)      row.sort_order      = p.sort_order
 
     const { data, error } = await getSupabase()
       .from('products')

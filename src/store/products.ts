@@ -52,6 +52,7 @@ export interface EditableProduct {
   whatsIncluded?: string[] // Package contents - what comes in the box
   inStock: boolean
   stockQuantity: number
+  sort_order?: number
 }
 
 interface ProductsStore {
