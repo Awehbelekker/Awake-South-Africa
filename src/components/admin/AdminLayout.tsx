@@ -28,7 +28,8 @@ import {
   MessageSquare,
   Award,
   Truck,
-  ClipboardList
+  ClipboardList,
+  Upload
 } from 'lucide-react'
 
 const bottomNav = [
@@ -54,6 +55,7 @@ const navigation = [
   { name: 'Demo Locations', href: '/admin/locations', icon: MapPin },
   { name: 'Demo Bookings', href: '/admin/bookings', icon: Calendar },
   { name: 'Invoices', href: '/admin/invoices', icon: FileText },
+  { name: 'Uploads', href: '/admin/uploads', icon: Upload },
   { name: 'Media Library', href: '/admin/media', icon: Image },
   { name: 'AI Assistant', href: '/admin/ai', icon: Bot },
   { name: 'Reports', href: '/admin/reports', icon: BarChart3 },
