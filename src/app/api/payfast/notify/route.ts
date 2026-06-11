@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
+import { awardPoints, pointsForOrder } from '@/lib/stoke-points';
 
 function getSupabase() {
   return createClient(
@@ -310,7 +311,33 @@ export async function POST(request: NextRequest) {
       console.log('ℹ️  Invoice already exists for', orderNumber);
     }
 
-    // ── 4. Send order confirmation email ────────────────────────────────────
+    // ── 4. Award Stoke Points ────────────────────────────────────────────────
+    if (tenantId && finalCustomerEmail) {
+      try {
+        const supabaseForStoke = getSupabase()
+        const { data: existing } = await supabaseForStoke
+          .from('stoke_points')
+          .select('id')
+          .eq('tenant_id', tenantId)
+          .eq('customer_email', finalCustomerEmail)
+          .maybeSingle()
+
+        const points = pointsForOrder(amountGross)
+        if (points > 0) {
+          await awardPoints(tenantId, finalCustomerEmail, points, 'purchase', orderId)
+          console.log(`✅ Awarded ${points} Stoke Points to ${finalCustomerEmail}`)
+        }
+        // First purchase bonus
+        if (!existing) {
+          await awardPoints(tenantId, finalCustomerEmail, 50, 'first_purchase', orderId)
+          console.log(`🎉 First purchase bonus: +50 Stoke Points to ${finalCustomerEmail}`)
+        }
+      } catch (err) {
+        console.warn('⚠️  Stoke Points award failed (non-fatal):', err)
+      }
+    }
+
+    // ── 5. Send order confirmation email ────────────────────────────────────
     await sendOrderConfirmationEmail({
       customerEmail: finalCustomerEmail,
       customerName:  finalCustomerName,
