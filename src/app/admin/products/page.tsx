@@ -7,21 +7,26 @@ import { useAdminStore } from '@/store/admin'
 import { useProductsStore, EditableProduct } from '@/store/products'
 import { useAdminProducts, useAdminUpdateProduct, useAdminUpdateVariant } from '@/lib/medusa-hooks'
 import ProductEditModal from '@/components/admin/ProductEditModal'
+import BulkEditModal, { BulkEditUpdates } from '@/components/admin/BulkEditModal'
 import QuickProductCreate from '@/components/admin/QuickProductCreate'
 import toast, { Toaster } from 'react-hot-toast'
-import { RefreshCw, Database, WifiOff, Trash2, Plus, RotateCcw, Layers } from 'lucide-react'
+import { RefreshCw, Database, WifiOff, Trash2, Plus, RotateCcw, Layers, Pencil } from 'lucide-react'
 import Link from 'next/link'
 import { PRODUCTS as DEFAULT_PRODUCTS } from '@/lib/constants'
+import { fulfillmentLabel, getProductInventory } from '@/lib/inventory'
+import { resolveCostEur, resolvePrices, marginOnCost } from '@/lib/product-costs'
 
 function mapSupabaseProduct(p: any): EditableProduct {
+  const id = p.metadata?.localId || p.sku || p.slug
+  const inv = getProductInventory(id)
   return {
     id: p.metadata?.localId || p.id,
-    _supabaseId: p.id,          // always keep the real Supabase UUID for direct UPDATE
+    _supabaseId: p.id,
     _slug: p.slug,
     name: p.name,
     price: p.price || 0,
     priceExVAT: p.price_ex_vat || Math.round((p.price || 0) / 1.15),
-    costEUR: p.cost_eur || 0,
+    costEUR: p.cost_eur ?? resolveCostEur(id) ?? 0,
     category: p.category,
     categoryTag: p.category_tag || p.category,
     description: p.description,
@@ -31,9 +36,11 @@ function mapSupabaseProduct(p: any): EditableProduct {
     skillLevel: p.skill_level,
     specs: p.specs,
     features: p.features,
-    whatsIncluded: p.whats_included,
-    inStock: p.in_stock,
-    stockQuantity: p.stock_quantity,
+    whatsIncluded: p.what_is_included,
+    inStock: p.in_stock ?? inv.inStock,
+    stockQuantity: p.stock_quantity ?? inv.stockQuantity,
+    fulfillment: p.metadata?.fulfillment || inv.fulfillment,
+    demoUnits: p.metadata?.demoUnits ?? inv.demoUnits,
   } as any
 }
 
@@ -47,6 +54,8 @@ export default function AdminProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [isBulkEditOpen, setIsBulkEditOpen] = useState(false)
+  const [bulkSaving, setBulkSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [sortField, setSortField] = useState<'name' | 'price' | 'category'>('name')
@@ -332,6 +341,73 @@ export default function AdminProductsPage() {
     }
   }
 
+  const handleBulkEdit = async (updates: BulkEditUpdates) => {
+    if (selectedIds.size === 0) return
+    setBulkSaving(true)
+    try {
+      const selectedProducts = products.filter((p) => selectedIds.has(p.id))
+      const patchPayload: Record<string, unknown> = { ...updates }
+      if (updates.fulfillment === 'preorder') {
+        patchPayload.leadTimeWeeks = '4–6'
+      }
+
+      if (dataSource === 'supabase') {
+        const supabaseIds = selectedProducts.map(
+          (p) => (p as any)._supabaseId || p.id
+        )
+        const res = await fetch('/api/tenant/products', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bulk: true, ids: supabaseIds, updates: patchPayload }),
+        })
+        const data = await res.json()
+        if (!data.success) throw new Error(data.error || 'Bulk update failed')
+
+        setSupabaseProducts((prev) =>
+          prev.map((p) => {
+            if (!selectedIds.has(p.id)) return p
+            return {
+              ...p,
+              ...(updates.inStock !== undefined && { inStock: updates.inStock }),
+              ...(updates.stockQuantity !== undefined && { stockQuantity: updates.stockQuantity }),
+              ...(updates.price !== undefined && { price: updates.price }),
+              ...(updates.priceExVAT !== undefined && { priceExVAT: updates.priceExVAT }),
+              ...(updates.costEUR !== undefined && { costEUR: updates.costEUR }),
+              ...(updates.categoryTag !== undefined && {
+                categoryTag: updates.categoryTag,
+                category: updates.categoryTag,
+              }),
+              ...(updates.fulfillment !== undefined && { fulfillment: updates.fulfillment }),
+            }
+          })
+        )
+      }
+
+      selectedProducts.forEach((p) => {
+        updateLocalProduct(p.id, {
+          ...(updates.inStock !== undefined && { inStock: updates.inStock }),
+          ...(updates.stockQuantity !== undefined && { stockQuantity: updates.stockQuantity }),
+          ...(updates.price !== undefined && { price: updates.price }),
+          ...(updates.priceExVAT !== undefined && { priceExVAT: updates.priceExVAT }),
+          ...(updates.costEUR !== undefined && { costEUR: updates.costEUR }),
+          ...(updates.categoryTag !== undefined && {
+            categoryTag: updates.categoryTag,
+            category: updates.categoryTag,
+          }),
+          ...(updates.fulfillment !== undefined && { fulfillment: updates.fulfillment }),
+        })
+      })
+
+      toast.success(`Updated ${selectedIds.size} product(s)`)
+      setSelectedIds(new Set())
+    } catch (err: any) {
+      toast.error('Bulk edit failed: ' + err.message)
+      throw err
+    } finally {
+      setBulkSaving(false)
+    }
+  }
+
   const handleResetAndResync = async () => {
     if (!confirm('This will DELETE all products from Supabase and re-sync the canonical 44 products from the catalog. Continue?')) return
     setResetting(true)
@@ -358,7 +434,18 @@ export default function AdminProductsPage() {
         ...DEFAULT_PRODUCTS.electronics,
         ...DEFAULT_PRODUCTS.parts,
         ...DEFAULT_PRODUCTS.apparel,
-      ].map(p => ({ ...p, inStock: true, stockQuantity: 5 }))
+      ].map(p => {
+        const inv = getProductInventory(p.id)
+        const official = resolvePrices(p.id)
+        return {
+          ...p,
+          price: official?.retailIncVatZar ?? p.price,
+          priceExVAT: official?.retailExVatZar ?? p.priceExVAT,
+          costEUR: resolveCostEur(p.id) ?? ('costEUR' in p ? p.costEUR : undefined),
+          inStock: inv.inStock,
+          stockQuantity: inv.stockQuantity,
+        }
+      })
 
       // Deduplicate
       const seen = new Set<string>()
@@ -393,16 +480,18 @@ export default function AdminProductsPage() {
   }
 
   const calculateMargin = (product: any) => {
-    if (!product.costEUR || !product.priceExVAT) return 'N/A'
-    const costZAR = product.costEUR * (settings.exchangeRate || 1)
-    const margin = product.priceExVAT > 0 ? ((product.priceExVAT - costZAR) / product.priceExVAT) * 100 : 0
-    return isNaN(margin) ? 'N/A' : margin.toFixed(2) + '%'
+    const row = resolvePrices(product.id)
+    const landedZar = row?.landedExVatZar ?? (product.costEUR ? product.costEUR * (settings.exchangeRate || 19.85) : 0)
+    if (!landedZar || !product.priceExVAT) return 'N/A'
+    const markup = marginOnCost(landedZar, product.priceExVAT)
+    return isNaN(markup) ? 'N/A' : markup.toFixed(0) + '% on cost'
   }
 
   const calculateProfit = (product: any) => {
-    if (!product.costEUR || !product.priceExVAT) return 'N/A'
-    const costZAR = product.costEUR * (settings.exchangeRate || 1)
-    const profit = product.priceExVAT - costZAR
+    const row = resolvePrices(product.id)
+    const landedZar = row?.landedExVatZar ?? (product.costEUR ? product.costEUR * (settings.exchangeRate || 19.85) : 0)
+    if (!landedZar || !product.priceExVAT) return 'N/A'
+    const profit = product.priceExVAT - landedZar
     return isNaN(profit) ? 'N/A' : 'R' + Math.round(profit).toLocaleString()
   }
 
@@ -495,11 +584,19 @@ export default function AdminProductsPage() {
 
       {/* Bulk Actions Bar */}
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 px-4 py-2 mb-2 bg-red-50 border border-red-200 rounded-lg">
-          <span className="text-sm text-red-700 font-medium">{selectedIds.size} selected</span>
+        <div className="flex flex-wrap items-center gap-3 px-4 py-2 mb-2 bg-blue-50 border border-blue-200 rounded-lg">
+          <span className="text-sm text-blue-800 font-medium">{selectedIds.size} selected</span>
+          <button
+            onClick={() => setIsBulkEditOpen(true)}
+            disabled={bulkSaving || deleting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-md"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            Bulk Edit
+          </button>
           <button
             onClick={handleBulkDelete}
-            disabled={deleting}
+            disabled={deleting || bulkSaving}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-md"
           >
             <Trash2 className="h-3.5 w-3.5" />
@@ -629,6 +726,14 @@ export default function AdminProductsPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={handleProductCreated}
+      />
+
+      <BulkEditModal
+        isOpen={isBulkEditOpen}
+        count={selectedIds.size}
+        categories={categories}
+        onClose={() => setIsBulkEditOpen(false)}
+        onApply={handleBulkEdit}
       />
     </AdminLayout>
   )

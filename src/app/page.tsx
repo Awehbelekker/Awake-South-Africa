@@ -4,9 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { ArrowRight, Zap, Shield, Waves, Battery, Phone, MapPin } from "lucide-react";
-import { AWAKE_IMAGES, PRODUCTS, SA_CONTENT } from "@/lib/constants";
-
-const formatPrice = (p: number) => `R${p.toLocaleString()}`
+import { AWAKE_IMAGES, SA_CONTENT, getCategoryStartingPrice } from "@/lib/constants";
 import { useDemoLocationsStore } from "@/store/demoLocations";
 
 export default function HomePage() {
@@ -110,7 +108,7 @@ export default function HomePage() {
               <div className="absolute bottom-0 left-0 right-0 p-8">
                 <h3 className="text-3xl font-bold text-white mb-1">RÄVIK Jetboards</h3>
                 <p className="text-accent-primary text-sm font-medium mb-1">
-                  From {formatPrice(Math.min(...PRODUCTS.jetboards.map(p => p.price)))}
+                  From {getCategoryStartingPrice('jetboards')}
                 </p>
                 <p className="text-gray-300 mb-4">High-speed rides on the water&apos;s surface</p>
                 <span className="inline-flex items-center text-accent-primary font-semibold gap-2">View Collection <ArrowRight className="w-5 h-5" /></span>
@@ -125,7 +123,7 @@ export default function HomePage() {
               <div className="absolute bottom-0 left-0 right-0 p-8">
                 <h3 className="text-3xl font-bold text-white mb-1">VINGA eFoils</h3>
                 <p className="text-accent-primary text-sm font-medium mb-1">
-                  From {formatPrice(Math.min(...PRODUCTS.efoils.map(p => p.price)))}
+                  From {getCategoryStartingPrice('efoils')}
                 </p>
                 <p className="text-gray-300 mb-4">Lift above the water for a &quot;flying&quot; sensation</p>
                 <span className="inline-flex items-center text-accent-primary font-semibold gap-2">View Collection <ArrowRight className="w-5 h-5" /></span>

@@ -6,6 +6,8 @@
 
 import { supabase, isSupabaseConfigured } from './supabase'
 import type { EditableProduct } from '@/store/products'
+import { resolveCostEur } from './product-costs'
+import { getProductInventory } from './inventory'
 
 // Check if Supabase is available
 export function hasSupabaseProducts(): boolean {
@@ -243,12 +245,17 @@ export async function deleteSupabaseProduct(id: string): Promise<{ success: bool
 
 // Helper function to map Supabase product to EditableProduct format
 function mapSupabaseToProduct(data: any): EditableProduct {
+  const id = data.sku || data.slug
+  const meta = data.metadata || {}
+  const inv = getProductInventory(id)
+  const costEUR = data.cost_eur != null ? parseFloat(data.cost_eur) : resolveCostEur(id)
+
   return {
-    id: data.sku || data.slug,
+    id,
     name: data.name,
     price: parseFloat(data.price),
     priceExVAT: data.price_ex_vat ? parseFloat(data.price_ex_vat) : parseFloat(data.price) / 1.15,
-    costEUR: data.cost_eur ? parseFloat(data.cost_eur) : undefined,
+    costEUR: costEUR ?? undefined,
     category: data.category,
     categoryTag: data.category_tag,
     description: data.description,
@@ -272,7 +279,10 @@ function mapSupabaseToProduct(data: any): EditableProduct {
     specs: data.specs || [],
     features: data.features || [],
     whatsIncluded: data.what_is_included || [],
-    inStock: data.in_stock,
-    stockQuantity: data.stock_quantity || 0,
+    inStock: data.in_stock ?? inv.inStock,
+    stockQuantity: data.stock_quantity ?? inv.stockQuantity,
+    fulfillment: meta.fulfillment || inv.fulfillment,
+    leadTimeWeeks: meta.leadTimeWeeks || inv.leadTimeWeeks,
+    demoUnits: meta.demoUnits ?? inv.demoUnits,
   }
 }

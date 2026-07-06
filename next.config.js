@@ -66,6 +66,15 @@ const nextConfig = {
     }
     return config;
   },
+
+  async redirects() {
+    return [
+      { source: '/products/ravik-s', destination: '/products/ravik-ultimate', permanent: true },
+      { source: '/products/ravik-3', destination: '/products/ravik-explore', permanent: true },
+      { source: '/products/vinga-2', destination: '/products/vinga-carve', permanent: true },
+      { source: '/products/brabus-shadow', destination: '/products/brabus-shadow-explore', permanent: true },
+    ]
+  },
 };
 
 module.exports = nextConfig;

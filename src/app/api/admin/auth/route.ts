@@ -50,10 +50,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, user: { email: email.trim(), name: 'Admin', role: 'super_admin' }, expiresAt: expiresAt.toISOString() })
     }
 
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Admin auth: SUPABASE_SERVICE_ROLE_KEY not configured')
+    }
+
     // Look up user in admin_users table
     const user = await getAdminByEmail(email)
 
     if (!user) {
+      if (!envPassword) {
+        console.error(
+          `Admin auth: no match for ${email.trim()} — set ADMIN_EMAIL/ADMIN_PASSWORD on Vercel or run scripts/create-admin-user.ts`
+        )
+      }
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 

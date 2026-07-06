@@ -1,54 +1,41 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-function sb() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
-
-async function getTenantId(request: NextRequest): Promise<string | null> {
-  const explicit = new URL(request.url).searchParams.get('tenant_id')
-  if (explicit) return explicit
-  const slug = request.headers.get('x-tenant-slug')
-  if (!slug) {
-    const { data } = await sb().from('tenants').select('id').eq('slug', 'awake-sa').single()
-    return data?.id || null
-  }
-  const { data } = await sb().from('tenants').select('id').or(`subdomain.eq.${slug},slug.eq.${slug}`).eq('is_active', true).single()
-  return data?.id || null
-}
+import { getSupabaseAdmin, getTenantIdFromRequest, resolveProductUuid } from '@/lib/tenant-api'
 
 // GET — social proof data for a product
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const tenantId = await getTenantId(request)
+  const tenantId = await getTenantIdFromRequest(request)
   if (!tenantId) return NextResponse.json({ views: 0, recent_purchases: 0, last_purchase_ago: null, low_stock: false })
 
-  const productId = params.id
+  const productId = await resolveProductUuid(tenantId, params.id)
+  if (!productId) {
+    return NextResponse.json({ views: 0, recent_purchases: 0, last_purchase_ago: null, low_stock: false })
+  }
 
-  // Increment view count — read current then write back
+  const supabase = getSupabaseAdmin()
+
   try {
-    const { data: cur } = await sb().from('products').select('view_count').eq('id', productId).single()
-    await sb().from('products').update({ view_count: (cur?.view_count || 0) + 1 }).eq('id', productId)
-  } catch { /* non-critical */ }
+    const { data: cur } = await supabase.from('products').select('view_count').eq('id', productId).single()
+    await supabase.from('products').update({ view_count: (cur?.view_count || 0) + 1 }).eq('id', productId)
+  } catch {
+    // non-critical
+  }
 
-  // Get product view count + stock
-  const { data: product } = await sb()
+  const { data: product } = await supabase
     .from('products')
     .select('view_count, stock_quantity, in_stock')
     .eq('id', productId)
     .single()
 
-  // Recent purchases (last 24h)
   const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-  const { count: recentCount } = await sb()
+  const { count: recentCount } = await supabase
     .from('order_items')
     .select('id', { count: 'exact', head: true })
     .eq('product_id', productId)
     .gte('created_at', yesterday)
 
-  // Last purchase time
-  const { data: lastOrder } = await sb()
+  const { data: lastOrder } = await supabase
     .from('order_items')
     .select('created_at')
     .eq('product_id', productId)
@@ -81,15 +68,21 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 // POST — explicit view increment (called client-side)
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  // Fire-and-forget increment
-  sb()
+  const tenantId = await getTenantIdFromRequest(request)
+  if (!tenantId) return NextResponse.json({ success: true })
+
+  const productId = await resolveProductUuid(tenantId, params.id)
+  if (!productId) return NextResponse.json({ success: true })
+
+  const supabase = getSupabaseAdmin()
+  supabase
     .from('products')
     .select('view_count')
-    .eq('id', params.id)
+    .eq('id', productId)
     .single()
     .then(({ data }) => {
       if (data) {
-        sb().from('products').update({ view_count: (data.view_count || 0) + 1 }).eq('id', params.id).then(() => {})
+        supabase.from('products').update({ view_count: (data.view_count || 0) + 1 }).eq('id', productId).then(() => {})
       }
     })
 

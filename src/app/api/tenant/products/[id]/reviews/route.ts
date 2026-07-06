@@ -1,30 +1,20 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-function sb() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
-
-async function getTenantId(request: NextRequest): Promise<string | null> {
-  const explicit = new URL(request.url).searchParams.get('tenant_id')
-  if (explicit) return explicit
-  const slug = request.headers.get('x-tenant-slug')
-  if (!slug) return null
-  const { data } = await sb().from('tenants').select('id').or(`subdomain.eq.${slug},slug.eq.${slug}`).eq('is_active', true).single()
-  return data?.id || null
-}
+import { getSupabaseAdmin, getTenantIdFromRequest, resolveProductUuid } from '@/lib/tenant-api'
 
 // GET — approved reviews for a product
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const tenantId = await getTenantId(request)
+  const tenantId = await getTenantIdFromRequest(request)
   if (!tenantId) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
 
-  const { data, error } = await sb()
+  const productId = await resolveProductUuid(tenantId, params.id)
+  if (!productId) return NextResponse.json({ reviews: [], average: 0, count: 0 })
+
+  const { data, error } = await getSupabaseAdmin()
     .from('reviews')
     .select('id, customer_name, rating, body, created_at')
-    .eq('product_id', params.id)
+    .eq('product_id', productId)
     .eq('tenant_id', tenantId)
     .eq('approved', true)
     .order('created_at', { ascending: false })
@@ -33,7 +23,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
   const reviews = data || []
   const avg = reviews.length > 0
-    ? reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length
+    ? reviews.reduce((s: number, r: { rating: number }) => s + r.rating, 0) / reviews.length
     : 0
 
   return NextResponse.json({ reviews, average: Math.round(avg * 10) / 10, count: reviews.length })
@@ -41,8 +31,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 // POST — submit a new review (pending approval)
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const tenantId = await getTenantId(request)
+  const tenantId = await getTenantIdFromRequest(request)
   if (!tenantId) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
+
+  const productId = await resolveProductUuid(tenantId, params.id)
+  if (!productId) return NextResponse.json({ error: 'Product not found' }, { status: 404 })
 
   const body = await request.json()
   if (!body.customer_email || !body.customer_name || !body.rating) {
@@ -52,11 +45,11 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return NextResponse.json({ error: 'Rating must be 1–5' }, { status: 400 })
   }
 
-  const { error } = await sb()
+  const { error } = await getSupabaseAdmin()
     .from('reviews')
     .insert({
       tenant_id: tenantId,
-      product_id: params.id,
+      product_id: productId,
       customer_email: body.customer_email,
       customer_name: body.customer_name,
       rating: body.rating,

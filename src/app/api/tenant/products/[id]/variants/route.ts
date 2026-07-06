@@ -1,30 +1,20 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-function sb() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
-
-async function getTenantId(request: NextRequest): Promise<string | null> {
-  const explicit = new URL(request.url).searchParams.get('tenant_id')
-  if (explicit) return explicit
-  const slug = request.headers.get('x-tenant-slug')
-  if (!slug) return null
-  const { data } = await sb().from('tenants').select('id').or(`subdomain.eq.${slug},slug.eq.${slug}`).eq('is_active', true).single()
-  return data?.id || null
-}
+import { getSupabaseAdmin, getTenantIdFromRequest, resolveProductUuid } from '@/lib/tenant-api'
 
 // GET /api/tenant/products/[id]/variants
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const tenantId = await getTenantId(request)
+  const tenantId = await getTenantIdFromRequest(request)
   if (!tenantId) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
 
-  const { data, error } = await sb()
+  const productId = await resolveProductUuid(tenantId, params.id)
+  if (!productId) return NextResponse.json({ variants: [] })
+
+  const { data, error } = await getSupabaseAdmin()
     .from('product_variants')
     .select('*')
-    .eq('product_id', params.id)
+    .eq('product_id', productId)
     .eq('tenant_id', tenantId)
     .eq('is_active', true)
     .order('created_at')
@@ -35,14 +25,17 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 // POST /api/tenant/products/[id]/variants
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const tenantId = await getTenantId(request)
+  const tenantId = await getTenantIdFromRequest(request)
   if (!tenantId) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
 
+  const productId = await resolveProductUuid(tenantId, params.id)
+  if (!productId) return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+
   const body = await request.json()
-  const { data, error } = await sb()
+  const { data, error } = await getSupabaseAdmin()
     .from('product_variants')
     .insert({
-      product_id: params.id,
+      product_id: productId,
       tenant_id: tenantId,
       name: body.name,
       options: body.options || {},
@@ -59,14 +52,14 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
 // PATCH /api/tenant/products/[id]/variants?variant_id=xxx
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-  const tenantId = await getTenantId(request)
+  const tenantId = await getTenantIdFromRequest(request)
   if (!tenantId) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
 
   const variantId = new URL(request.url).searchParams.get('variant_id')
   if (!variantId) return NextResponse.json({ error: 'Missing variant_id' }, { status: 400 })
 
   const body = await request.json()
-  const row: Record<string, any> = {}
+  const row: Record<string, unknown> = {}
   if (body.name !== undefined) row.name = body.name
   if (body.options !== undefined) row.options = body.options
   if (body.sku !== undefined) row.sku = body.sku
@@ -74,7 +67,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   if (body.stock_count !== undefined) row.stock_count = body.stock_count
   if (body.is_active !== undefined) row.is_active = body.is_active
 
-  const { data, error } = await sb()
+  const { data, error } = await getSupabaseAdmin()
     .from('product_variants')
     .update(row)
     .eq('id', variantId)
@@ -88,13 +81,13 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
 // DELETE /api/tenant/products/[id]/variants?variant_id=xxx
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  const tenantId = await getTenantId(request)
+  const tenantId = await getTenantIdFromRequest(request)
   if (!tenantId) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
 
   const variantId = new URL(request.url).searchParams.get('variant_id')
   if (!variantId) return NextResponse.json({ error: 'Missing variant_id' }, { status: 400 })
 
-  const { error } = await sb()
+  const { error } = await getSupabaseAdmin()
     .from('product_variants')
     .update({ is_active: false })
     .eq('id', variantId)

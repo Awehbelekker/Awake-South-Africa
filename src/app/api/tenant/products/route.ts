@@ -8,55 +8,64 @@ export const dynamic = 'force-dynamic'
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin, getTenantIdFromRequest } from '@/lib/tenant-api'
+import { getProductInventory } from '@/lib/inventory'
+import { resolveCostEur, resolvePrices } from '@/lib/product-costs'
 
-function getSupabase(): any {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+function getSupabase() {
+  return getSupabaseAdmin()
 }
 
 async function getTenantId(request: NextRequest): Promise<string | null> {
-  const tenantSlug = request.headers.get('x-tenant-slug')
-  const customDomain = request.headers.get('x-custom-domain')
-  const isCustomDomain = request.headers.get('x-is-custom-domain') === 'true'
-  // Allow explicit tenant_id as query param for admin operations
-  const explicitTenantId = new URL(request.url).searchParams.get('tenant_id')
+  return getTenantIdFromRequest(request)
+}
 
-  if (explicitTenantId) return explicitTenantId
+function normalizeImages(images: unknown): string[] {
+  if (!Array.isArray(images)) return []
+  return images
+    .map((img) => (typeof img === 'string' ? img : (img as { url?: string })?.url))
+    .filter((url): url is string => Boolean(url))
+}
 
-  let tenant = null
+function toProductRow(tenantId: string, p: Record<string, any>) {
+  const slug = p.id || p.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  const inv = getProductInventory(slug)
+  const official = resolvePrices(slug)
+  const costEur = resolveCostEur(slug) ?? (p.costEUR ? Number(p.costEUR) : null)
+  const price = official?.retailIncVatZar ?? (Number(p.price) || 0)
+  const priceExVat = official?.retailExVatZar ?? (Number(p.priceExVAT) || Math.round(price / 1.15))
 
-  if (isCustomDomain && customDomain) {
-    const { data } = await getSupabase()
-      .from('tenants')
-      .select('id')
-      .eq('domain', customDomain)
-      .eq('is_active', true)
-      .single()
-    tenant = data
-  } else if (tenantSlug) {
-    const { data } = await getSupabase()
-      .from('tenants')
-      .select('id')
-      .or(`subdomain.eq.${tenantSlug},slug.eq.${tenantSlug}`)
-      .eq('is_active', true)
-      .single()
-    tenant = data
+  return {
+    tenant_id: tenantId,
+    name: p.name,
+    slug,
+    sku: p.id || slug,
+    description: p.description || '',
+    price,
+    price_ex_vat: priceExVat,
+    cost_eur: costEur,
+    category: p.categoryTag || p.category || 'uncategorised',
+    category_tag: p.categoryTag || null,
+    image: p.image || null,
+    images: normalizeImages(p.images),
+    badge: p.badge ?? inv.badge ?? null,
+    battery: p.battery || null,
+    skill_level: p.skillLevel || null,
+    specs: p.specs || [],
+    features: p.features || [],
+    what_is_included: p.whatsIncluded || [],
+    in_stock: p.inStock ?? inv.inStock,
+    stock_quantity: p.stockQuantity != null ? Number(p.stockQuantity) : inv.stockQuantity,
+    is_active: true,
+    is_featured: Boolean(p.badge || inv.badge),
+    metadata: {
+      localId: p.id,
+      fulfillment: inv.fulfillment,
+      leadTimeWeeks: inv.leadTimeWeeks,
+      demoUnits: inv.demoUnits,
+      landedExVatZar: official?.landedExVatZar,
+    },
   }
-
-  // Fallback to default Awake SA tenant
-  if (!tenant) {
-    const { data } = await getSupabase()
-      .from('tenants')
-      .select('id')
-      .eq('slug', 'awake-sa')
-      .single()
-    tenant = data
-  }
-
-  return tenant?.id || null
 }
 
 export async function GET(request: NextRequest) {
@@ -186,32 +195,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'No products provided' }, { status: 400 })
     }
 
-    const rows = products.map((p: any) => ({
-      tenant_id: tenantId,
-      name: p.name,
-      slug: p.id || p.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      description: p.description || '',
-      price: p.price || 0,
-      price_ex_vat: p.priceExVAT || Math.round((p.price || 0) / 1.15),
-      cost_eur: p.costEUR || null,
-      category: p.categoryTag || p.category || 'uncategorised',
-      category_tag: p.categoryTag || null,
-      image: p.image || null,
-      images: p.images || [],
-      badge: p.badge || null,
-      battery: p.battery || null,
-      skill_level: p.skillLevel || null,
-      specs: p.specs || [],
-      features: p.features || [],
-      whats_included: p.whatsIncluded || [],
-      in_stock: p.inStock ?? true,
-      stock_quantity: p.stockQuantity || 0,
-      is_active: true,
-      is_featured: false,
-      metadata: {
-        localId: p.id,
-      },
-    }))
+    const rows = products.map((p: any) => toProductRow(tenantId, p))
 
     const { data, error } = await getSupabase()
       .from('products')
@@ -291,7 +275,7 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// PATCH /api/tenant/products - Update single product by Supabase UUID
+// PATCH /api/tenant/products - Update single product or bulk update
 export async function PATCH(request: NextRequest) {
   try {
     const tenantId = await getTenantId(request)
@@ -300,30 +284,57 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
+
+    // Bulk update: { bulk: true, ids: [...], updates: { inStock?, ... } }
+    if (body.bulk === true && Array.isArray(body.ids) && body.ids.length > 0) {
+      const baseRow = buildPatchRow(body.updates || {})
+      if (Object.keys(baseRow).length === 0) {
+        return NextResponse.json({ error: 'No updates provided' }, { status: 400 })
+      }
+
+      let updated = 0
+      for (const productId of body.ids) {
+        const row = { ...baseRow }
+        if (row.metadata) {
+          const { data: existing } = await getSupabase()
+            .from('products')
+            .select('metadata')
+            .eq('id', productId)
+            .eq('tenant_id', tenantId)
+            .single()
+          row.metadata = { ...(existing?.metadata || {}), ...row.metadata }
+        }
+        const { error } = await getSupabase()
+          .from('products')
+          .update(row)
+          .eq('id', productId)
+          .eq('tenant_id', tenantId)
+        if (!error) updated++
+      }
+
+      return NextResponse.json({ success: true, updated })
+    }
+
     const { id, ...p } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Missing id' }, { status: 400 })
     }
 
-    const row: Record<string, any> = {}
-    if (p.name !== undefined)          row.name          = p.name
-    if (p.description !== undefined)   row.description   = p.description || ''
-    if (p.price !== undefined)         row.price         = p.price
-    if (p.priceExVAT !== undefined)    row.price_ex_vat  = p.priceExVAT
-    if (p.costEUR !== undefined)       row.cost_eur      = p.costEUR
-    if (p.category !== undefined)      row.category      = p.categoryTag || p.category
-    if (p.categoryTag !== undefined)   row.category_tag  = p.categoryTag
-    if (p.image !== undefined)         row.image         = p.image
-    if (p.images !== undefined)        row.images        = p.images
-    if (p.badge !== undefined)         row.badge         = p.badge
-    if (p.battery !== undefined)       row.battery       = p.battery
-    if (p.skillLevel !== undefined)    row.skill_level   = p.skillLevel
-    if (p.specs !== undefined)           row.specs           = p.specs
-    if (p.features !== undefined)        row.features        = p.features
-    if (p.whatsIncluded !== undefined)   row.whats_included  = p.whatsIncluded
-    if (p.inStock !== undefined)         row.in_stock        = p.inStock
-    if (p.stockQuantity !== undefined)   row.stock_quantity  = p.stockQuantity
+    const row = buildPatchRow(p)
+    if (Object.keys(row).length === 0) {
+      return NextResponse.json({ error: 'No updates provided' }, { status: 400 })
+    }
+
+    if (row.metadata) {
+      const { data: existing } = await getSupabase()
+        .from('products')
+        .select('metadata')
+        .eq('id', id)
+        .eq('tenant_id', tenantId)
+        .single()
+      row.metadata = { ...(existing?.metadata || {}), ...row.metadata }
+    }
 
     const { data, error } = await getSupabase()
       .from('products')
@@ -343,5 +354,31 @@ export async function PATCH(request: NextRequest) {
     console.error('Products PATCH error:', error?.message)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
+}
+
+function buildPatchRow(p: Record<string, any>): Record<string, any> {
+  const row: Record<string, any> = {}
+  if (p.name !== undefined) row.name = p.name
+  if (p.description !== undefined) row.description = p.description || ''
+  if (p.price !== undefined) row.price = p.price
+  if (p.priceExVAT !== undefined) row.price_ex_vat = p.priceExVAT
+  if (p.costEUR !== undefined) row.cost_eur = p.costEUR
+  if (p.category !== undefined) row.category = p.categoryTag || p.category
+  if (p.categoryTag !== undefined) {
+    row.category_tag = p.categoryTag
+    row.category = p.categoryTag
+  }
+  if (p.image !== undefined) row.image = p.image
+  if (p.images !== undefined) row.images = normalizeImages(p.images)
+  if (p.inStock !== undefined) row.in_stock = p.inStock
+  if (p.stockQuantity !== undefined) row.stock_quantity = p.stockQuantity
+  if (p.fulfillment !== undefined || p.leadTimeWeeks !== undefined || p.demoUnits !== undefined) {
+    row.metadata = {
+      ...(p.fulfillment !== undefined && { fulfillment: p.fulfillment }),
+      ...(p.leadTimeWeeks !== undefined && { leadTimeWeeks: p.leadTimeWeeks }),
+      ...(p.demoUnits !== undefined && { demoUnits: p.demoUnits }),
+    }
+  }
+  return row
 }
 

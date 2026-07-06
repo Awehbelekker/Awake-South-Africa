@@ -2,6 +2,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { PRODUCTS as DEFAULT_PRODUCTS } from '@/lib/constants'
+import { getProductInventory } from '@/lib/inventory'
+import { resolveCostEur, resolvePrices } from '@/lib/product-costs'
 
 export interface MediaFile {
   id: string
@@ -52,6 +54,9 @@ export interface EditableProduct {
   whatsIncluded?: string[] // Package contents - what comes in the box
   inStock: boolean
   stockQuantity: number
+  fulfillment?: 'in_stock' | 'preorder'
+  leadTimeWeeks?: string
+  demoUnits?: number
 }
 
 interface ProductsStore {
@@ -92,11 +97,23 @@ const flattenProducts = (): EditableProduct[] => {
     ...DEFAULT_PRODUCTS.electronics,
     ...DEFAULT_PRODUCTS.parts,
     ...DEFAULT_PRODUCTS.apparel,
-  ].map(p => ({
-    ...p,
-    inStock: true,
-    stockQuantity: 5,
-  }))
+  ].map(p => {
+    const inv = getProductInventory(p.id)
+    const official = resolvePrices(p.id)
+    const costEUR = resolveCostEur(p.id) ?? p.costEUR
+    return {
+      ...p,
+      price: official?.retailIncVatZar ?? p.price,
+      priceExVAT: official?.retailExVatZar ?? p.priceExVAT,
+      costEUR,
+      inStock: inv.inStock,
+      stockQuantity: inv.stockQuantity,
+      fulfillment: inv.fulfillment,
+      leadTimeWeeks: inv.leadTimeWeeks,
+      demoUnits: inv.demoUnits,
+      badge: inv.badge ?? p.badge,
+    }
+  })
   return deduplicateById(allProducts)
 }
 
